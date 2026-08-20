@@ -1,4 +1,4 @@
-import { useEffect, useState, FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { fetchApi } from '../api/client';
 
 export default function AdminVenues() {
