@@ -53,25 +53,33 @@ function App() {
           </div>
         </nav>
 
-        {/* Main Content — no padding here; each page manages its own bleed */}
-        <main className="flex-grow px-4 md:px-8 pt-6 pb-12">
+        {/* Main Content */}
+        <main className="flex-grow overflow-hidden">
           <Routes>
             <Route path="/" element={<Navigate to="/events" />} />
+            {/* Auth pages — full viewport, no padding */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/events" element={<Events />} />
-            <Route path="/events/:eventId/shows/:showId/map" element={
-              <ProtectedRoute allowedRoles={['customer']}><SeatMap /></ProtectedRoute>
-            } />
-            <Route path="/bookings" element={
-              <ProtectedRoute allowedRoles={['customer']}><Bookings /></ProtectedRoute>
-            } />
-            <Route path="/waitlist/offer/:token" element={<WaitlistOffer />} />
-            <Route path="/organiser/dashboard" element={
-              <ProtectedRoute allowedRoles={['organiser']}><OrganiserDashboard /></ProtectedRoute>
-            } />
-            <Route path="/admin/venues" element={
-              <ProtectedRoute allowedRoles={['admin']}><AdminVenues /></ProtectedRoute>
+            {/* App pages — padded container */}
+            <Route path="/*" element={
+              <div className="px-4 md:px-8 pt-6 pb-12">
+                <Routes>
+                  <Route path="/events" element={<Events />} />
+                  <Route path="/events/:eventId/shows/:showId/map" element={
+                    <ProtectedRoute allowedRoles={['customer']}><SeatMap /></ProtectedRoute>
+                  } />
+                  <Route path="/bookings" element={
+                    <ProtectedRoute allowedRoles={['customer']}><Bookings /></ProtectedRoute>
+                  } />
+                  <Route path="/waitlist/offer/:token" element={<WaitlistOffer />} />
+                  <Route path="/organiser/dashboard" element={
+                    <ProtectedRoute allowedRoles={['organiser']}><OrganiserDashboard /></ProtectedRoute>
+                  } />
+                  <Route path="/admin/venues" element={
+                    <ProtectedRoute allowedRoles={['admin']}><AdminVenues /></ProtectedRoute>
+                  } />
+                </Routes>
+              </div>
             } />
           </Routes>
         </main>
