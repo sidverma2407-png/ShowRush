@@ -7,12 +7,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        'seatzy-black': '#000000',
-        'seatzy-white': '#FFFFFF',
-        'seatzy-acid-yellow': '#F2FF00',
-        'seatzy-magenta': '#FF00E5',
-        'seatzy-cyan': '#00F0FF',
-        'seatzy-gray-grid': '#E5E5E5',
+        'seatzy-black':      '#1C1C1C',   // soft charcoal, not pure black
+        'seatzy-white':      '#F7F3EE',   // warm parchment
+        'seatzy-acid-yellow':'#D4A843',   // honey amber  (was neon yellow)
+        'seatzy-magenta':    '#B85C7A',   // dusty rose   (was neon magenta)
+        'seatzy-cyan':       '#4FADA6',   // sage teal    (was neon cyan)
+        'seatzy-gray-grid':  '#E8E3DC',   // warm light gray
       },
       fontFamily: {
         sans: ['Space Grotesk', 'Archivo Black', 'ui-sans-serif', 'system-ui'],
