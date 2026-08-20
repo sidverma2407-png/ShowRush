@@ -6,6 +6,8 @@ import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 import path from 'path';
 import authRoutes from './routes/auth.routes';
+import adminRoutes from './routes/admin.routes';
+import organiserRoutes from './routes/organiser.routes';
 import { errorHandler } from './middleware/errorHandler';
 
 // Load environment variables from the root .env file
@@ -28,6 +30,8 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api', adminRoutes); // admin endpoints are defined directly e.g. /venues
+app.use('/api', organiserRoutes); // organiser endpoints e.g. /events
 
 // Basic health check
 app.get('/api/health', (req, res) => {
