@@ -10,11 +10,16 @@ export default function Register() {
   const [role, setRole] = useState('customer');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [agreed, setAgreed] = useState(false);
   const login = useAuthStore(state => state.login);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!agreed) {
+      setError('You must agree to the Terms.');
+      return;
+    }
     setError('');
     setLoading(true);
     try {
@@ -32,143 +37,140 @@ export default function Register() {
   };
 
   return (
-    <div className="fixed inset-0 top-[57px] flex flex-col md:flex-row overflow-hidden">
-
-      {/* ── LEFT PANEL: black brand block ── */}
-      <div className="relative bg-seatzy-black flex flex-col justify-between p-10 md:p-14 w-full md:w-1/2 shrink-0 overflow-hidden border-r-4 border-seatzy-black">
-
-        {/* Grid overlay — visible on black */}
-        <div className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage: 'linear-gradient(to right,rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,0.04) 1px,transparent 1px)',
-            backgroundSize: '70px 70px'
-          }}
-        />
-
-        {/* wordmark */}
-        <div className="relative z-10">
-          <h1 className="text-[clamp(4rem,10vw,8rem)] font-black uppercase tracking-tighter leading-none text-seatzy-acid-yellow"
-            style={{ textShadow: '6px 6px 0 #F2FF00' }}>
-            SEAT<br />ZY
-          </h1>
-          <p className="font-mono text-xs font-bold uppercase tracking-widest mt-4 text-seatzy-white opacity-50">
-            // Your ticket. Your seat. Now.
-          </p>
+    <div className="h-screen w-screen overflow-hidden flex flex-col md:flex-row">
+      {/* Left Side: Image/Branding */}
+      <div className="hidden md:flex w-1/2 h-full neo-brutalism-border border-r-0 border-y-0 border-l-0 border-r-border-width relative overflow-hidden bg-primary-fixed">
+        <div className="absolute inset-0 blueprint-bg opacity-50 mix-blend-multiply"></div>
+        <div className="absolute inset-0 p-margin-desktop flex flex-col justify-between z-10">
+          <div>
+            <h1 className="font-display-xl text-display-xl text-on-background uppercase leading-none mix-blend-exclusion" style={{ color: '#1b1b1b', textShadow: '2px 2px 0px #fff' }}>
+              SEATZY<br />JOIN<br />THE<br />RIOT
+            </h1>
+          </div>
+          <div className="w-full neo-brutalism-border bg-on-background p-4 neo-brutalism-shadow rotate-[-2deg]">
+            <p className="font-data-label text-data-label text-primary-fixed uppercase tracking-widest text-center">
+              TICKET_ID: REG-001 // ACCESS GRANTED
+            </p>
+          </div>
         </div>
-
-        {/* feature pills */}
-        <div className="relative z-10 flex flex-col gap-3 mt-auto">
-          {[
-            { color: 'bg-seatzy-acid-yellow text-seatzy-black', text: '⚡ Real-time seat map' },
-            { color: 'bg-seatzy-magenta text-seatzy-white', text: '🔒 Secure hold system' },
-            { color: 'bg-seatzy-cyan text-seatzy-black', text: '📧 Instant QR tickets' },
-          ].map(p => (
-            <div key={p.text} className={`${p.color} border-2 border-seatzy-white font-mono text-xs font-bold px-3 py-2 shadow-neo-sm inline-block self-start`}>
-              {p.text}
-            </div>
-          ))}
+        
+        {/* Brutalist Abstract Background Shapes */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 mix-blend-luminosity opacity-40">
+          <div className="absolute -top-[20%] -left-[20%] w-[80%] aspect-square rounded-full border-[40px] border-on-background" />
+          <div className="absolute top-[40%] -right-[10%] w-[60%] h-[120%] bg-on-background transform rotate-12" />
+          <div className="absolute bottom-[10%] left-[20%] w-[40%] aspect-square bg-transparent border-[20px] border-on-background border-dashed transform -rotate-12" />
         </div>
-
-        {/* big decorative number */}
-        <span className="absolute bottom-6 right-8 text-[12rem] font-black text-seatzy-white opacity-5 leading-none select-none">02</span>
       </div>
 
-      {/* ── RIGHT PANEL: form ── */}
-      <div className="flex-grow bg-seatzy-white flex items-center justify-center p-8 overflow-y-auto">
-        <div className="w-full max-w-md">
-
-          {/* Page header band */}
-          <div className="bg-seatzy-magenta text-seatzy-white border-4 border-seatzy-black shadow-neo-xl mb-8 px-6 py-4 flex items-center justify-between">
-            <h2 className="text-4xl font-black uppercase tracking-tighter">Register</h2>
-            <span className="font-mono text-seatzy-acid-yellow text-xs tracking-widest">→ step 1/1</span>
+      {/* Right Side: Form */}
+      <div className="w-full md:w-1/2 h-full flex flex-col bg-surface overflow-y-auto blueprint-bg relative">
+        <div className="w-full max-w-lg mx-auto my-auto p-margin-mobile md:p-margin-desktop flex flex-col gap-gutter">
+          <div className="mb-4">
+            <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg uppercase font-black tracking-tighter">Register</h2>
+            <p className="font-body-md text-on-surface-variant mt-2 font-bold uppercase">Claim your access</p>
           </div>
 
           {error && (
-            <div className="bg-seatzy-magenta text-seatzy-white border-4 border-seatzy-black shadow-neo px-4 py-3 mb-6 font-mono text-sm font-bold">
+            <div className="bg-error text-on-error neo-brutalism-border px-4 py-3 font-data-label text-data-label">
               ⚠ {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1">
-              <label className="font-black text-xs uppercase tracking-widest">Name</label>
+            {/* Role Toggle (Segmented Control) */}
+            <div className="w-full flex neo-brutalism-border bg-surface-variant p-1">
+              <label className="flex-1 cursor-pointer">
+                <input
+                  type="radio"
+                  name="role"
+                  value="customer"
+                  checked={role === 'customer'}
+                  onChange={() => setRole('customer')}
+                  className="peer sr-only"
+                />
+                <div className="w-full py-3 text-center font-data-label text-data-label uppercase font-black transition-all peer-checked:bg-primary-fixed peer-checked:text-on-background peer-checked:neo-brutalism-border text-on-surface-variant border-transparent border-4 hover:bg-surface-dim">
+                  Customer
+                </div>
+              </label>
+              <label className="flex-1 cursor-pointer">
+                <input
+                  type="radio"
+                  name="role"
+                  value="organiser"
+                  checked={role === 'organiser'}
+                  onChange={() => setRole('organiser')}
+                  className="peer sr-only"
+                />
+                <div className="w-full py-3 text-center font-data-label text-data-label uppercase font-black transition-all peer-checked:bg-primary-fixed peer-checked:text-on-background peer-checked:neo-brutalism-border text-on-surface-variant border-transparent border-4 hover:bg-surface-dim">
+                  Organiser
+                </div>
+              </label>
+            </div>
+
+            {/* Inputs */}
+            <div className="flex flex-col gap-2">
+              <label htmlFor="name" className="font-data-label text-data-label uppercase">Full Name</label>
               <input
-                id="register-name"
+                id="name"
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
-                className="neo-input w-full text-base"
-                placeholder="Your full name"
+                placeholder="JOHN_DOE"
+                className="w-full neo-brutalism-border p-4 bg-on-tertiary text-on-surface font-data-label focus:outline-none focus:ring-0 focus:border-on-background neo-brutalism-shadow-hover transition-all placeholder:text-surface-dim"
                 required
               />
             </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="font-black text-xs uppercase tracking-widest">Email</label>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="email" className="font-data-label text-data-label uppercase">Email Address</label>
               <input
-                id="register-email"
+                id="email"
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="neo-input w-full text-base"
-                placeholder="you@example.com"
+                placeholder="USER@DOMAIN.COM"
+                className="w-full neo-brutalism-border p-4 bg-on-tertiary text-on-surface font-data-label focus:outline-none focus:ring-0 focus:border-on-background neo-brutalism-shadow-hover transition-all placeholder:text-surface-dim"
                 required
               />
             </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="font-black text-xs uppercase tracking-widest">Password</label>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="password" className="font-data-label text-data-label uppercase">Password</label>
               <input
-                id="register-password"
+                id="password"
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                className="neo-input w-full text-base"
-                placeholder="Min 8 characters"
+                placeholder="••••••••"
+                className="w-full neo-brutalism-border p-4 bg-on-tertiary text-on-surface font-data-label focus:outline-none focus:ring-0 focus:border-on-background neo-brutalism-shadow-hover transition-all placeholder:text-surface-dim"
                 required
               />
             </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="font-black text-xs uppercase tracking-widest">I am a…</label>
-              {/* Role selector as styled segmented buttons */}
-              <div className="flex border-4 border-seatzy-black shadow-neo overflow-hidden">
-                {(['customer', 'organiser'] as const).map(r => (
-                  <button
-                    key={r}
-                    type="button"
-                    onClick={() => setRole(r)}
-                    className={`flex-1 py-3 font-black uppercase text-sm tracking-tight border-r-2 border-seatzy-black last:border-r-0 transition-colors
-                      ${role === r
-                        ? 'bg-seatzy-acid-yellow text-seatzy-black'
-                        : 'bg-seatzy-white text-seatzy-black hover:bg-seatzy-gray-grid'
-                      }`}
-                  >
-                    {r}
-                  </button>
-                ))}
-              </div>
+            <div className="flex items-center gap-3 mt-2">
+              <input
+                id="terms"
+                type="checkbox"
+                checked={agreed}
+                onChange={e => setAgreed(e.target.checked)}
+                className="appearance-none w-6 h-6 neo-brutalism-border bg-on-tertiary checked:bg-primary-fixed checked:after:content-['✓'] checked:after:text-on-background checked:after:font-bold checked:after:flex checked:after:justify-center checked:after:items-center cursor-pointer"
+              />
+              <label htmlFor="terms" className="font-data-label text-data-label uppercase cursor-pointer">
+                I agree to the <Link to="#" className="underline decoration-2 underline-offset-4 hover:text-primary transition-colors">Terms</Link>
+              </label>
             </div>
 
+            {/* Submit Action */}
             <button
-              id="register-submit"
               type="submit"
               disabled={loading}
-              className="neo-btn-hero bg-seatzy-acid-yellow text-seatzy-black py-5 text-2xl w-full mt-2 disabled:opacity-50"
+              className="w-full mt-6 bg-primary-fixed text-on-background font-headline-lg-mobile text-headline-lg-mobile py-4 uppercase neo-brutalism-border neo-brutalism-shadow neo-brutalism-shadow-hover neo-brutalism-shadow-active transition-all cursor-pointer disabled:opacity-50"
             >
-              {loading ? 'Creating...' : 'Create Account →'}
+              {loading ? 'Creating...' : 'Create Account'}
             </button>
           </form>
 
-          {/* Switch link */}
-          <div className="mt-8 border-t-4 border-seatzy-black pt-6 flex items-center justify-between">
-            <p className="font-mono text-sm">Already have an account?</p>
-            <Link
-              to="/login"
-              className="neo-btn bg-seatzy-cyan text-seatzy-black px-5 py-2 text-sm shadow-neo"
-            >
-              Sign In →
-            </Link>
+          <div className="mt-8 text-center border-t-4 border-on-background pt-6">
+            <p className="font-data-label text-data-label uppercase">
+              Already registered? <Link to="/login" className="text-on-background font-black underline decoration-4 underline-offset-4 hover:bg-primary-fixed transition-colors p-1">Log in here</Link>
+            </p>
           </div>
         </div>
       </div>

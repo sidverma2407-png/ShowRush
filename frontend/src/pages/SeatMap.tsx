@@ -7,15 +7,26 @@ import { useAuthStore } from '../store/auth';
 export default function SeatMap() {
   const { showId } = useParams();
   const [seats, setSeats] = useState<any[]>([]);
-  const [selectedSeat, setSelectedSeat] = useState<any | null>(null);
+  const [pricing, setPricing] = useState<any[]>([]);
+  const [selectedSeats, setSelectedSeats] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [holding, setHolding] = useState(false);
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  
+  // Customer details for checkout
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+
   const user = useAuthStore(state => state.user);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchApi(`/shows/${showId}/seats`)
-      .then(res => setSeats(res.data))
+      .then(res => {
+        setSeats(res.data.seats || []);
+        setPricing(res.data.pricing || []);
+      })
       .catch(err => console.error('Failed to fetch seats:', err))
       .finally(() => setLoading(false));
 
@@ -23,58 +34,124 @@ export default function SeatMap() {
     newSocket.emit('join_room', showId);
     newSocket.on('seat_status_updated', (updatedSeat: any) => {
       setSeats(prev => prev.map(s => s.id === updatedSeat.id ? updatedSeat : s));
-      setSelectedSeat((prev: any) => prev?.id === updatedSeat.id ? updatedSeat : prev);
+      setSelectedSeats(prev => {
+        // If an externally updated seat is in our selection and it became unavailable/booked by someone else, we might want to remove it
+        // Or if we held it successfully, we want to reflect the updated state (hold_expires_at)
+        return prev.map(s => s.id === updatedSeat.id ? updatedSeat : s);
+      });
     });
     return () => { newSocket.disconnect(); };
   }, [showId]);
 
+  // Timer logic
+  useEffect(() => {
+    const myHolds = seats.filter(s => s.status === 'held' && s.held_by === user?.id && s.hold_expires_at);
+    if (myHolds.length === 0) {
+      setCountdown(null);
+      return;
+    }
+
+    const minExpiry = Math.min(...myHolds.map(h => new Date(h.hold_expires_at).getTime()));
+    
+    const interval = setInterval(() => {
+      const remaining = Math.max(0, Math.floor((minExpiry - Date.now()) / 1000));
+      setCountdown(remaining);
+      if (remaining === 0) {
+        // Auto clear selection on frontend when expired
+        setSelectedSeats(prev => prev.filter(s => s.status !== 'held' || s.held_by !== user?.id));
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [seats, user?.id]);
+
+  const toggleSeatSelection = (seat: any) => {
+    if (seat.status === 'booked' || (seat.status === 'held' && seat.held_by !== user?.id)) {
+      // It's taken or held by someone else, but allow selecting ONE taken seat for waitlisting
+      setSelectedSeats([seat]);
+      return;
+    }
+    
+    setSelectedSeats(prev => {
+      const isSelected = prev.some(s => s.id === seat.id);
+      if (isSelected) return prev.filter(s => s.id !== seat.id);
+      // Ensure we don't mix available/own-held seats with other-held/booked seats in selection
+      const filteredPrev = prev.filter(s => s.status === 'available' || (s.status === 'held' && s.held_by === user?.id));
+      return [...filteredPrev, seat];
+    });
+  };
+
   const handleHold = async () => {
-    if (!selectedSeat) return;
+    const seatsToHold = selectedSeats.filter(s => s.status === 'available');
+    if (seatsToHold.length === 0) return;
     setHolding(true);
     try {
       const res = await fetchApi(`/shows/${showId}/hold`, {
         method: 'POST',
-        body: JSON.stringify({ seat_ids: [selectedSeat.id] })
+        body: JSON.stringify({ seat_ids: seatsToHold.map(s => s.id) })
       });
-      setSeats(prev => prev.map(s => s.id === res.data[0].id ? res.data[0] : s));
-      setSelectedSeat(res.data[0]);
+      // The socket will update 'seats', but we can manually update to avoid lag
+      const updatedFromServer = res.data;
+      setSeats(prev => prev.map(s => {
+        const up = updatedFromServer.find((u: any) => u.id === s.id);
+        return up || s;
+      }));
+      setSelectedSeats(prev => prev.map(s => {
+        const up = updatedFromServer.find((u: any) => u.id === s.id);
+        return up || s;
+      }));
     } catch (err: any) {
-      alert(err.message);
+      alert(err.message); // Should clearly say 409 Conflict if someone grabbed it
+      // Refresh seats to clear dirty state
+      fetchApi(`/shows/${showId}/seats`).then(res => setSeats(res.data.seats || []));
+      setSelectedSeats([]);
     } finally {
       setHolding(false);
     }
   };
 
-  const handleRelease = async () => {
-    if (!selectedSeat) return;
-    try {
-      await fetchApi(`/holds/${selectedSeat.id}`, { method: 'DELETE' });
-    } catch (err: any) {
-      alert(err.message);
+  const handleReleaseAll = async () => {
+    const myHolds = seats.filter(s => s.status === 'held' && s.held_by === user?.id);
+    for (const hold of myHolds) {
+      try {
+        await fetchApi(`/holds/${hold.id}`, { method: 'DELETE' });
+      } catch (err: any) {
+        console.error(err);
+      }
     }
+    setSelectedSeats([]);
   };
 
   const handleCheckout = async () => {
-    const heldSeats = seats.filter(s => s.status === 'held' && s.held_by === user?.id);
-    if (heldSeats.length === 0) return alert('No seats held');
+    const myHolds = seats.filter(s => s.status === 'held' && s.held_by === user?.id);
+    if (myHolds.length === 0) return alert('No seats held');
+    if (!customerName || !customerPhone) return alert('Please enter your name and phone number');
+    
+    setCheckingOut(true);
     try {
       const res = await fetchApi(`/bookings`, {
         method: 'POST',
-        body: JSON.stringify({ show_id: showId, seat_status_ids: heldSeats.map(s => s.id) })
+        body: JSON.stringify({ 
+          show_id: showId, 
+          seat_status_ids: myHolds.map(s => s.id),
+          customer_name: customerName,
+          customer_phone: customerPhone
+        })
       });
       alert(`Booking Confirmed! Reference: ${res.data.booking_reference}. Email with QR sent.`);
       navigate('/bookings');
     } catch (err: any) {
       alert(err.message);
+    } finally {
+      setCheckingOut(false);
     }
   };
 
-  const handleWaitlist = async () => {
-    if (!selectedSeat) return;
+  const handleWaitlist = async (seat: any) => {
     try {
       await fetchApi(`/shows/${showId}/waitlist`, {
         method: 'POST',
-        body: JSON.stringify({ category_id: selectedSeat.venue_seat.category_id })
+        body: JSON.stringify({ category_id: seat.venue_seat.category_id })
       });
       alert('Joined waitlist for this category!');
     } catch (err: any) {
@@ -83,9 +160,9 @@ export default function SeatMap() {
   };
 
   if (loading) return (
-    <div className="min-h-[60vh] flex items-center justify-center">
-      <div className="bg-seatzy-cyan border-4 border-seatzy-black shadow-neo-xl px-12 py-8">
-        <p className="font-black text-4xl uppercase tracking-tighter">Loading Map...</p>
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="bg-primary-container text-on-background border-4 border-on-background neo-brutalist-shadow px-12 py-8">
+        <p className="font-display-xl text-4xl uppercase tracking-tighter">Loading Map...</p>
       </div>
     </div>
   );
@@ -93,243 +170,194 @@ export default function SeatMap() {
   const rows = Array.from(new Set(seats.map(s => s.venue_seat.row_label))).sort();
   const myHolds = seats.filter(s => s.status === 'held' && s.held_by === user?.id);
 
-  const getSeatStyle = (seat: any) => {
-    const isSelected = selectedSeat?.id === seat.id;
-    const isMyHold = seat.status === 'held' && seat.held_by === user?.id;
-    const isOtherHold = seat.status === 'held' && seat.held_by !== user?.id;
-    const isBooked = seat.status === 'booked';
-
-    let base = 'w-14 h-14 border-4 border-seatzy-black font-black text-sm font-mono transition-all duration-150 relative flex items-center justify-center';
-
-    if (isBooked) return `${base} bg-seatzy-black text-seatzy-white cursor-not-allowed opacity-70`;
-    if (isMyHold) return `${base} bg-seatzy-magenta text-seatzy-white cursor-pointer ${isSelected ? 'shadow-neo-lg scale-110 z-10' : 'shadow-neo hover:-translate-y-1'}`;
-    if (isOtherHold) return `${base} bg-seatzy-acid-yellow text-seatzy-black cursor-pointer ${isSelected ? 'shadow-neo-lg scale-110 z-10' : 'shadow-neo-sm hover:-translate-y-1'}`;
-    // available
-    return `${base} bg-seatzy-white text-seatzy-black cursor-pointer ${isSelected ? 'bg-seatzy-cyan shadow-neo-lg scale-110 z-10 ring-4 ring-seatzy-black' : 'shadow-neo-sm hover:-translate-y-1 hover:shadow-neo'}`;
+  const getPrice = (categoryId: string) => {
+    const p = pricing.find(p => p.category_id === categoryId);
+    return p ? Number(p.price) : 0;
   };
 
+  const subtotal = myHolds.reduce((sum, s) => sum + getPrice(s.venue_seat.category_id), 0);
+
+  const getSeatClass = (seat: any) => {
+    const isSelected = selectedSeats.some(s => s.id === seat.id);
+    const isMyHold = seat.status === 'held' && seat.held_by === user?.id;
+    const isBooked = seat.status === 'booked';
+    const isOtherHold = seat.status === 'held' && seat.held_by !== user?.id;
+
+    if (isBooked) return isSelected ? 'seat-selected opacity-50' : 'seat-sold';
+    if (isMyHold) return 'seat-hold';
+    if (isOtherHold) return isSelected ? 'seat-selected opacity-50' : 'seat-sold';
+    if (isSelected) return 'seat-selected';
+    return 'seat-available';
+  };
+
+  const hasAvailableSelected = selectedSeats.some(s => s.status === 'available');
+  const onlyOtherHeldSelected = selectedSeats.length === 1 && (selectedSeats[0].status === 'booked' || (selectedSeats[0].status === 'held' && selectedSeats[0].held_by !== user?.id));
+
   return (
-    <div className="w-full flex flex-col gap-0">
-      {/* Full-bleed page title band */}
-      <div className="bg-seatzy-black text-seatzy-white -mx-4 md:-mx-8 px-4 md:px-8 py-5 mb-6 border-b-4 border-seatzy-black flex items-center justify-between gap-4 shadow-neo-lg">
-        <div>
-          <p className="font-mono text-seatzy-cyan text-xs tracking-widest uppercase mb-0.5">// Live Seat Map</p>
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">Pick Your Seat</h1>
-        </div>
-        <div className="flex items-center gap-3">
-          {myHolds.length > 0 && (
-            <div className="stamp-badge-magenta hidden md:block">
-              {myHolds.length} Held
-            </div>
-          )}
-          <button onClick={() => navigate(-1)} className="neo-btn bg-seatzy-white text-seatzy-black px-4 py-2 text-sm border-2 shadow-neo-sm">
-            ← Back
+    <div className="w-full flex-grow flex flex-col bg-background relative selection:bg-primary-fixed selection:text-on-primary-fixed">
+      <header className="bg-on-background text-on-primary border-b-4 border-on-background flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 sticky top-0 z-50">
+        <div className="flex items-center gap-4">
+          <button onClick={() => navigate(-1)} aria-label="Go Back" className="bg-surface text-on-surface hover:bg-primary-fixed hover:text-on-primary-fixed border-border-width border-on-background p-2 neo-brutalism-shadow neo-brutalism-shadow-hover neo-brutalism-shadow-active transition-all">
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>arrow_back</span>
           </button>
+          <h1 className="font-headline-lg-mobile md:font-headline-lg uppercase text-primary-fixed tracking-tight">VENUE MAP</h1>
         </div>
-      </div>
-
-      <div className="flex flex-col xl:flex-row gap-6 w-full">
-        {/* ====== MAIN SEAT MAP ====== */}
-        <div className="flex-grow flex flex-col neo-card-lg overflow-hidden">
-          {/* Screen indicator */}
-          <div className="bg-seatzy-black border-b-4 border-seatzy-black flex items-center justify-center py-2">
-            <div className="font-mono text-seatzy-acid-yellow text-xs tracking-widest uppercase font-bold">— SCREEN —</div>
+        {countdown !== null && (
+          <div className="font-data-label text-data-label bg-error text-on-error border-border-width border-on-background px-4 py-2 neo-brutalism-shadow animate-pulse">
+            HOLD EXPIRES IN {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
           </div>
+        )}
+      </header>
 
-          {/* Grid area */}
-          <div className="flex-grow p-6 md:p-10 overflow-auto flex flex-col items-center gap-8">
-            {/* Rows of seats */}
-            <div className="flex flex-col gap-5 w-full max-w-2xl">
+      <div className="flex-grow flex flex-col md:flex-row relative">
+        <section className="flex-grow bg-surface-container blueprint-bg relative overflow-hidden flex flex-col p-margin-mobile md:p-margin-desktop border-b-4 md:border-b-0 md:border-r-4 border-on-background">
+          <div className="max-w-4xl mx-auto w-full mb-8">
+            <div className="stage-area neo-brutalism-shadow">STAGE</div>
+          </div>
+          <div className="seat-map-container overflow-auto flex-grow pb-24">
+            <div className="flex flex-col gap-6 w-max mx-auto">
               {rows.map(row => (
-                <div key={row} className="flex gap-4 items-center">
-                  <span className="font-black font-mono text-lg w-8 text-right shrink-0">{row}</span>
-                  <div className="flex gap-3 flex-wrap">
+                <div key={row as string} className="flex gap-4 items-center justify-center">
+                  <span className="font-data-label text-data-label text-on-surface-variant w-8 text-right shrink-0">{row as string}</span>
+                  <div className="flex gap-2">
                     {seats
                       .filter(s => s.venue_seat.row_label === row)
                       .sort((a, b) => a.venue_seat.seat_number - b.venue_seat.seat_number)
                       .map(seat => (
                         <button
                           key={seat.id}
-                          onClick={() => seat.status !== 'booked' && setSelectedSeat(seat)}
-                          className={getSeatStyle(seat)}
-                          title={`${seat.venue_seat.row_label}${seat.venue_seat.seat_number} — ${seat.status}`}
+                          onClick={() => toggleSeatSelection(seat)}
+                          className={`seat-btn ${getSeatClass(seat)}`}
+                          title={`${seat.venue_seat.row_label}${seat.venue_seat.seat_number} — ${seat.status} ($${getPrice(seat.venue_seat.category_id)})`}
                         >
                           {seat.venue_seat.seat_number}
                         </button>
                       ))}
                   </div>
+                  <span className="font-data-label text-data-label text-on-surface-variant w-8 text-left shrink-0">{row as string}</span>
                 </div>
               ))}
             </div>
+          </div>
 
-            {/* Color-key legend — fills the lower space */}
-            <div className="w-full max-w-2xl mt-4 border-t-4 border-seatzy-black pt-6">
-              <p className="font-black text-xs uppercase tracking-widest mb-4">Seat Legend</p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {[
-                  { color: 'bg-seatzy-white border-4 border-seatzy-black shadow-neo-sm', label: 'Available' },
-                  { color: 'bg-seatzy-cyan border-4 border-seatzy-black shadow-neo', label: 'Selected' },
-                  { color: 'bg-seatzy-acid-yellow border-4 border-seatzy-black shadow-neo-sm', label: 'Held — Other' },
-                  { color: 'bg-seatzy-magenta border-4 border-seatzy-black shadow-neo', label: 'Your Hold' },
-                  { color: 'bg-seatzy-black border-4 border-seatzy-black', label: 'Booked' },
-                ].map(item => (
-                  <div key={item.label} className="flex items-center gap-3">
-                    <div className={`w-8 h-8 shrink-0 ${item.color}`} />
-                    <span className="font-mono text-xs uppercase font-bold">{item.label}</span>
-                  </div>
-                ))}
-              </div>
+          <div className="absolute bottom-4 left-4 right-4 md:left-margin-desktop md:right-auto bg-surface border-border-width border-on-background p-4 neo-brutalism-shadow flex flex-wrap gap-4 items-center z-10">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 border-2 border-on-background bg-surface"></div>
+              <span className="font-data-label text-data-label uppercase">Available</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 border-2 border-on-background bg-tertiary-fixed"></div>
+              <span className="font-data-label text-data-label uppercase">Selected</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 border-2 border-on-background bg-secondary-container"></div>
+              <span className="font-data-label text-data-label uppercase">Your Hold</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 border-2 border-on-background bg-primary-fixed opacity-70"></div>
+              <span className="font-data-label text-data-label uppercase">Unavailable</span>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* ====== RIGHT SIDEBAR ====== */}
-        <div className="w-full xl:w-96 shrink-0 flex flex-col gap-5">
-
-          {/* Seat Detail Panel */}
-          {selectedSeat ? (
-            <div className="neo-card-lg flex flex-col overflow-hidden">
-              {/* Coloured header band */}
-              {selectedSeat.status === 'available' && (
-                <div className="bg-seatzy-cyan border-b-4 border-seatzy-black px-5 py-3 flex items-center justify-between">
-                  <h3 className="font-black text-xl uppercase tracking-tight">
-                    Seat {selectedSeat.venue_seat.row_label}{selectedSeat.venue_seat.seat_number}
-                  </h3>
-                  <span className="font-mono text-xs font-bold uppercase">Available</span>
-                </div>
-              )}
-              {selectedSeat.status === 'held' && selectedSeat.held_by === user?.id && (
-                <div className="bg-seatzy-magenta text-seatzy-white border-b-4 border-seatzy-black px-5 py-3 flex items-center justify-between">
-                  <h3 className="font-black text-xl uppercase tracking-tight">
-                    Seat {selectedSeat.venue_seat.row_label}{selectedSeat.venue_seat.seat_number}
-                  </h3>
-                  <span className="stamp-badge border-seatzy-white bg-seatzy-acid-yellow text-seatzy-black text-xs border-2">Held by You</span>
-                </div>
-              )}
-              {selectedSeat.status === 'held' && selectedSeat.held_by !== user?.id && (
-                <div className="bg-seatzy-acid-yellow border-b-4 border-seatzy-black px-5 py-3 flex items-center justify-between">
-                  <h3 className="font-black text-xl uppercase tracking-tight">
-                    Seat {selectedSeat.venue_seat.row_label}{selectedSeat.venue_seat.seat_number}
-                  </h3>
-                  <span className="font-mono text-xs font-bold">Held</span>
-                </div>
-              )}
-              {selectedSeat.status === 'booked' && (
-                <div className="bg-seatzy-black text-seatzy-white border-b-4 border-seatzy-black px-5 py-3 flex items-center justify-between">
-                  <h3 className="font-black text-xl uppercase tracking-tight">
-                    Seat {selectedSeat.venue_seat.row_label}{selectedSeat.venue_seat.seat_number}
-                  </h3>
-                  <span className="stamp-badge-magenta text-xs border-2">Booked</span>
-                </div>
-              )}
-
-              <div className="p-5 flex flex-col gap-4">
-                {/* Seat data rows */}
-                <div className="font-mono text-sm border-4 border-seatzy-black">
-                  <div className="flex justify-between border-b-4 border-seatzy-black px-3 py-2">
-                    <span className="font-bold uppercase">Row</span>
-                    <span>{selectedSeat.venue_seat.row_label}</span>
-                  </div>
-                  <div className="flex justify-between border-b-4 border-seatzy-black px-3 py-2">
-                    <span className="font-bold uppercase">Number</span>
-                    <span>{selectedSeat.venue_seat.seat_number}</span>
-                  </div>
-                  <div className="flex justify-between px-3 py-2">
-                    <span className="font-bold uppercase">Status</span>
-                    <span className="uppercase font-bold">{selectedSeat.status}</span>
-                  </div>
-                </div>
-
-                {/* Action buttons */}
-                {selectedSeat.status === 'available' && (
-                  <button
-                    onClick={handleHold}
-                    disabled={holding}
-                    className="neo-btn-hero bg-seatzy-acid-yellow text-seatzy-black py-4 text-xl w-full disabled:opacity-50"
-                  >
-                    {holding ? 'Holding...' : 'Hold Seat (10 min)'}
+        <aside className="w-full md:w-[400px] flex-shrink-0 bg-surface flex flex-col h-auto md:h-[calc(100vh-80px)] md:sticky md:top-[80px]">
+          <div className="p-margin-mobile border-b-4 border-on-background bg-on-background text-on-primary">
+            {selectedSeats.length > 0 ? (
+               <>
+                <h2 className="font-headline-lg-mobile uppercase mb-2">
+                  {selectedSeats.length} SEAT(S) SELECTED
+                </h2>
+                
+                {hasAvailableSelected && (
+                   <button onClick={handleHold} disabled={holding} className="mt-4 w-full bg-primary-fixed text-on-primary-fixed border-border-width border-on-background py-2 font-headline-lg-mobile text-sm uppercase neo-brutalism-shadow neo-brutalism-shadow-hover neo-brutalism-shadow-active transition-all disabled:opacity-50">
+                     {holding ? 'Holding...' : 'Hold Selected'}
+                   </button>
+                )}
+                
+                {onlyOtherHeldSelected && (
+                  <button onClick={() => handleWaitlist(selectedSeats[0])} className="mt-4 w-full bg-tertiary-fixed text-on-tertiary-fixed border-border-width border-on-background py-2 font-headline-lg-mobile text-sm uppercase neo-brutalism-shadow neo-brutalism-shadow-hover neo-brutalism-shadow-active transition-all">
+                    Join Waitlist for Category
                   </button>
                 )}
+               </>
+            ) : (
+               <>
+                 <h2 className="font-headline-lg-mobile uppercase mb-2 text-on-surface-variant">Select Seats</h2>
+                 <p className="font-data-label text-data-label text-on-surface-variant opacity-70">Click seats on the map to view details.</p>
+               </>
+            )}
+            
+            {myHolds.length > 0 && (
+               <button onClick={handleReleaseAll} className="mt-4 w-full bg-secondary-container text-on-primary border-border-width border-on-background py-2 font-headline-lg-mobile text-sm uppercase neo-brutalism-shadow neo-brutalism-shadow-hover neo-brutalism-shadow-active transition-all">
+                 Release All Holds
+               </button>
+            )}
+          </div>
 
-                {selectedSeat.status === 'held' && selectedSeat.held_by === user?.id && (
-                  <div className="flex flex-col gap-2">
-                    <div className="bg-seatzy-magenta text-seatzy-white px-4 py-3 border-4 border-seatzy-black font-black text-center uppercase tracking-wider animate-pulse">
-                      ⚡ Held by You
-                    </div>
-                    <button onClick={handleRelease} className="neo-btn bg-seatzy-white text-seatzy-black py-3 w-full border-2 shadow-neo-sm">
-                      Release Hold
-                    </button>
-                  </div>
-                )}
-
-                {selectedSeat.status === 'held' && selectedSeat.held_by !== user?.id && (
-                  <div className="flex flex-col gap-3">
-                    <div className="bg-seatzy-black text-seatzy-white px-4 py-3 border-4 border-seatzy-black font-mono text-sm text-center">
-                      Held by someone else
-                    </div>
-                    <button onClick={handleWaitlist} className="neo-btn bg-seatzy-cyan text-seatzy-black py-3 w-full">
-                      Join Waitlist
-                    </button>
-                  </div>
-                )}
-
-                {selectedSeat.status === 'booked' && (
-                  <div className="relative overflow-hidden">
-                    <div className="bg-seatzy-black text-seatzy-white px-4 py-4 border-4 border-seatzy-black font-black text-center text-xl uppercase">
-                      Unavailable
-                    </div>
-                    <div className="absolute top-1 right-1 stamp-badge-magenta text-xs border-2 opacity-90">SOLD</div>
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="neo-card-lg flex flex-col overflow-hidden">
-              <div className="bg-seatzy-gray-grid border-b-4 border-seatzy-black px-5 py-3">
-                <h3 className="font-black text-xl uppercase tracking-tight">Select a Seat</h3>
-              </div>
-              <div className="p-8 hash-pattern flex items-center justify-center min-h-[160px]">
-                <p className="font-mono text-sm font-bold uppercase text-center opacity-60">
-                  Click any seat on the map to see details
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Your Holds Cart */}
-          <div className="neo-card-lg flex flex-col overflow-hidden">
-            <div className="bg-seatzy-black text-seatzy-white border-b-4 border-seatzy-black px-5 py-3 flex items-center justify-between">
-              <h3 className="font-black text-xl uppercase tracking-tight">Your Holds</h3>
-              {myHolds.length > 0 && (
-                <span className="bg-seatzy-magenta text-seatzy-white border-2 border-seatzy-white px-2 py-0.5 font-mono text-xs font-bold">
-                  {myHolds.length} seat{myHolds.length !== 1 ? 's' : ''}
-                </span>
-              )}
-            </div>
-            <div className="p-4 flex flex-col gap-3">
+          <div className="flex-grow p-margin-mobile overflow-y-auto blueprint-bg bg-surface-container border-b-4 border-on-background">
+            <h3 className="font-headline-lg-mobile uppercase mb-4 text-on-surface border-b-4 border-on-background pb-2 inline-block">Your Holds</h3>
+            <div className="flex flex-col gap-4">
               {myHolds.length === 0 ? (
-                <p className="font-mono text-sm opacity-50 py-2 text-center uppercase">No active holds</p>
+                 <div className="text-center p-8 bg-surface border-4 border-on-background opacity-50">
+                   <span className="font-data-label text-data-label uppercase">No active holds</span>
+                 </div>
               ) : (
                 myHolds.map(s => (
-                  <div key={s.id} className="flex justify-between items-center border-4 border-seatzy-black px-3 py-2 shadow-neo-sm bg-seatzy-magenta text-seatzy-white">
-                    <span className="font-black uppercase">
-                      Seat {s.venue_seat.row_label}{s.venue_seat.seat_number}
-                    </span>
-                    <span className="font-mono text-xs font-bold bg-seatzy-black text-seatzy-white px-2 py-1">10:00</span>
+                  <div key={s.id} className="bg-surface border-border-width border-on-background p-4 neo-brutalism-shadow relative overflow-hidden group">
+                    <div className="absolute left-[-10px] top-1/2 transform -translate-y-1/2 w-[20px] h-[20px] rounded-full bg-surface-container border-r-4 border-on-background"></div>
+                    <div className="flex justify-between items-start ml-4">
+                      <div>
+                        <div className="font-data-label text-data-label bg-tertiary-fixed text-on-tertiary-fixed px-2 py-1 border-2 border-on-background inline-block mb-2">SEAT</div>
+                        <div className="font-headline-lg-mobile text-on-surface">ROW {s.venue_seat.row_label} <br /> NUM {s.venue_seat.seat_number}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-headline-lg-mobile text-secondary">${getPrice(s.venue_seat.category_id)}</div>
+                      </div>
+                    </div>
                   </div>
                 ))
               )}
-
-              <button
-                onClick={handleCheckout}
-                disabled={myHolds.length === 0}
-                className="neo-btn-hero bg-seatzy-acid-yellow text-seatzy-black py-4 text-xl w-full mt-2 disabled:opacity-40 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
-              >
-                Checkout →
-              </button>
             </div>
           </div>
-        </div>
+
+          {/* Checkout Details Form */}
+          {myHolds.length > 0 && (
+            <div className="p-margin-mobile bg-surface-variant border-b-4 border-on-background">
+               <h3 className="font-headline-lg-mobile text-sm uppercase mb-3 text-on-surface">Guest Details</h3>
+               <div className="flex flex-col gap-3">
+                 <input 
+                   type="text" 
+                   placeholder="FULL NAME" 
+                   value={customerName}
+                   onChange={e => setCustomerName(e.target.value)}
+                   className="w-full bg-surface border-2 border-on-background p-2 font-data-label text-data-label focus:outline-none focus:border-primary-fixed"
+                 />
+                 <input 
+                   type="tel" 
+                   placeholder="PHONE NUMBER" 
+                   value={customerPhone}
+                   onChange={e => setCustomerPhone(e.target.value)}
+                   className="w-full bg-surface border-2 border-on-background p-2 font-data-label text-data-label focus:outline-none focus:border-primary-fixed"
+                 />
+               </div>
+            </div>
+          )}
+
+          <div className="p-margin-mobile bg-surface z-20">
+            <div className="flex justify-between items-end mb-4">
+              <span className="font-data-label text-data-label uppercase text-on-surface-variant">Subtotal ({myHolds.length} tickets)</span>
+              <span className="font-headline-lg-mobile text-on-background">${subtotal.toFixed(2)}</span>
+            </div>
+            <button 
+              onClick={handleCheckout}
+              disabled={myHolds.length === 0 || !customerName || !customerPhone || checkingOut}
+              className="w-full bg-primary-fixed text-on-primary-fixed border-border-width border-on-background py-4 font-headline-lg-mobile uppercase neo-brutalism-shadow neo-brutalism-shadow-hover neo-brutalism-shadow-active transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+            >
+              {checkingOut ? 'PROCESSING...' : 'CHECKOUT'}
+              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>arrow_forward</span>
+            </button>
+          </div>
+        </aside>
       </div>
     </div>
   );

@@ -30,111 +30,97 @@ export default function Login() {
   };
 
   return (
-    /* Full-viewport split — no outer padding so it truly bleeds */
-    <div className="fixed inset-0 top-[57px] flex flex-col md:flex-row overflow-hidden">
-
-      {/* ── LEFT PANEL: brand block ── */}
-      <div className="relative bg-seatzy-acid-yellow border-r-4 border-seatzy-black flex flex-col justify-between p-10 md:p-14 w-full md:w-1/2 shrink-0 overflow-hidden">
-
-        {/* Blueprint grid overlay on the yellow panel */}
-        <div className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage: 'linear-gradient(to right,rgba(0,0,0,0.07) 1px,transparent 1px),linear-gradient(to bottom,rgba(0,0,0,0.07) 1px,transparent 1px)',
-            backgroundSize: '70px 70px'
-          }}
-        />
-
-        {/* wordmark */}
-        <div className="relative z-10">
-          <h1 className="text-[clamp(4rem,10vw,8rem)] font-black uppercase tracking-tighter leading-none text-seatzy-black"
-            style={{ textShadow: '6px 6px 0 #000' }}>
-            SEAT<br />ZY
+    <main className="w-full max-w-[1200px] mx-auto my-auto flex flex-col md:flex-row neo-border neo-shadow bg-surface min-h-[600px] h-[85vh] mt-[5vh]">
+      {/* Left Panel: Brand / Visual Anchor */}
+      <section className="w-full md:w-1/2 bg-on-background text-on-primary flex flex-col justify-between p-6 md:p-12 border-b-border-width md:border-b-0 md:border-r-border-width border-on-background relative overflow-hidden">
+        <div className="z-10 flex flex-col gap-8">
+          <h1 className="font-display-xl text-display-xl uppercase text-primary-container leading-none font-black italic tracking-tighter">
+            SEATZY
           </h1>
-          <p className="font-mono text-xs font-bold uppercase tracking-widest mt-4 text-seatzy-black opacity-70">
-            // Book smarter. Sit better.
+          <div className="mt-8">
+            <h1 className="font-display-xl text-[64px] uppercase text-primary-container leading-none">
+              GET IN<br />THE SEAT
+            </h1>
+          </div>
+          <div className="flex flex-wrap gap-4 mt-6">
+            <span className="bg-tertiary-fixed text-on-tertiary-fixed font-data-label text-data-label px-4 py-2 neo-border uppercase">Fast</span>
+            <span className="bg-primary-container text-on-primary-container font-data-label text-data-label px-4 py-2 neo-border uppercase">Live</span>
+            <span className="bg-secondary text-on-secondary font-data-label text-data-label px-4 py-2 neo-border uppercase">Raw</span>
+          </div>
+        </div>
+        <div className="z-10 mt-auto pt-12">
+          <p className="font-data-label text-data-label text-surface-variant max-w-sm uppercase">
+            Access the rawest live events. No soft tickets, no hidden fees. Just hard entry.
           </p>
         </div>
+        {/* Abstract background shape element */}
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-primary-container opacity-20 transform rotate-45 pointer-events-none"></div>
+      </section>
 
-        {/* bottom accent strip */}
-        <div className="relative z-10 flex flex-col gap-3 mt-auto">
-          <div className="flex gap-3">
-            <div className="h-6 w-20 bg-seatzy-black border-2 border-seatzy-black" />
-            <div className="h-6 w-10 bg-seatzy-magenta border-2 border-seatzy-black" />
-            <div className="h-6 w-14 bg-seatzy-cyan border-2 border-seatzy-black" />
-            <div className="h-6 w-8 bg-seatzy-black border-2 border-seatzy-black" />
+      {/* Right Panel: Login Form */}
+      <section className="w-full md:w-1/2 bg-surface p-6 md:p-12 flex flex-col justify-center">
+        <div className="max-w-md w-full mx-auto flex flex-col gap-8">
+          <div className="flex flex-col gap-2">
+            <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg uppercase text-on-background">Access Core</h2>
+            <p className="font-body-md text-body-md text-on-surface-variant">Enter your credentials to proceed.</p>
           </div>
-          <p className="font-mono text-xs opacity-60">Concurrent • Secure • Real-time</p>
-        </div>
-
-        {/* big decorative number */}
-        <span className="absolute bottom-6 right-8 text-[12rem] font-black text-seatzy-black opacity-5 leading-none select-none">01</span>
-      </div>
-
-      {/* ── RIGHT PANEL: form ── */}
-      <div className="flex-grow bg-seatzy-white flex items-center justify-center p-8 overflow-y-auto">
-        <div className="w-full max-w-md">
-
-          {/* Page header band */}
-          <div className="bg-seatzy-black text-seatzy-white border-4 border-seatzy-black shadow-neo-xl mb-8 px-6 py-4 flex items-center justify-between">
-            <h2 className="text-4xl font-black uppercase tracking-tighter">Sign In</h2>
-            <span className="font-mono text-seatzy-cyan text-xs tracking-widest">→ step 1/1</span>
-          </div>
-
+          
           {error && (
-            <div className="bg-seatzy-magenta text-seatzy-white border-4 border-seatzy-black shadow-neo px-4 py-3 mb-6 font-mono text-sm font-bold">
+            <div className="bg-error text-on-error neo-border px-4 py-3 font-data-label text-data-label">
               ⚠ {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            <div className="flex flex-col gap-1">
-              <label className="font-black text-xs uppercase tracking-widest">Email</label>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
+              <label htmlFor="email" className="font-data-label text-data-label uppercase text-on-background">Email Identifier</label>
               <input
-                id="login-email"
+                id="email"
                 type="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="neo-input w-full text-base"
-                placeholder="you@example.com"
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-surface-lowest text-on-background font-data-label text-data-label px-4 py-4 neo-border focus:outline-none focus:ring-0 focus:border-primary placeholder:text-outline-variant transition-colors"
+                placeholder="USER@SEATZY.COM"
                 required
               />
             </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="font-black text-xs uppercase tracking-widest">Password</label>
+            
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between items-center">
+                <label htmlFor="password" className="font-data-label text-data-label uppercase text-on-background">Access Code</label>
+                <Link to="#" className="font-data-label text-data-label text-secondary hover:text-primary transition-colors underline uppercase">Lost Code?</Link>
+              </div>
               <input
-                id="login-password"
+                id="password"
                 type="password"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
-                className="neo-input w-full text-base"
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-surface-lowest text-on-background font-data-label text-data-label px-4 py-4 neo-border focus:outline-none focus:ring-0 focus:border-primary placeholder:text-outline-variant transition-colors"
                 placeholder="••••••••"
                 required
               />
             </div>
-
+            
             <button
-              id="login-submit"
               type="submit"
               disabled={loading}
-              className="neo-btn-hero bg-seatzy-acid-yellow text-seatzy-black py-5 text-2xl w-full mt-2 disabled:opacity-50"
+              className="w-full bg-primary-container text-on-primary-container font-headline-lg-mobile text-headline-lg-mobile uppercase py-4 neo-border neo-shadow neo-shadow-hover neo-shadow-active transition-all mt-4 flex justify-center items-center gap-2 disabled:opacity-50"
             >
-              {loading ? 'Signing in...' : 'Sign In →'}
+              <span>{loading ? 'Signing In...' : 'Sign In'}</span>
+              <span className="material-symbols-outlined font-bold" style={{ fontVariationSettings: "'FILL' 1" }}>login</span>
             </button>
           </form>
-
-          {/* Switch link */}
-          <div className="mt-8 border-t-4 border-seatzy-black pt-6 flex items-center justify-between">
-            <p className="font-mono text-sm">No account yet?</p>
-            <Link
-              to="/register"
-              className="neo-btn bg-seatzy-cyan text-seatzy-black px-5 py-2 text-sm shadow-neo"
-            >
-              Register →
-            </Link>
+          
+          <div className="mt-8 text-center border-t-border-width border-on-background pt-6">
+            <p className="font-data-label text-data-label text-on-surface-variant uppercase">
+              No access yet?{' '}
+              <Link to="/register" className="text-on-background font-bold underline hover:bg-primary-container transition-colors px-1">
+                Register Entity
+              </Link>
+            </p>
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
