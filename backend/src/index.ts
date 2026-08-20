@@ -8,7 +8,9 @@ import path from 'path';
 import authRoutes from './routes/auth.routes';
 import adminRoutes from './routes/admin.routes';
 import organiserRoutes from './routes/organiser.routes';
+import customerRoutes from './routes/customer.routes';
 import { errorHandler } from './middleware/errorHandler';
+import { startScheduler } from './jobs/scheduler';
 
 // Load environment variables from the root .env file
 dotenv.config({ path: path.join(__dirname, '../../.env') });
@@ -32,6 +34,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api', adminRoutes); // admin endpoints are defined directly e.g. /venues
 app.use('/api', organiserRoutes); // organiser endpoints e.g. /events
+app.use('/api', customerRoutes); // customer endpoints
 
 // Basic health check
 app.get('/api/health', (req, res) => {
@@ -40,6 +43,9 @@ app.get('/api/health', (req, res) => {
 
 // Error handling (must be last)
 app.use(errorHandler);
+
+// Start scheduler
+startScheduler();
 
 // Start the server
 const PORT = process.env.PORT || 3000;
