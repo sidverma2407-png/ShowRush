@@ -3,14 +3,15 @@ import { fetchApi } from '../api/client';
 
 export default function OrganiserDashboard() {
   const [events, setEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // In a real app we'd fetch only organiser's events and summaries.
     // For simplicity using /events and filtering locally if endpoint isn't fully ready.
-    fetchApi('/events').then(res => {
-      // Assuming event object has organiser_id (if not, we'd need a specific endpoint)
-      setEvents(res.data);
-    });
+    fetchApi('/events')
+      .then(res => setEvents(res.data))
+      .catch(err => console.error('Failed to fetch dashboard events:', err))
+      .finally(() => setLoading(false));
   }, []);
 
   return (

@@ -14,10 +14,10 @@ export default function SeatMap() {
 
   useEffect(() => {
     // Fetch initial state
-    fetchApi(`/shows/${showId}/seats`).then(res => {
-      setSeats(res.data);
-      setLoading(false);
-    });
+    fetchApi(`/shows/${showId}/seats`)
+      .then(res => setSeats(res.data))
+      .catch(err => console.error('Failed to fetch seats:', err))
+      .finally(() => setLoading(false));
 
     // Connect to websocket
     const newSocket = io((import.meta as any).env?.VITE_API_URL || 'http://localhost:3000');

@@ -8,10 +8,10 @@ export default function Events() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchApi('/events').then(res => {
-      setEvents(res.data);
-      setLoading(false);
-    });
+    fetchApi('/events')
+      .then(res => setEvents(res.data))
+      .catch(err => console.error('Failed to fetch events:', err))
+      .finally(() => setLoading(false));
   }, []);
 
   if (loading) return <div className="p-8 font-mono text-2xl uppercase font-black">Loading...</div>;

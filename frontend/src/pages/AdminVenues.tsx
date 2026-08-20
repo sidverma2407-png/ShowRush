@@ -5,9 +5,13 @@ export default function AdminVenues() {
   const [venues, setVenues] = useState<any[]>([]);
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const loadVenues = () => {
-    fetchApi('/venues').then(res => setVenues(res.data));
+    fetchApi('/venues')
+      .then(res => setVenues(res.data))
+      .catch(err => console.error('Failed to fetch venues:', err))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {

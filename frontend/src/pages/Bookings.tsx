@@ -6,10 +6,10 @@ export default function Bookings() {
   const [loading, setLoading] = useState(true);
 
   const fetchBookings = () => {
-    fetchApi('/bookings').then(res => {
-      setBookings(res.data);
-      setLoading(false);
-    });
+    fetchApi('/bookings')
+      .then(res => setBookings(res.data))
+      .catch(err => console.error('Failed to fetch bookings:', err))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
