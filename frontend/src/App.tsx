@@ -7,8 +7,10 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Events from './pages/Events';
 import SeatMap from './pages/SeatMap';
-const Dashboard = () => <div className="p-8">Organiser Dashboard</div>;
-const Venues = () => <div className="p-8">Admin Venues</div>;
+import Bookings from './pages/Bookings';
+import WaitlistOffer from './pages/WaitlistOffer';
+import AdminVenues from './pages/AdminVenues';
+import OrganiserDashboard from './pages/OrganiserDashboard';
 
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: string[] }) {
   const { user } = useAuthStore();
@@ -34,7 +36,12 @@ function App() {
                 <span className="font-mono text-sm">Hi, {user.name}</span>
                 {user.role === 'admin' && <a href="/admin/venues" className="hover:text-seatzy-cyan font-bold uppercase">Venues</a>}
                 {user.role === 'organiser' && <a href="/organiser/dashboard" className="hover:text-seatzy-cyan font-bold uppercase">Dashboard</a>}
-                {user.role === 'customer' && <a href="/events" className="hover:text-seatzy-cyan font-bold uppercase">Events</a>}
+                {user.role === 'customer' && (
+                  <>
+                    <a href="/events" className="hover:text-seatzy-cyan font-bold uppercase">Events</a>
+                    <a href="/bookings" className="hover:text-seatzy-cyan font-bold uppercase">My Bookings</a>
+                  </>
+                )}
                 <button onClick={logout} className="neo-btn bg-seatzy-magenta text-seatzy-white px-4 py-1 text-sm border-2">Logout</button>
               </>
             ) : (
@@ -56,11 +63,15 @@ function App() {
             <Route path="/events/:eventId/shows/:showId/map" element={
               <ProtectedRoute allowedRoles={['customer']}><SeatMap /></ProtectedRoute>
             } />
+            <Route path="/bookings" element={
+              <ProtectedRoute allowedRoles={['customer']}><Bookings /></ProtectedRoute>
+            } />
+            <Route path="/waitlist/offer/:token" element={<WaitlistOffer />} />
             <Route path="/organiser/dashboard" element={
-              <ProtectedRoute allowedRoles={['organiser']}><Dashboard /></ProtectedRoute>
+              <ProtectedRoute allowedRoles={['organiser']}><OrganiserDashboard /></ProtectedRoute>
             } />
             <Route path="/admin/venues" element={
-              <ProtectedRoute allowedRoles={['admin']}><Venues /></ProtectedRoute>
+              <ProtectedRoute allowedRoles={['admin']}><AdminVenues /></ProtectedRoute>
             } />
           </Routes>
         </main>
