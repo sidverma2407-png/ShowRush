@@ -4,66 +4,147 @@
 
 @layer base {
   body {
-    @apply bg-seatzy-white text-seatzy-black font-sans;
-    /* Bold blueprint grid — clearly visible */
-    background-image: 
-      linear-gradient(to right, rgba(28,28,28,0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(28,28,28,0.05) 1px, transparent 1px);
-    background-size: 70px 70px;
+    @apply bg-background text-on-background font-body-md;
   }
 }
 
-@layer components {
-  .neo-btn {
-    @apply border-4 border-seatzy-black shadow-neo font-bold uppercase tracking-tight transition-transform active:translate-x-1 active:translate-y-1 active:shadow-none cursor-pointer;
-  }
-
-  .neo-btn-hero {
-    @apply border-4 border-seatzy-black shadow-neo-lg font-black uppercase tracking-tight transition-transform active:translate-x-2 active:translate-y-2 active:shadow-none cursor-pointer;
+@layer utilities {
+  /* Neo-Brutalist utility classes */
+  .neo-border { 
+    @apply border-border-width border-on-background; 
   }
   
-  .neo-card {
-    @apply border-4 border-seatzy-black shadow-neo bg-seatzy-white;
+  .neo-brutalism-border {
+    @apply border-border-width border-on-background;
+  }
+  
+  .neo-shadow { 
+    box-shadow: 6px 6px 0px 0px rgba(27,27,27,1); 
   }
 
-  .neo-card-lg {
-    @apply border-4 border-seatzy-black shadow-neo-lg bg-seatzy-white;
+  .neo-shadow-hover:hover { 
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0px 0px rgba(27,27,27,1); 
   }
 
-  .neo-input {
-    @apply border-4 border-seatzy-black bg-seatzy-white p-3 font-mono focus:outline-none focus:ring-2 focus:ring-seatzy-acid-yellow;
+  .neo-shadow-active:active {
+    transform: translate(0px, 0px);
+    box-shadow: 0px 0px 0px 0px rgba(27,27,27,1);
   }
 
-  /* Diagonal hash pattern for empty poster placeholders */
-  .hash-pattern {
-    background-image: repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 6px,
-      rgba(0,0,0,0.08) 6px,
-      rgba(0,0,0,0.08) 7px
-    );
+  .neo-brutalism-shadow {
+    box-shadow: 6px 6px 0px 0px rgba(27,27,27,1);
   }
 
-  /* Rotated brutalist stamp badge */
+  .neo-brutalism-shadow-hover:hover {
+    box-shadow: 8px 8px 0px 0px rgba(27,27,27,1);
+    transform: translate(-2px, -2px);
+  }
+
+  .neo-brutalism-shadow-active:active {
+    box-shadow: 0px 0px 0px 0px rgba(27,27,27,1);
+    transform: translate(0px, 0px);
+  }
+  
+  .neo-brutalist-shadow {
+    box-shadow: 6px 6px 0px 0px rgba(0,0,0,1);
+  }
+
+  .neo-brutalist-hover:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
+  }
+
+  .neo-brutalist-active:active {
+    transform: translate(0px, 0px);
+    box-shadow: none;
+  }
+
+  /* Blueprint Backgrounds */
+  .blueprint-bg {
+    background-color: var(--color-background, #f9f9f9);
+    background-image: 
+        linear-gradient(rgba(27, 27, 27, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(27, 27, 27, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  /* Specific component styles */
+  .ticket-stub-mask {
+    mask-image: radial-gradient(circle at 0 50%, transparent 10px, black 11px), radial-gradient(circle at 100% 50%, transparent 10px, black 11px);
+    mask-size: 51% 100%;
+    mask-repeat: no-repeat;
+    mask-position: left, right;
+  }
+
+  .ticket-mask {
+    mask-image: radial-gradient(circle at 0 50%, transparent 12px, black 13px), radial-gradient(circle at 100% 50%, transparent 12px, black 13px);
+    mask-size: 51% 100%;
+    mask-repeat: no-repeat;
+    mask-position: left center, right center;
+    -webkit-mask-image: radial-gradient(circle at 0 50%, transparent 12px, black 13px), radial-gradient(circle at 100% 50%, transparent 12px, black 13px);
+    -webkit-mask-size: 51% 100%;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: left center, right center;
+  }
+  
+  .ticket-stub {
+    mask-image: radial-gradient(circle at 0 50%, transparent 15px, black 16px), radial-gradient(circle at 100% 50%, transparent 15px, black 16px);
+    mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+    mask-position: left, right;
+    -webkit-mask-image: radial-gradient(circle at 0 50%, transparent 15px, black 16px), radial-gradient(circle at 100% 50%, transparent 15px, black 16px);
+    -webkit-mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: left, right;
+  }
+
+  .b-w-filter { filter: grayscale(100%); transition: filter 0.3s ease; }
+  .b-w-filter:hover { filter: grayscale(0%); }
+  
   .stamp-badge {
-    @apply font-black uppercase border-4 border-seatzy-black px-3 py-1 tracking-widest text-sm inline-block;
-    transform: rotate(-3deg);
+    transform: rotate(-15deg);
   }
 
-  .stamp-badge-magenta {
-    @apply stamp-badge bg-seatzy-magenta text-seatzy-white;
+  /* Seat map styles */
+  .seat-btn {
+    @apply w-12 h-12 flex items-center justify-center border-4 border-on-background font-data-label text-data-label cursor-pointer transition-all;
   }
+  .seat-available { @apply bg-on-tertiary text-on-background; }
+  .seat-available:hover { @apply transform -translate-x-0.5 -translate-y-0.5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]; }
+  .seat-available:active { @apply transform translate-x-0 translate-y-0 shadow-none; }
+  .seat-selected { @apply bg-tertiary-fixed text-on-tertiary-fixed transform -translate-x-0.5 -translate-y-0.5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]; }
+  .seat-hold { @apply bg-secondary-container text-on-primary transform -translate-x-0.5 -translate-y-0.5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]; }
+  .seat-sold { @apply bg-primary-fixed text-on-primary-fixed cursor-not-allowed opacity-70; }
 
-  .stamp-badge-cyan {
-    @apply stamp-badge bg-seatzy-cyan text-seatzy-black;
+  .stage-area {
+    @apply border-4 border-on-background bg-surface-variant text-center p-6 font-display-xl font-black text-2xl tracking-[0.1em] mb-10 relative overflow-hidden;
   }
-
-  .stamp-badge-yellow {
-    @apply stamp-badge bg-seatzy-acid-yellow text-seatzy-black;
+  .stage-area::after {
+    content: '';
+    @apply absolute -bottom-5 left-1/2 -translate-x-1/2 w-4/5 h-10 bg-black/10 rounded-full blur-md;
   }
-
-  .stamp-badge-black {
-    @apply stamp-badge bg-seatzy-black text-seatzy-white;
+  
+  /* Custom scrollbar */
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  
+  .seat-map-container::-webkit-scrollbar { height: 12px; width: 12px; }
+  .seat-map-container::-webkit-scrollbar-track { @apply bg-background border-4 border-on-background; }
+  .seat-map-container::-webkit-scrollbar-thumb { @apply bg-primary-fixed border-4 border-on-background; }
+  
+  /* Venue Builder specific */
+  .seat-cell {
+    @apply w-6 h-6 border-2 border-on-background cursor-pointer transition-all;
   }
+  .seat-cell:hover {
+    @apply transform -translate-x-px -translate-y-px shadow-[2px_2px_0px_0px_#1b1b1b];
+  }
+  .seat-cell.selected {
+    @apply transform-none shadow-none;
+  }
+  .seat-premium { @apply bg-inverse-primary; }
+  .seat-standard { @apply bg-tertiary-fixed; }
+  .seat-balcony { @apply bg-secondary-container; }
+  .seat-empty { @apply bg-on-tertiary; }
 }

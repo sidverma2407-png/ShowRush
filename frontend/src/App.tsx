@@ -12,6 +12,10 @@ import WaitlistOffer from './pages/WaitlistOffer';
 import AdminVenues from './pages/AdminVenues';
 import OrganiserDashboard from './pages/OrganiserDashboard';
 
+// Components
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: string[] }) {
   const { user } = useAuthStore();
   
@@ -22,52 +26,25 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode,
 }
 
 function App() {
-  const { user, logout } = useAuthStore();
-
   return (
     <BrowserRouter>
-      <div className="min-h-screen flex flex-col">
-        {/* Navigation Bar */}
-        <nav className="bg-seatzy-black text-seatzy-white border-b-4 border-seatzy-black p-4 flex justify-between items-center z-10">
-          <div className="text-3xl font-black uppercase tracking-tighter text-seatzy-acid-yellow">Seatzy</div>
-          <div className="space-x-4">
-            {user ? (
-              <>
-                <span className="font-mono text-sm">Hi, {user.name}</span>
-                {user.role === 'admin' && <a href="/admin/venues" className="hover:text-seatzy-cyan font-bold uppercase">Venues</a>}
-                {user.role === 'organiser' && <a href="/organiser/dashboard" className="hover:text-seatzy-cyan font-bold uppercase">Dashboard</a>}
-                {user.role === 'customer' && (
-                  <>
-                    <a href="/events" className="hover:text-seatzy-cyan font-bold uppercase">Events</a>
-                    <a href="/bookings" className="hover:text-seatzy-cyan font-bold uppercase">My Bookings</a>
-                  </>
-                )}
-                <button onClick={logout} className="neo-btn bg-seatzy-magenta text-seatzy-white px-4 py-1 text-sm border-2">Logout</button>
-              </>
-            ) : (
-              <>
-                <a href="/login" className="hover:text-seatzy-cyan font-bold uppercase">Login</a>
-                <a href="/register" className="neo-btn bg-seatzy-acid-yellow text-seatzy-black px-4 py-1 text-sm border-2">Register</a>
-              </>
-            )}
-          </div>
-        </nav>
-
-        {/* Main Content */}
-        <main className="flex-grow overflow-hidden">
-          <Routes>
-            <Route path="/" element={<Navigate to="/events" />} />
-            {/* Auth pages — full viewport, no padding */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            {/* App pages — padded container */}
-            <Route path="/*" element={
-              <div className="px-4 md:px-8 pt-6 pb-12">
+      <div className="min-h-screen flex flex-col font-body-md blueprint-bg">
+        <Routes>
+          {/* Auth pages — full viewport, no padding, no global nav/footer */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/events/:eventId/shows/:showId/map" element={
+            <ProtectedRoute allowedRoles={['customer']}><SeatMap /></ProtectedRoute>
+          } />
+          
+          {/* App pages — standard layout with Nav and Footer */}
+          <Route path="/*" element={
+            <>
+              <Navbar />
+              <main className="flex-grow w-full max-w-[1440px] mx-auto flex flex-col">
                 <Routes>
+                  <Route path="/" element={<Navigate to="/events" />} />
                   <Route path="/events" element={<Events />} />
-                  <Route path="/events/:eventId/shows/:showId/map" element={
-                    <ProtectedRoute allowedRoles={['customer']}><SeatMap /></ProtectedRoute>
-                  } />
                   <Route path="/bookings" element={
                     <ProtectedRoute allowedRoles={['customer']}><Bookings /></ProtectedRoute>
                   } />
@@ -79,10 +56,11 @@ function App() {
                     <ProtectedRoute allowedRoles={['admin']}><AdminVenues /></ProtectedRoute>
                   } />
                 </Routes>
-              </div>
-            } />
-          </Routes>
-        </main>
+              </main>
+              <Footer />
+            </>
+          } />
+        </Routes>
       </div>
     </BrowserRouter>
   );
