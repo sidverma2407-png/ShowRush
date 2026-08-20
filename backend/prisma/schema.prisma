@@ -1,0 +1,232 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  customer
+  organiser
+  admin
+}
+
+enum EventType {
+  movie
+  concert
+}
+
+enum ShowStatus {
+  scheduled
+  completed
+  cancelled
+}
+
+enum SeatStatusEnum {
+  available
+  held
+  booked
+}
+
+enum BookingStatus {
+  confirmed
+  cancelled
+}
+
+enum WaitlistStatus {
+  waiting
+  offered
+  expired
+  booked
+  cancelled
+}
+
+model User {
+  id            String  @id @default(uuid()) @db.Uuid
+  name          String
+  email         String  @unique
+  password_hash String
+  role          Role
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  venues_created   Venue[]
+  events_organized Event[]
+  seat_holds       SeatStatus[]
+  bookings         Booking[]
+  waitlist_entries WaitlistEntry[]
+
+  @@map("users")
+}
+
+model Venue {
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String
+  address    String
+  created_by String   @db.Uuid
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  creator    User     @relation(fields: [created_by], references: [id])
+  seats      VenueSeat[]
+  shows      Show[]
+
+  @@map("venues")
+}
+
+model SeatCategory {
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  venue_seats      VenueSeat[]
+  show_pricing     ShowCategoryPricing[]
+  waitlist_entries WaitlistEntry[]
+
+  @@map("seat_categories")
+}
+
+model VenueSeat {
+  id           String   @id @default(uuid()) @db.Uuid
+  venue_id     String   @db.Uuid
+  row_label    String
+  seat_number  Int
+  category_id  String   @db.Uuid
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  venue        Venue        @relation(fields: [venue_id], references: [id])
+  category     SeatCategory @relation(fields: [category_id], references: [id])
+  seat_statuses SeatStatus[]
+  booking_seats BookingSeat[]
+  waitlist_offers WaitlistEntry[] @relation("OfferedSeat")
+
+  @@unique([venue_id, row_label, seat_number])
+  @@map("venue_seats")
+}
+
+model Event {
+  id           String    @id @default(uuid()) @db.Uuid
+  organiser_id String    @db.Uuid
+  title        String
+  type         EventType
+  description  String
+  poster_url   String?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  organiser    User      @relation(fields: [organiser_id], references: [id])
+  shows        Show[]
+
+  @@map("events")
+}
+
+model Show {
+  id         String     @id @default(uuid()) @db.Uuid
+  event_id   String     @db.Uuid
+  venue_id   String     @db.Uuid
+  date       DateTime   @db.Date
+  time       String     // e.g. "19:00"
+  status     ShowStatus @default(scheduled)
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+
+  event            Event                 @relation(fields: [event_id], references: [id])
+  venue            Venue                 @relation(fields: [venue_id], references: [id])
+  pricing          ShowCategoryPricing[]
+  seat_statuses    SeatStatus[]
+  bookings         Booking[]
+  waitlist_entries WaitlistEntry[]
+
+  @@map("shows")
+}
+
+model ShowCategoryPricing {
+  id          String   @id @default(uuid()) @db.Uuid
+  show_id     String   @db.Uuid
+  category_id String   @db.Uuid
+  price       Decimal  @db.Decimal(10, 2)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  show        Show         @relation(fields: [show_id], references: [id])
+  category    SeatCategory @relation(fields: [category_id], references: [id])
+
+  @@unique([show_id, category_id])
+  @@map("show_category_pricing")
+}
+
+model SeatStatus {
+  id              String         @id @default(uuid()) @db.Uuid
+  show_id         String         @db.Uuid
+  venue_seat_id   String         @db.Uuid
+  status          SeatStatusEnum @default(available)
+  held_by         String?        @db.Uuid
+  hold_expires_at DateTime?      @db.Timestamptz
+  booking_id      String?        @db.Uuid
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+
+  show            Show         @relation(fields: [show_id], references: [id])
+  venue_seat      VenueSeat    @relation(fields: [venue_seat_id], references: [id])
+  holder          User?        @relation(fields: [held_by], references: [id])
+  booking         Booking?     @relation(fields: [booking_id], references: [id])
+
+  @@unique([show_id, venue_seat_id])
+  @@map("seat_status")
+}
+
+model Booking {
+  id                String        @id @default(uuid()) @db.Uuid
+  customer_id       String        @db.Uuid
+  show_id           String        @db.Uuid
+  booking_reference String        @unique
+  total_price       Decimal       @db.Decimal(10, 2)
+  status            BookingStatus @default(confirmed)
+  qr_code_url       String?
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+
+  customer          User          @relation(fields: [customer_id], references: [id])
+  show              Show          @relation(fields: [show_id], references: [id])
+  seats             BookingSeat[]
+  seat_statuses     SeatStatus[]
+
+  @@map("bookings")
+}
+
+model BookingSeat {
+  id            String   @id @default(uuid()) @db.Uuid
+  booking_id    String   @db.Uuid
+  venue_seat_id String   @db.Uuid
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  booking       Booking    @relation(fields: [booking_id], references: [id])
+  venue_seat    VenueSeat  @relation(fields: [venue_seat_id], references: [id])
+
+  @@map("booking_seats")
+}
+
+model WaitlistEntry {
+  id                    String         @id @default(uuid()) @db.Uuid
+  show_id               String         @db.Uuid
+  category_id           String         @db.Uuid
+  customer_id           String         @db.Uuid
+  position              Int
+  status                WaitlistStatus @default(waiting)
+  offered_venue_seat_id String?        @db.Uuid
+  offer_expires_at      DateTime?      @db.Timestamptz
+  created_at            DateTime       @default(now())
+  updated_at            DateTime       @updatedAt
+
+  show                  Show           @relation(fields: [show_id], references: [id])
+  category              SeatCategory   @relation(fields: [category_id], references: [id])
+  customer              User           @relation(fields: [customer_id], references: [id])
+  offered_seat          VenueSeat?     @relation("OfferedSeat", fields: [offered_venue_seat_id], references: [id])
+
+  @@map("waitlist_entries")
+}
