@@ -13,7 +13,7 @@ import { errorHandler } from './middleware/errorHandler';
 import { startScheduler } from './jobs/scheduler';
 
 // Load environment variables from the root .env file
-dotenv.config({ path: path.join(__dirname, '../../.env') });
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const app = express();
 const httpServer = createServer(app);
