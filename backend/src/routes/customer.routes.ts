@@ -21,13 +21,12 @@ router.get('/shows/:id/seats', getSeatMap);
 router.get('/waitlist/offer/:token', viewWaitlistOffer);
 
 // Authenticated routes
-router.use(authenticate);
-router.post('/shows/:id/hold', holdSeats);
-router.delete('/holds/:id', releaseHold);
-router.post('/bookings', confirmBooking);
-router.get('/bookings', getMyBookings);
-router.delete('/bookings/:id', cancelBooking);
-router.post('/shows/:id/waitlist', joinWaitlist);
-router.post('/waitlist/offer/:token/accept', acceptWaitlistOffer);
+router.post('/shows/:id/hold', authenticate, holdSeats);
+router.delete('/holds/:id', authenticate, releaseHold);
+router.post('/bookings', authenticate, confirmBooking);
+router.get('/bookings', authenticate, getMyBookings);
+router.delete('/bookings/:id', authenticate, cancelBooking);
+router.post('/shows/:id/waitlist', authenticate, joinWaitlist);
+router.post('/waitlist/offer/:token/accept', authenticate, acceptWaitlistOffer);
 
 export default router;

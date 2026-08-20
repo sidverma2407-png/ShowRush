@@ -10,16 +10,14 @@ import {
 } from '../controllers/admin.controller';
 
 const router = Router();
+const adminAuth = [authenticate, requireRole(['admin'])];
 
-// All admin routes require admin role
-router.use(authenticate, requireRole(['admin']));
+router.get('/venues', ...adminAuth, getVenues);
+router.post('/venues', ...adminAuth, createVenue);
+router.put('/venues/:id', ...adminAuth, updateVenue);
+router.post('/venues/:id/seats', ...adminAuth, createVenueSeats);
 
-router.get('/venues', getVenues);
-router.post('/venues', createVenue);
-router.put('/venues/:id', updateVenue);
-router.post('/venues/:id/seats', createVenueSeats);
-
-router.get('/seat-categories', getSeatCategories);
-router.post('/seat-categories', createSeatCategory);
+router.get('/seat-categories', ...adminAuth, getSeatCategories);
+router.post('/seat-categories', ...adminAuth, createSeatCategory);
 
 export default router;

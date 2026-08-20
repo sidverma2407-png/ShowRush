@@ -4,6 +4,14 @@ import { BadRequestError, NotFoundError } from '../utils/errors';
 import { AuthRequest } from '../middleware/auth';
 import { EventType, ShowStatus } from '@prisma/client';
 
+export const getMyEvents = async (req: AuthRequest, res: Response) => {
+  const events = await prisma.event.findMany({
+    where: { organiser_id: req.user!.id },
+    include: { shows: true }
+  });
+  res.json({ status: 'success', data: events });
+};
+
 export const createEvent = async (req: AuthRequest, res: Response) => {
   const { title, type, description, poster_url } = req.body;
   if (!title || !type || !description) {
