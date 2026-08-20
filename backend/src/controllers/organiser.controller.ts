@@ -167,11 +167,24 @@ export const getEventSummary = async (req: AuthRequest, res: Response) => {
     };
   });
 
+  const recent_bookings = bookings
+    .sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
+    .slice(0, 50)
+    .map(b => ({
+      id: b.id,
+      reference: b.booking_reference,
+      customer_name: b.customer_name || 'N/A',
+      customer_phone: b.customer_phone || 'N/A',
+      total_price: Number(b.total_price),
+      date: b.created_at
+    }));
+
   res.json({
     status: 'success',
     data: {
       total_revenue: totalRevenue,
-      shows: summary
+      shows: summary,
+      recent_bookings
     }
   });
 };

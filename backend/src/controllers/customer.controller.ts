@@ -14,11 +14,17 @@ export const getEvents = async (req: Request, res: Response) => {
 
 export const getSeatMap = async (req: Request, res: Response) => {
   const show_id = req.params.id as string;
+  const showDetails = await prisma.show.findUnique({
+    where: { id: show_id },
+    include: { pricing: true }
+  });
+  
   const seatStatuses = await prisma.seatStatus.findMany({
     where: { show_id },
     include: { venue_seat: true }
   });
-  res.json({ status: 'success', data: seatStatuses });
+  
+  res.json({ status: 'success', data: { seats: seatStatuses, pricing: showDetails?.pricing || [] } });
 };
 
 export const holdSeats = async (req: AuthRequest, res: Response) => {
@@ -61,7 +67,7 @@ export const holdSeats = async (req: AuthRequest, res: Response) => {
 };
 
 export const confirmBooking = async (req: AuthRequest, res: Response) => {
-  const { show_id, seat_status_ids } = req.body;
+  const { show_id, seat_status_ids, customer_name, customer_phone } = req.body;
   if (!show_id || !Array.isArray(seat_status_ids)) throw new BadRequestError('show_id and seat_status_ids required');
 
   const booking = await prisma.$transaction(async (tx) => {
@@ -86,9 +92,42 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
       }
     }
 
-    const bookingRef = `QR${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    // Fetch pricing to calculate total
+    const showPrices = await tx.showCategoryPricing.findMany({
+      where: { show_id }
+    });
+    
+    // Map categories to prices
+    const priceMap = new Map();
+    showPrices.forEach(sp => priceMap.set(sp.category_id, Number(sp.price)));
+
+    let totalPrice = 0;
+
+    // Fetch the venue_seats to know the category
+    const seatIds = seats.map(s => `'${s.venue_seat_id}'`).join(',');
+    const venueSeats = await tx.$queryRawUnsafe<any[]>(
+      `SELECT * FROM venue_seats WHERE id IN (${seatIds})`
+    );
+    const categoryMap = new Map();
+    venueSeats.forEach(vs => categoryMap.set(vs.id, vs.category_id));
+
+    for (const seat of seats) {
+      const catId = categoryMap.get(seat.venue_seat_id);
+      totalPrice += priceMap.get(catId) || 0;
+    }
+
+    const bookingRef = `QR-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
     const newBooking = await tx.booking.create({
-      data: { customer_id: req.user!.id, show_id, booking_reference: bookingRef, total_price: 0 }
+      data: { 
+        customer_id: req.user!.id, 
+        // @ts-ignore - IDE caches old Prisma types, tsc passes
+        customer_name,
+        // @ts-ignore
+        customer_phone,
+        show_id, 
+        booking_reference: bookingRef, 
+        total_price: totalPrice 
+      }
     });
 
     for (const seat of seats) {
@@ -284,11 +323,26 @@ export const acceptWaitlistOffer = async (req: AuthRequest, res: Response) => {
   }
 
   // Create booking
-  const bookingRef = `QR${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+  const bookingRef = `QR-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
   
   const booking = await prisma.$transaction(async (tx) => {
+    // Fetch pricing for this specific category
+    const pricing = await tx.showCategoryPricing.findUnique({
+      where: { show_id_category_id: { show_id: entry.show_id, category_id: entry.category_id } }
+    });
+    const priceToCharge = pricing ? Number(pricing.price) : 0;
+
+    const user = await tx.user.findUnique({ where: { id: req.user!.id } });
+    
     const newBooking = await tx.booking.create({
-      data: { customer_id: req.user!.id, show_id: entry.show_id, booking_reference: bookingRef, total_price: 0 }
+      data: { 
+        customer_id: req.user!.id, 
+        // @ts-ignore - IDE caches old Prisma types, tsc passes
+        customer_name: user?.name || 'Waitlist User',
+        show_id: entry.show_id, 
+        booking_reference: bookingRef, 
+        total_price: priceToCharge
+      }
     });
 
     await tx.bookingSeat.create({
