@@ -53,8 +53,8 @@ function App() {
           </div>
         </nav>
 
-        {/* Main Content */}
-        <main className="flex-grow p-4 md:p-8">
+        {/* Main Content — no padding here; each page manages its own bleed */}
+        <main className="flex-grow px-4 md:px-8 pt-6 pb-12">
           <Routes>
             <Route path="/" element={<Navigate to="/events" />} />
             <Route path="/login" element={<Login />} />

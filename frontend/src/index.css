@@ -5,24 +5,65 @@
 @layer base {
   body {
     @apply bg-seatzy-white text-seatzy-black font-sans;
-    /* subtle architectural/blueprint grid pattern */
+    /* Bold blueprint grid — clearly visible */
     background-image: 
-      linear-gradient(to right, rgba(229, 229, 229, 0.5) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(229, 229, 229, 0.5) 1px, transparent 1px);
-    background-size: 50px 50px;
+      linear-gradient(to right, rgba(0,0,0,0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,0,0,0.06) 1px, transparent 1px);
+    background-size: 70px 70px;
   }
 }
 
 @layer components {
   .neo-btn {
-    @apply border-4 border-seatzy-black shadow-neo font-bold uppercase tracking-tight transition-transform active:translate-x-1 active:translate-y-1 active:shadow-none;
+    @apply border-4 border-seatzy-black shadow-neo font-bold uppercase tracking-tight transition-transform active:translate-x-1 active:translate-y-1 active:shadow-none cursor-pointer;
+  }
+
+  .neo-btn-hero {
+    @apply border-4 border-seatzy-black shadow-neo-lg font-black uppercase tracking-tight transition-transform active:translate-x-2 active:translate-y-2 active:shadow-none cursor-pointer;
   }
   
   .neo-card {
     @apply border-4 border-seatzy-black shadow-neo bg-seatzy-white;
   }
 
+  .neo-card-lg {
+    @apply border-4 border-seatzy-black shadow-neo-lg bg-seatzy-white;
+  }
+
   .neo-input {
     @apply border-4 border-seatzy-black bg-seatzy-white p-3 font-mono focus:outline-none focus:ring-2 focus:ring-seatzy-acid-yellow;
+  }
+
+  /* Diagonal hash pattern for empty poster placeholders */
+  .hash-pattern {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 6px,
+      rgba(0,0,0,0.08) 6px,
+      rgba(0,0,0,0.08) 7px
+    );
+  }
+
+  /* Rotated brutalist stamp badge */
+  .stamp-badge {
+    @apply font-black uppercase border-4 border-seatzy-black px-3 py-1 tracking-widest text-sm inline-block;
+    transform: rotate(-3deg);
+  }
+
+  .stamp-badge-magenta {
+    @apply stamp-badge bg-seatzy-magenta text-seatzy-white;
+  }
+
+  .stamp-badge-cyan {
+    @apply stamp-badge bg-seatzy-cyan text-seatzy-black;
+  }
+
+  .stamp-badge-yellow {
+    @apply stamp-badge bg-seatzy-acid-yellow text-seatzy-black;
+  }
+
+  .stamp-badge-black {
+    @apply stamp-badge bg-seatzy-black text-seatzy-white;
   }
 }
