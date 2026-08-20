@@ -7,7 +7,10 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  console.error(err);
+  // Always log the full error in dev for debugging
+  console.error('[ERROR]', err.name, err.message);
+  if ((err as any).meta) console.error('[PRISMA META]', (err as any).meta);
+  if ((err as any).code) console.error('[CODE]', (err as any).code);
 
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({

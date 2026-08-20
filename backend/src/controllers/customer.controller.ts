@@ -73,8 +73,17 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
 
     const now = new Date();
     for (const seat of seats) {
-      if (seat.status !== 'held' || seat.held_by !== req.user!.id) throw new ConflictError('Seat is not held by you or hold expired');
-      if (seat.hold_expires_at && new Date(seat.hold_expires_at) < now) throw new ConflictError('Hold has expired');
+      const seatHeldBy = seat.held_by ? String(seat.held_by).toLowerCase().trim() : null;
+      const userId = req.user!.id.toLowerCase().trim();
+      if (seat.status !== 'held') {
+        throw new ConflictError(`Seat ${seat.id} is not in held status (current: ${seat.status})`);
+      }
+      if (seatHeldBy !== userId) {
+        throw new ConflictError('Seat is not held by you or hold expired');
+      }
+      if (seat.hold_expires_at && new Date(seat.hold_expires_at) < now) {
+        throw new ConflictError('Hold has expired — please re-select and hold the seat');
+      }
     }
 
     const bookingRef = `QR${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
@@ -119,7 +128,9 @@ export const releaseHold = async (req: AuthRequest, res: Response) => {
     const seatArray = await tx.$queryRawUnsafe<any[]>(`SELECT * FROM seat_status WHERE id = $1 FOR UPDATE`, id);
     if (!seatArray.length) throw new NotFoundError('Seat not found');
     const seat = seatArray[0];
-    if (seat.held_by !== req.user!.id) throw new ConflictError('You do not hold this seat');
+    const seatHeldBy = seat.held_by ? String(seat.held_by).toLowerCase().trim() : null;
+    const userId = req.user!.id.toLowerCase().trim();
+    if (seatHeldBy !== userId) throw new ConflictError('You do not hold this seat');
 
     return await tx.seatStatus.update({
       where: { id },
