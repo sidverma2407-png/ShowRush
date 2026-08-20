@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: seatzy-db
+    restart: always
+    environment:
+      POSTGRES_USER: seatzy_user
+      POSTGRES_PASSWORD: seatzy_password
+      POSTGRES_DB: seatzy_dev
+    ports:
+      - '5432:5432'
+    volumes:
+      - seatzy_pgdata:/var/lib/postgresql/data
+
+volumes:
+  seatzy_pgdata:
