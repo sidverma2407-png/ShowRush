@@ -24,7 +24,7 @@ export const createEvent = async (req: AuthRequest, res: Response) => {
 };
 
 export const updateEvent = async (req: AuthRequest, res: Response) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   const { title, type, description, poster_url } = req.body;
 
   // Verify ownership
@@ -42,7 +42,7 @@ export const updateEvent = async (req: AuthRequest, res: Response) => {
 };
 
 export const createShow = async (req: AuthRequest, res: Response) => {
-  const { id: event_id } = req.params;
+  const event_id = req.params.id as string;
   const { venue_id, date, time } = req.body; // e.g. date: '2026-10-15T00:00:00Z', time: '19:00'
 
   if (!venue_id || !date || !time) throw new BadRequestError('Venue, date, and time required');
@@ -90,7 +90,7 @@ export const createShow = async (req: AuthRequest, res: Response) => {
 };
 
 export const updateShowPricing = async (req: AuthRequest, res: Response) => {
-  const { id: show_id } = req.params;
+  const show_id = req.params.id as string;
   const { pricing } = req.body; // Array of { category_id, price }
 
   if (!Array.isArray(pricing)) throw new BadRequestError('Pricing array required');
@@ -120,7 +120,7 @@ export const updateShowPricing = async (req: AuthRequest, res: Response) => {
 };
 
 export const getEventSummary = async (req: AuthRequest, res: Response) => {
-  const { id: event_id } = req.params;
+  const event_id = req.params.id as string;
 
   // Verify ownership
   const event = await prisma.event.findUnique({ where: { id: event_id } });
@@ -142,13 +142,13 @@ export const getEventSummary = async (req: AuthRequest, res: Response) => {
       seat_statuses: true,
       waitlist_entries: true
     }
-  });
+  }) as any[];
 
   const summary = shows.map(show => {
-    const available = show.seat_statuses.filter(s => s.status === 'available').length;
-    const booked = show.seat_statuses.filter(s => s.status === 'booked').length;
-    const held = show.seat_statuses.filter(s => s.status === 'held').length;
-    const waitlist = show.waitlist_entries.filter(w => w.status === 'waiting').length;
+    const available = show.seat_statuses.filter((s: any) => s.status === 'available').length;
+    const booked = show.seat_statuses.filter((s: any) => s.status === 'booked').length;
+    const held = show.seat_statuses.filter((s: any) => s.status === 'held').length;
+    const waitlist = show.waitlist_entries.filter((w: any) => w.status === 'waiting').length;
 
     return {
       show_id: show.id,

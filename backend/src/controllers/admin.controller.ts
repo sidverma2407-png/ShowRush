@@ -16,7 +16,7 @@ export const createVenue = async (req: AuthRequest, res: Response) => {
 };
 
 export const updateVenue = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   const { name, address } = req.body;
 
   const venue = await prisma.venue.update({
@@ -51,7 +51,7 @@ export const getSeatCategories = async (req: Request, res: Response) => {
 
 // --- Bulk Layout Upload ---
 export const createVenueSeats = async (req: Request, res: Response) => {
-  const { id: venue_id } = req.params;
+  const venue_id = req.params.id as string;
   const { seats } = req.body; // Array of { row_label, seat_number, category_id }
 
   if (!Array.isArray(seats) || seats.length === 0) {

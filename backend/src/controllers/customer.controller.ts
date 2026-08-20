@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
-import { BadRequestError, NotFoundError, ConflictError } from '../utils/errors';
+import { BadRequestError, NotFoundError, ConflictError, ForbiddenError } from '../utils/errors';
 import { AuthRequest } from '../middleware/auth';
 import { io } from '../index';
 import { sendBookingEmail, sendWaitlistOfferEmail } from '../utils/email';
@@ -13,7 +13,7 @@ export const getEvents = async (req: Request, res: Response) => {
 };
 
 export const getSeatMap = async (req: Request, res: Response) => {
-  const { id: show_id } = req.params;
+  const show_id = req.params.id as string;
   const seatStatuses = await prisma.seatStatus.findMany({
     where: { show_id },
     include: { venue_seat: true }
@@ -22,7 +22,7 @@ export const getSeatMap = async (req: Request, res: Response) => {
 };
 
 export const holdSeats = async (req: AuthRequest, res: Response) => {
-  const { id: show_id } = req.params;
+  const show_id = req.params.id as string;
   const { seat_ids } = req.body;
   if (!Array.isArray(seat_ids) || seat_ids.length === 0) throw new BadRequestError('seat_ids array required');
 
@@ -114,7 +114,7 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
 };
 
 export const releaseHold = async (req: AuthRequest, res: Response) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   const updatedSeat = await prisma.$transaction(async (tx) => {
     const seatArray = await tx.$queryRawUnsafe<any[]>(`SELECT * FROM seat_status WHERE id = $1 FOR UPDATE`, id);
     if (!seatArray.length) throw new NotFoundError('Seat not found');
@@ -142,11 +142,11 @@ export const getMyBookings = async (req: AuthRequest, res: Response) => {
 // -- Waitlist & Cancel Booking flow -- //
 
 export const cancelBooking = async (req: AuthRequest, res: Response) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   const booking = await prisma.booking.findUnique({
     where: { id },
     include: { seats: { include: { venue_seat: true } }, show: true }
-  });
+  }) as any;
 
   if (!booking || booking.customer_id !== req.user!.id) throw new NotFoundError('Booking not found');
   if (booking.status === 'cancelled') throw new ConflictError('Already cancelled');
@@ -218,7 +218,7 @@ export const cancelBooking = async (req: AuthRequest, res: Response) => {
 };
 
 export const joinWaitlist = async (req: AuthRequest, res: Response) => {
-  const { id: show_id } = req.params;
+  const show_id = req.params.id as string;
   const { category_id } = req.body;
   if (!category_id) throw new BadRequestError('category_id required');
 
@@ -248,7 +248,7 @@ export const joinWaitlist = async (req: AuthRequest, res: Response) => {
 };
 
 export const viewWaitlistOffer = async (req: Request, res: Response) => {
-  const { token } = req.params;
+  const token = req.params.token as string;
   const entry = await prisma.waitlistEntry.findUnique({
     where: { id: token },
     include: { show: { include: { event: true } }, offered_seat: true }
@@ -263,7 +263,7 @@ export const viewWaitlistOffer = async (req: Request, res: Response) => {
 };
 
 export const acceptWaitlistOffer = async (req: AuthRequest, res: Response) => {
-  const { token } = req.params;
+  const token = req.params.token as string;
   const entry = await prisma.waitlistEntry.findUnique({ where: { id: token } });
 
   if (!entry) throw new NotFoundError('Waitlist offer not found');

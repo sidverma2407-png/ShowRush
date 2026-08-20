@@ -21,7 +21,7 @@ export default function SeatMap() {
     });
 
     // Connect to websocket
-    const newSocket = io(process.env.REACT_APP_API_URL || 'http://localhost:3000');
+    const newSocket = io((import.meta as any).env?.VITE_API_URL || 'http://localhost:3000');
     setSocket(newSocket);
 
     // Join room
