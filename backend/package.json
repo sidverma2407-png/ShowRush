@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.ts",
+    "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -35,9 +35,8 @@
     "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^8.0.1",
     "@types/qrcode": "^1.5.6",
-    "nodemon": "^3.1.14",
+    "tsx": "^4.19.1",
     "prisma": "^7.9.1",
-    "ts-node": "^10.9.2",
-    "typescript": "^7.0.2"
+    "typescript": "^5.5.4"
   }
 }
