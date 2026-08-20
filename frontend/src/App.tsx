@@ -5,9 +5,8 @@ import { useAuthStore } from './store/auth';
 // Pages
 import Login from './pages/Login';
 import Register from './pages/Register';
-// Placeholder imports for now
-const Events = () => <div className="p-8">Events</div>;
-const SeatMap = () => <div className="p-8">Seat Map</div>;
+import Events from './pages/Events';
+import SeatMap from './pages/SeatMap';
 const Dashboard = () => <div className="p-8">Organiser Dashboard</div>;
 const Venues = () => <div className="p-8">Admin Venues</div>;
 
