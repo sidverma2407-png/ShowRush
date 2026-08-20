@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { io, Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { fetchApi } from '../api/client';
 import { useAuthStore } from '../store/auth';
 
 export default function SeatMap() {
-  const { eventId, showId } = useParams();
+  const { showId } = useParams();
   const [seats, setSeats] = useState<any[]>([]);
-  const [socket, setSocket] = useState<Socket | null>(null);
   const [selectedSeat, setSelectedSeat] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const user = useAuthStore(state => state.user);
@@ -22,7 +21,6 @@ export default function SeatMap() {
 
     // Connect to websocket
     const newSocket = io((import.meta as any).env?.VITE_API_URL || 'http://localhost:3000');
-    setSocket(newSocket);
 
     // Join room
     newSocket.emit('join_room', showId);

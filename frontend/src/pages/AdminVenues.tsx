@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, FormEvent } from 'react';
 import { fetchApi } from '../api/client';
 
 export default function AdminVenues() {
@@ -14,7 +14,7 @@ export default function AdminVenues() {
     loadVenues();
   }, []);
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleCreate = async (e: FormEvent) => {
     e.preventDefault();
     try {
       await fetchApi('/venues', {

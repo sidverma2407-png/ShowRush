@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchApi } from '../api/client';
-import { useAuthStore } from '../store/auth';
 
 export default function OrganiserDashboard() {
   const [events, setEvents] = useState<any[]>([]);
-  const user = useAuthStore(state => state.user);
 
   useEffect(() => {
     // In a real app we'd fetch only organiser's events and summaries.
