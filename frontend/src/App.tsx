@@ -6,6 +6,7 @@ import { useAuthStore } from './store/auth';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Events from './pages/Events';
+import Explore from './pages/Explore';
 import SeatMap from './pages/SeatMap';
 import Bookings from './pages/Bookings';
 import WaitlistOffer from './pages/WaitlistOffer';
@@ -43,7 +44,8 @@ function App() {
               <Navbar />
               <main className="flex-grow w-full max-w-[1440px] mx-auto flex flex-col">
                 <Routes>
-                  <Route path="/" element={<Navigate to="/events" />} />
+                  <Route path="/" element={<Navigate to="/explore" />} />
+                  <Route path="/explore" element={<Explore />} />
                   <Route path="/events" element={<Events />} />
                   <Route path="/bookings" element={
                     <ProtectedRoute allowedRoles={['customer']}><Bookings /></ProtectedRoute>

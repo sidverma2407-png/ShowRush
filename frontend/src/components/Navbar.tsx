@@ -63,8 +63,11 @@ export default function Navbar() {
               )}
               {user.role === 'customer' && (
                 <>
+                  <Link to="/explore" className={`font-headline-lg text-lg md:text-xl uppercase font-bold transition-all ${location.pathname === '/explore' ? 'text-primary-fixed underline decoration-4 underline-offset-8' : 'text-on-primary hover:translate-x-[-2px] hover:translate-y-[-2px]'}`}>
+                    Explore
+                  </Link>
                   <Link to="/events" className={`font-headline-lg text-lg md:text-xl uppercase font-bold transition-all ${location.pathname === '/events' ? 'text-primary-fixed underline decoration-4 underline-offset-8' : 'text-on-primary hover:translate-x-[-2px] hover:translate-y-[-2px]'}`}>
-                    Browse
+                    Events
                   </Link>
                   <Link to="/bookings" className={`font-headline-lg text-lg md:text-xl uppercase font-bold transition-all ${location.pathname.startsWith('/bookings') ? 'text-primary-fixed underline decoration-4 underline-offset-8' : 'text-on-primary hover:translate-x-[-2px] hover:translate-y-[-2px]'}`}>
                     My Bookings

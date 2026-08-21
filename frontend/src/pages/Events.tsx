@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { fetchApi } from '../api/client';
 
 export default function Events() {
@@ -8,13 +8,24 @@ export default function Events() {
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('');
-  const [typeFilter, setTypeFilter] = useState('');
+
+  const [searchParams] = useSearchParams();
+  const initialType = searchParams.get('type') || '';
+  const [typeFilter, setTypeFilter] = useState(initialType);
+
   const [selectedCity, setSelectedCity] = useState<string>(() => {
     return localStorage.getItem('seatzy_selected_city') || 'All Cities';
   });
 
   const navigate = useNavigate();
   const eventsGridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const paramType = searchParams.get('type');
+    if (paramType) {
+      setTypeFilter(paramType);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     fetchApi('/events')
@@ -29,13 +40,6 @@ export default function Events() {
     return () => window.removeEventListener('seatzy_city_changed' as any, handleCityChange);
   }, []);
 
-  const handleCategoryExplore = (type: string) => {
-    setTypeFilter(type);
-    if (eventsGridRef.current) {
-      eventsGridRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center bg-background">
@@ -45,41 +49,6 @@ export default function Events() {
       </div>
     );
   }
-
-  const categoryCards = [
-    {
-      id: 'movie',
-      title: 'MOVIES',
-      subtitle: 'Blockbusters & Cinema',
-      icon: 'movie',
-      color: 'bg-amber-400 text-on-background border-amber-600',
-      badge: 'CINEMA EXPERIENCE'
-    },
-    {
-      id: 'comedy',
-      title: 'COMEDY',
-      subtitle: 'Standup & Roasts',
-      icon: 'mic',
-      color: 'bg-yellow-300 text-on-background border-yellow-600',
-      badge: 'FLAT ₹350 SEATS'
-    },
-    {
-      id: 'sports',
-      title: 'SPORTS',
-      subtitle: 'Cricket & Football',
-      icon: 'stadium',
-      color: 'bg-emerald-400 text-on-background border-emerald-700',
-      badge: 'STADIUM ATMOSPHERE'
-    },
-    {
-      id: 'concert',
-      title: 'CONCERTS',
-      subtitle: '360° Live Music',
-      icon: 'graphic_eq',
-      color: 'bg-cyan-400 text-on-background border-cyan-700',
-      badge: 'VIP STAGE ACCESS'
-    }
-  ];
 
   return (
     <div className="w-full bg-background selection:bg-primary-fixed selection:text-on-primary-fixed">
@@ -108,68 +77,8 @@ export default function Events() {
         <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #fff 0, #fff 2px, transparent 2px, transparent 20px)' }}></div>
       </section>
 
-      {/* "WHAT DO U WANNA EXPLORE TODAY?" CATEGORY PORTAL */}
-      <section className="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-10 border-b-4 border-on-background bg-surface-container blueprint-bg">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div>
-            <h2 className="font-headline-lg-mobile md:font-headline-lg uppercase text-on-surface font-black tracking-tight flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary-fixed text-3xl font-black">explore</span>
-              WHAT DO U WANNA EXPLORE TODAY?
-            </h2>
-            <p className="font-data-label text-data-label uppercase text-on-surface-variant mt-1 font-bold">
-              PICK A CATEGORY TO INSTANTLY FILTER LIVE EVENTS IN {selectedCity.toUpperCase()}
-            </p>
-          </div>
-        </div>
-
-        {/* 4 Interactive Category Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categoryCards.map((cat) => {
-            const isSelected = typeFilter.toLowerCase() === cat.id;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => handleCategoryExplore(cat.id)}
-                className={`p-6 border-4 border-on-background flex flex-col justify-between text-left transition-all relative overflow-hidden group cursor-pointer ${
-                  isSelected
-                    ? 'bg-primary-fixed text-on-primary-fixed neo-brutalism-shadow translate-x-[-4px] translate-y-[-4px]'
-                    : 'bg-surface text-on-surface hover:bg-surface-container hover:neo-brutalism-shadow hover:translate-x-[-4px] hover:translate-y-[-4px]'
-                }`}
-              >
-                <div className="flex justify-between items-start mb-6">
-                  <div className={`w-14 h-14 border-4 border-on-background ${cat.color} flex items-center justify-center neo-brutalism-shadow-sm group-hover:scale-110 transition-transform`}>
-                    <span className="material-symbols-outlined text-3xl font-black">{cat.icon}</span>
-                  </div>
-                  <span className="font-mono text-[9px] font-black uppercase px-2 py-0.5 bg-on-background text-on-primary border border-on-background">
-                    {cat.badge}
-                  </span>
-                </div>
-
-                <div>
-                  <h3 className="font-headline-lg-mobile text-2xl uppercase font-black tracking-tight mb-1 group-hover:text-primary-fixed transition-colors">
-                    {cat.title}
-                  </h3>
-                  <p className="font-data-label text-xs uppercase opacity-80 font-bold">
-                    {cat.subtitle}
-                  </p>
-                </div>
-
-                <div className="mt-6 pt-4 border-t-2 border-on-background flex items-center justify-between">
-                  <span className="font-data-label text-[10px] uppercase font-black">
-                    {isSelected ? '✓ ACTIVE FILTER' : 'EXPLORE'}
-                  </span>
-                  <span className="material-symbols-outlined text-lg font-black group-hover:translate-x-1 transition-transform">
-                    arrow_forward
-                  </span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
       {/* Search / Filter Bar & Active City Marker */}
-      <section ref={eventsGridRef} className="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-gutter flex flex-col md:flex-row gap-4 items-stretch md:items-center">
+      <section ref={eventsGridRef} className="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-8 flex flex-col md:flex-row gap-4 items-stretch md:items-center">
         <div className="flex-grow min-w-0 flex relative">
           <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-on-surface-variant z-10" style={{ fontVariationSettings: "'FILL' 1" }}>search</span>
           <input 
@@ -262,12 +171,13 @@ export default function Events() {
                   className="bg-surface border-border-width border-on-background flex flex-col group neo-brutalist-shadow neo-brutalist-hover transition-all relative overflow-hidden cursor-pointer" 
                   onClick={() => setSelectedEvent(event)}
                 >
-                  <div className="relative h-[340px] md:h-[380px] border-b-4 border-on-background overflow-hidden bg-black">
+                  {/* Poster Container - object-contain bg-black to display full poster without cropping */}
+                  <div className="relative w-full aspect-[3/4] border-b-4 border-on-background overflow-hidden bg-black flex items-center justify-center">
                     {event.poster_url ? (
                       <img 
                         src={event.poster_url} 
                         alt={event.title}
-                        className="w-full h-full object-cover transition-transform duration-500 scale-100 group-hover:scale-105" 
+                        className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105" 
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center blueprint-bg">
@@ -275,11 +185,11 @@ export default function Events() {
                       </div>
                     )}
                     <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
-                      <span className="bg-tertiary-fixed text-on-tertiary-fixed font-data-label text-data-label uppercase px-2 py-1 border-2 border-on-background font-bold">
+                      <span className="bg-tertiary-fixed text-on-tertiary-fixed font-data-label text-data-label uppercase px-2 py-1 border-2 border-on-background font-bold shadow-md">
                         {event.type || 'EVENT'}
                       </span>
                       {venueObj?.city && (
-                        <span className="bg-primary-fixed text-on-primary-fixed font-data-label text-data-label uppercase px-2 py-1 border-2 border-on-background font-bold flex items-center gap-0.5">
+                        <span className="bg-primary-fixed text-on-primary-fixed font-data-label text-data-label uppercase px-2 py-1 border-2 border-on-background font-bold flex items-center gap-0.5 shadow-md">
                           <span className="material-symbols-outlined text-[14px]">location_on</span>
                           {venueObj.city}
                         </span>
@@ -311,18 +221,18 @@ export default function Events() {
 
       {/* Event Details Modal */}
       {selectedEvent && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-margin-mobile md:p-margin-desktop bg-on-background/80 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-surface border-4 border-on-background neo-brutalist-shadow w-full max-w-4xl flex flex-col md:flex-row relative">
+        <div className="fixed inset-0 z-[99] flex items-center justify-center p-4 bg-on-background/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-surface border-4 border-on-background neo-brutalist-shadow max-w-4xl w-full flex flex-col md:flex-row relative overflow-hidden max-h-[90vh]">
             <button 
               onClick={() => setSelectedEvent(null)}
-              className="absolute top-4 right-4 z-10 bg-surface border-2 border-on-background w-10 h-10 flex items-center justify-center hover:bg-error hover:text-on-error transition-colors"
+              className="absolute top-4 right-4 z-20 bg-error text-on-error border-2 border-on-background p-1 hover:bg-red-600 transition-colors"
             >
-              <span className="material-symbols-outlined font-bold" style={{ fontVariationSettings: "'FILL' 1" }}>close</span>
+              <span className="material-symbols-outlined text-2xl font-black">close</span>
             </button>
             
-            <div className="w-full md:w-1/2 bg-surface-dim border-b-4 md:border-b-0 md:border-r-4 border-on-background">
+            <div className="w-full md:w-1/2 bg-black border-b-4 md:border-b-0 md:border-r-4 border-on-background flex items-center justify-center p-2">
               {selectedEvent.poster_url ? (
-                <img src={selectedEvent.poster_url} alt={selectedEvent.title} className="w-full h-full object-cover aspect-[3/4] md:aspect-auto" />
+                <img src={selectedEvent.poster_url} alt={selectedEvent.title} className="w-full h-full object-contain max-h-[500px]" />
               ) : (
                 <div className="w-full h-full min-h-[300px] flex items-center justify-center blueprint-bg">
                   <span className="font-data-label text-data-label uppercase text-on-surface-variant font-bold">No Poster</span>
