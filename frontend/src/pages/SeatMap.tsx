@@ -258,7 +258,7 @@ export default function SeatMap() {
     );
   };
 
-  // Dedicated 360-Degree Concert Arena Layout (Optimized Contrast)
+  // Dedicated 360-Degree Concert Arena Layout — Premium Redesign
   const renderConcertStadiumLayout = () => {
     const getRowSeats = (row: string, startNum?: number, endNum?: number) => {
       let rowSeats = seats
@@ -271,121 +271,189 @@ export default function SeatMap() {
     };
 
     return (
-      <div className="flex flex-col gap-6 items-center w-full max-w-full px-2">
-        {/* 1. NORTH: VIP PIT (Rows A & B) */}
-        <div className="w-full max-w-4xl bg-amber-100 border-4 border-amber-600 p-3 neo-brutalism-shadow rounded-lg text-center">
-          <div className="font-headline-lg-mobile text-amber-950 uppercase tracking-widest mb-2 flex items-center justify-center gap-2 text-xs font-black">
-            <span className="material-symbols-outlined text-sm">star</span>
-            <span>VIP STAGE PIT (FRONT ACCESS)</span>
-            <span className="material-symbols-outlined text-sm">star</span>
-          </div>
-          <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
-            {['A', 'B'].map(row => (
-              <div key={row} className="flex gap-2 items-center justify-center">
-                <span className="font-data-label text-xs text-amber-900 w-4 font-black">{row}</span>
-                <div className="flex gap-1.5">
-                  {getRowSeats(row).map(seat => renderSeat(seat, true))}
+      <div className="flex flex-col gap-5 items-center w-full max-w-full px-2 py-2">
+
+        {/* 1. VIP FRONT STAGE PIT (Rows A & B) */}
+        <div className="w-full max-w-4xl relative overflow-hidden rounded-xl border-4 border-yellow-500 neo-brutalism-shadow" style={{background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fbbf24 100%)'}}>
+          <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'repeating-linear-gradient(45deg, #92400e 0px, #92400e 2px, transparent 2px, transparent 12px)'}}></div>
+          <div className="relative p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-yellow-500 border-2 border-yellow-900 flex items-center justify-center rounded">
+                  <span className="material-symbols-outlined text-yellow-950 text-base font-black">star</span>
                 </div>
-                <span className="font-data-label text-xs text-amber-900 w-4 font-black">{row}</span>
+                <div>
+                  <div className="font-black text-yellow-950 uppercase tracking-widest text-xs">VIP FRONT STAGE PIT</div>
+                  <div className="text-[10px] font-mono text-yellow-800 font-bold">ROWS A–B · CLOSEST TO STAGE · PREMIUM ACCESS</div>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 2. CENTER STAGE & SIDE WINGS HUB */}
-        <div className="w-full max-w-4xl flex flex-col xl:flex-row gap-4 items-center justify-center">
-          {/* WEST TIER (Left Wing - Rows F, G, H, seats 1-8) */}
-          <div className="bg-teal-100 border-4 border-teal-600 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
-            <div className="font-headline-lg-mobile text-teal-950 uppercase tracking-wider mb-2 text-xs font-black flex items-center justify-center gap-1">
-              <span className="material-symbols-outlined text-sm">stadium</span>
-              <span>WEST TIER WING</span>
+              <div className="bg-yellow-900 text-yellow-300 font-mono text-xs font-black px-3 py-1.5 border border-yellow-600 tracking-widest">₹1,200 / SEAT</div>
             </div>
-            <div className="flex flex-col gap-1.5 items-center">
-              {['F', 'G', 'H'].map(row => (
-                <div key={`west-${row}`} className="flex gap-1.5 items-center justify-center">
-                  <span className="font-data-label text-xs text-teal-950 font-black w-4">{row}</span>
-                  <div className="flex gap-1">
-                    {getRowSeats(row, 1, 8).map(seat => renderSeat(seat, true))}
+            <div className="flex flex-col gap-2 items-center overflow-x-auto pb-1">
+              {['A', 'B'].map(row => (
+                <div key={row} className="flex gap-2 items-center justify-center">
+                  <span className="font-data-label text-xs text-yellow-900 font-black w-5 text-right shrink-0">{row}</span>
+                  <div className="flex gap-1.5">
+                    {getRowSeats(row).map(seat => renderSeat(seat, true))}
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 360 STAGE CENTER PIECE */}
-          <div className="shrink-0 w-56 bg-on-background text-primary-fixed border-4 border-on-background neo-brutalism-shadow p-4 flex flex-col items-center justify-center text-center relative overflow-hidden my-2 xl:my-0">
-            <div className="absolute top-1 left-1 text-[9px] font-mono text-amber-300 font-bold">AUDIO STACK</div>
-            <div className="absolute top-1 right-1 text-[9px] font-mono text-amber-300 font-bold">AUDIO STACK</div>
-            <span className="material-symbols-outlined text-3xl text-amber-400 mb-1 animate-bounce">graphic_eq</span>
-            <span className="font-headline-lg text-xs uppercase tracking-widest text-primary-fixed leading-tight font-black">
-              CENTRAL STAGE
-            </span>
-            <div className="w-full h-1.5 bg-amber-400 border border-on-background my-1.5 animate-pulse"></div>
-            <span className="text-[10px] font-mono uppercase text-amber-300 font-bold tracking-wider">
-              360° STADIUM HUB
-            </span>
-          </div>
-
-          {/* EAST TIER (Right Wing - Rows F, G, H, seats 9-16) */}
-          <div className="bg-teal-100 border-4 border-teal-600 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
-            <div className="font-headline-lg-mobile text-teal-950 uppercase tracking-wider mb-2 text-xs font-black flex items-center justify-center gap-1">
-              <span className="material-symbols-outlined text-sm">stadium</span>
-              <span>EAST TIER WING</span>
-            </div>
-            <div className="flex flex-col gap-1.5 items-center">
-              {['F', 'G', 'H'].map(row => (
-                <div key={`east-${row}`} className="flex gap-1.5 items-center justify-center">
-                  <div className="flex gap-1">
-                    {getRowSeats(row, 9, 16).map(seat => renderSeat(seat, true))}
-                  </div>
-                  <span className="font-data-label text-xs text-teal-950 font-black w-4">{row}</span>
+                  <span className="font-data-label text-xs text-yellow-900 font-black w-5 text-left shrink-0">{row}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* 3. SOUTH INNER: GOLDEN CIRCLE GA FLOOR (Rows C, D & E) */}
-        <div className="w-full max-w-4xl bg-purple-100 border-4 border-purple-600 p-3 neo-brutalism-shadow rounded-lg text-center">
-          <div className="font-headline-lg-mobile text-purple-950 uppercase tracking-widest mb-2 flex items-center justify-center gap-2 text-xs font-black">
-            <span className="material-symbols-outlined text-sm">bolt</span>
-            <span>GOLDEN CIRCLE DANCE FLOOR</span>
-            <span className="material-symbols-outlined text-sm">bolt</span>
-          </div>
-          <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
-            {['C', 'D', 'E'].map(row => (
-              <div key={row} className="flex gap-2 items-center justify-center">
-                <span className="font-data-label text-xs text-purple-950 w-4 font-black">{row}</span>
-                <div className="flex gap-1.5">
-                  {getRowSeats(row).map(seat => renderSeat(seat, true))}
+        {/* 2. CENTER SECTION — STAGE + SIDE WINGS */}
+        <div className="w-full max-w-4xl flex flex-col lg:flex-row gap-4 items-stretch justify-center">
+
+          {/* WEST TIER WING */}
+          <div className="relative overflow-hidden rounded-xl border-4 border-teal-500 neo-brutalism-shadow shrink-0" style={{background: 'linear-gradient(160deg, #ccfbf1 0%, #99f6e4 60%, #5eead4 100%)'}}>
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-teal-500"></div>
+            <div className="p-3 pt-4">
+              <div className="flex items-center gap-1.5 mb-2 justify-center">
+                <span className="material-symbols-outlined text-teal-900 text-sm">stadium</span>
+                <div className="text-center">
+                  <div className="font-black text-teal-950 uppercase text-[11px] tracking-widest">WEST TIER</div>
+                  <div className="text-[9px] font-mono text-teal-800 font-bold">ROWS F–H · SEATS 1–8</div>
                 </div>
-                <span className="font-data-label text-xs text-purple-950 w-4 font-black">{row}</span>
               </div>
-            ))}
+              <div className="flex flex-col gap-1.5 items-center">
+                {['F', 'G', 'H'].map(row => (
+                  <div key={`west-${row}`} className="flex gap-1 items-center justify-center">
+                    <span className="font-data-label text-[11px] text-teal-950 font-black w-4 text-right">{row}</span>
+                    <div className="flex gap-1">
+                      {getRowSeats(row, 1, 8).map(seat => renderSeat(seat, true))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* CENTRAL STAGE CENTERPIECE */}
+          <div className="shrink-0 flex-grow max-w-xs flex flex-col">
+            <div className="relative flex-grow overflow-hidden rounded-xl border-4 border-gray-800 neo-brutalism-shadow flex flex-col items-center justify-center p-4 text-center min-h-[160px]" style={{background: 'linear-gradient(180deg, #0f0f1a 0%, #1a1a2e 40%, #16213e 100%)'}}>
+              {/* Stars bg */}
+              <div className="absolute inset-0 overflow-hidden">
+                {[...Array(20)].map((_, i) => (
+                  <div key={i} className="absolute w-0.5 h-0.5 bg-white rounded-full opacity-60" style={{top: `${Math.random()*90}%`, left: `${Math.random()*100}%`}}></div>
+                ))}
+              </div>
+              {/* Spotlights */}
+              <div className="absolute top-0 left-1/4 w-12 h-full opacity-10" style={{background: 'linear-gradient(180deg, #fbbf24, transparent)'}}></div>
+              <div className="absolute top-0 right-1/4 w-12 h-full opacity-10" style={{background: 'linear-gradient(180deg, #fbbf24, transparent)'}}></div>
+              <div className="relative z-10 flex flex-col items-center gap-2">
+                <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
+                <span className="material-symbols-outlined text-amber-400 text-3xl animate-pulse">graphic_eq</span>
+                <span className="font-black text-white uppercase tracking-[0.2em] text-sm">MAIN STAGE</span>
+                <div className="flex gap-1 items-center">
+                  <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+                  <span className="text-[9px] font-mono text-amber-300 font-bold tracking-widest">LIVE CONCERT ARENA</span>
+                  <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+                </div>
+                <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
+                <div className="flex gap-3 mt-1">
+                  <span className="text-[9px] font-mono text-slate-400">AUDIO L</span>
+                  <span className="material-symbols-outlined text-slate-500 text-xs">speaker</span>
+                  <span className="material-symbols-outlined text-slate-500 text-xs">speaker</span>
+                  <span className="text-[9px] font-mono text-slate-400">AUDIO R</span>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gray-900 border-x-4 border-b-4 border-gray-800 text-center py-1 rounded-b-lg">
+              <span className="text-[9px] font-mono text-amber-400 uppercase tracking-widest font-black">360° STADIUM SURROUND</span>
+            </div>
+          </div>
+
+          {/* EAST TIER WING */}
+          <div className="relative overflow-hidden rounded-xl border-4 border-teal-500 neo-brutalism-shadow shrink-0" style={{background: 'linear-gradient(200deg, #ccfbf1 0%, #99f6e4 60%, #5eead4 100%)'}}>
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-teal-500"></div>
+            <div className="p-3 pt-4">
+              <div className="flex items-center gap-1.5 mb-2 justify-center">
+                <span className="material-symbols-outlined text-teal-900 text-sm">stadium</span>
+                <div className="text-center">
+                  <div className="font-black text-teal-950 uppercase text-[11px] tracking-widest">EAST TIER</div>
+                  <div className="text-[9px] font-mono text-teal-800 font-bold">ROWS F–H · SEATS 9–16</div>
+                </div>
+              </div>
+              <div className="flex flex-col gap-1.5 items-center">
+                {['F', 'G', 'H'].map(row => (
+                  <div key={`east-${row}`} className="flex gap-1 items-center justify-center">
+                    <div className="flex gap-1">
+                      {getRowSeats(row, 9, 16).map(seat => renderSeat(seat, true))}
+                    </div>
+                    <span className="font-data-label text-[11px] text-teal-950 font-black w-4 text-left">{row}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* 4. SOUTH OUTER: UPPER DECK BLEACHERS (Rows I, J & K) */}
-        <div className="w-full max-w-4xl bg-slate-900 border-4 border-slate-700 p-3 neo-brutalism-shadow rounded-lg text-center">
-          <div className="font-headline-lg-mobile text-slate-100 uppercase tracking-widest mb-2 text-xs font-black flex items-center justify-center gap-1">
-            <span className="material-symbols-outlined text-sm">chair</span>
-            <span>UPPER DECK BLEACHERS & REAR ARENA</span>
-          </div>
-          <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
-            {['I', 'J', 'K'].map(row => (
-              <div key={row} className="flex gap-2 items-center justify-center">
-                <span className="font-data-label text-xs text-slate-200 w-4 font-bold">{row}</span>
-                <div className="flex gap-1.5">
-                  {getRowSeats(row).map(seat => renderSeat(seat, true))}
+        {/* 3. GOLDEN CIRCLE DANCE FLOOR (Rows C, D, E) */}
+        <div className="w-full max-w-4xl relative overflow-hidden rounded-xl border-4 border-purple-500 neo-brutalism-shadow" style={{background: 'linear-gradient(135deg, #faf5ff 0%, #e9d5ff 50%, #d8b4fe 100%)'}}>
+          <div className="absolute inset-0 opacity-5" style={{backgroundImage: 'radial-gradient(circle, #7c3aed 1px, transparent 1px)', backgroundSize: '16px 16px'}}></div>
+          <div className="relative p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-purple-600 border-2 border-purple-900 flex items-center justify-center rounded">
+                  <span className="material-symbols-outlined text-white text-base font-black">bolt</span>
                 </div>
-                <span className="font-data-label text-xs text-slate-200 w-4 font-bold">{row}</span>
+                <div>
+                  <div className="font-black text-purple-950 uppercase tracking-widest text-xs">GOLDEN CIRCLE DANCE FLOOR</div>
+                  <div className="text-[10px] font-mono text-purple-800 font-bold">ROWS C–E · GA STANDING · BEST ATMOSPHERE</div>
+                </div>
               </div>
-            ))}
+              <div className="bg-purple-800 text-purple-200 font-mono text-xs font-black px-3 py-1.5 border border-purple-500 tracking-widest">₹800 / SEAT</div>
+            </div>
+            <div className="flex flex-col gap-2 items-center overflow-x-auto pb-1">
+              {['C', 'D', 'E'].map(row => (
+                <div key={row} className="flex gap-2 items-center justify-center">
+                  <span className="font-data-label text-xs text-purple-950 font-black w-5 text-right shrink-0">{row}</span>
+                  <div className="flex gap-1.5">
+                    {getRowSeats(row).map(seat => renderSeat(seat, true))}
+                  </div>
+                  <span className="font-data-label text-xs text-purple-950 font-black w-5 text-left shrink-0">{row}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+
+        {/* 4. UPPER DECK BLEACHERS (Rows I, J, K) */}
+        <div className="w-full max-w-4xl relative overflow-hidden rounded-xl border-4 border-slate-600 neo-brutalism-shadow" style={{background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%)'}}>
+          <div className="absolute inset-0 opacity-5" style={{backgroundImage: 'repeating-linear-gradient(0deg, #ffffff 0px, #ffffff 1px, transparent 1px, transparent 24px), repeating-linear-gradient(90deg, #ffffff 0px, #ffffff 1px, transparent 1px, transparent 24px)'}}></div>
+          <div className="relative p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-slate-600 border-2 border-slate-400 flex items-center justify-center rounded">
+                  <span className="material-symbols-outlined text-slate-200 text-base">chair</span>
+                </div>
+                <div>
+                  <div className="font-black text-slate-100 uppercase tracking-widest text-xs">UPPER DECK BLEACHERS</div>
+                  <div className="text-[10px] font-mono text-slate-400 font-bold">ROWS I–K · ELEVATED REAR ARENA</div>
+                </div>
+              </div>
+              <div className="bg-slate-800 text-slate-300 font-mono text-xs font-black px-3 py-1.5 border border-slate-500 tracking-widest">₹450 / SEAT</div>
+            </div>
+            <div className="flex flex-col gap-2 items-center overflow-x-auto pb-1">
+              {['I', 'J', 'K'].map(row => (
+                <div key={row} className="flex gap-2 items-center justify-center">
+                  <span className="font-data-label text-xs text-slate-300 font-black w-5 text-right shrink-0">{row}</span>
+                  <div className="flex gap-1.5">
+                    {getRowSeats(row).map(seat => renderSeat(seat, true))}
+                  </div>
+                  <span className="font-data-label text-xs text-slate-300 font-black w-5 text-left shrink-0">{row}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
       </div>
     );
   };
+
 
   // Dedicated Intimate Comedy Club Layout (Optimized Contrast)
   const renderComedyLayout = () => {
@@ -439,120 +507,195 @@ export default function SeatMap() {
     return (
       <div className="flex flex-col gap-6 items-center w-full max-w-5xl mx-auto px-2">
         {/* 1. VIP PAVILION BOX (NORTH) */}
-        <div className="w-full max-w-4xl bg-amber-100 border-4 border-amber-600 p-3 neo-brutalism-shadow rounded-lg text-center">
-          <div className="font-headline-lg-mobile text-amber-950 uppercase tracking-widest mb-2 flex items-center justify-center gap-2 text-xs font-black">
-            <span className="material-symbols-outlined text-sm">workspace_premium</span>
-            <span>VIP PAVILION & SUITE BOX (₹1,500)</span>
-            <span className="material-symbols-outlined text-sm">workspace_premium</span>
-          </div>
-          <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
-            {['A', 'B'].map(row => (
-              <div key={row} className="flex gap-2 items-center justify-center">
-                <span className="font-data-label text-xs text-amber-900 w-4 font-black">{row}</span>
-                <div className="flex gap-1.5">
-                  {getRowSeats(row).map(seat => renderSeat(seat, true))}
+        <div className="w-full max-w-4xl relative overflow-hidden rounded-xl border-4 border-yellow-500 neo-brutalism-shadow" style={{background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fbbf24 100%)'}}>
+          <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'repeating-linear-gradient(45deg, #92400e 0px, #92400e 2px, transparent 2px, transparent 12px)'}}></div>
+          <div className="relative p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-yellow-500 border-2 border-yellow-900 flex items-center justify-center rounded">
+                  <span className="material-symbols-outlined text-yellow-950 text-base font-black">workspace_premium</span>
                 </div>
-                <span className="font-data-label text-xs text-amber-900 w-4 font-black">{row}</span>
+                <div>
+                  <div className="font-black text-yellow-950 uppercase tracking-widest text-xs">VIP PAVILION & SUITE BOX</div>
+                  <div className="text-[10px] font-mono text-yellow-800 font-bold">ROWS A–B · PREMIUM HOSPITALITY · BEST SIGHT LINES</div>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 2. CENTRAL SPORTS FIELD & SIDE WINGS */}
-        <div className="w-full max-w-4xl flex flex-col xl:flex-row gap-4 items-center justify-center">
-          {/* WEST TIER SIDE STAND (Rows C, D, E, seats 1-7) */}
-          <div className="bg-teal-100 border-4 border-teal-600 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
-            <div className="font-headline-lg-mobile text-teal-950 uppercase tracking-wider mb-2 text-xs font-black flex items-center justify-center gap-1">
-              <span className="material-symbols-outlined text-sm">stadium</span>
-              <span>WEST STAND WING (₹850)</span>
+              <div className="bg-yellow-900 text-yellow-300 font-mono text-xs font-black px-3 py-1.5 border border-yellow-600 tracking-widest">₹1,500 / SEAT</div>
             </div>
-            <div className="flex flex-col gap-1.5 items-center">
-              {['C', 'D', 'E'].map(row => (
-                <div key={`west-${row}`} className="flex gap-1.5 items-center justify-center">
-                  <span className="font-data-label text-xs text-teal-950 font-black w-4">{row}</span>
-                  <div className="flex gap-1">
-                    {getRowSeats(row, 1, 7).map(seat => renderSeat(seat, true))}
+            <div className="flex flex-col gap-2 items-center overflow-x-auto pb-1">
+              {['A', 'B'].map(row => (
+                <div key={row} className="flex gap-2 items-center justify-center">
+                  <span className="font-data-label text-xs text-yellow-900 font-black w-5 text-right shrink-0">{row}</span>
+                  <div className="flex gap-1.5">
+                    {getRowSeats(row).map(seat => renderSeat(seat, true))}
                   </div>
+                  <span className="font-data-label text-xs text-yellow-900 font-black w-5 text-left shrink-0">{row}</span>
                 </div>
               ))}
             </div>
           </div>
+        </div>
 
-          {/* CENTRAL FIELD VISIBILITY ENGINE */}
-          {isCricket ? (
-            /* CRICKET CIRCULAR OVAL FIELD */
-            <div className="shrink-0 w-64 h-48 bg-emerald-900/40 border-4 border-emerald-600 rounded-full neo-brutalism-shadow p-3 flex flex-col items-center justify-center text-center relative overflow-hidden my-2 xl:my-0">
-              <div className="w-48 h-32 border-2 border-dashed border-emerald-400 rounded-full flex flex-col items-center justify-center relative">
-                {/* 22-Yard Pitch Strip */}
-                <div className="w-20 h-20 bg-amber-100 border-2 border-amber-600 flex flex-col justify-between items-center py-1 rounded">
-                  <div className="w-10 h-1 bg-amber-800"></div>
-                  <span className="text-[10px] font-mono font-black text-amber-950">CRICKET PITCH</span>
-                  <div className="w-10 h-1 bg-amber-800"></div>
+        {/* 2. CENTRAL FIELD + SIDE STANDS */}
+        <div className="w-full max-w-4xl flex flex-col lg:flex-row gap-4 items-stretch justify-center">
+
+          {/* WEST STAND (C, D, E seats 1–7) */}
+          <div className="relative overflow-hidden rounded-xl border-4 border-teal-500 neo-brutalism-shadow shrink-0" style={{background: 'linear-gradient(160deg, #ccfbf1 0%, #99f6e4 60%, #5eead4 100%)'}}>
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-teal-500"></div>
+            <div className="p-3 pt-4">
+              <div className="flex items-center gap-1.5 mb-2 justify-center">
+                <span className="material-symbols-outlined text-teal-900 text-sm">stadium</span>
+                <div className="text-center">
+                  <div className="font-black text-teal-950 uppercase text-[11px] tracking-widest">WEST STAND</div>
+                  <div className="text-[9px] font-mono text-teal-800 font-bold">ROWS C–E · SEATS 1–7 · ₹850</div>
                 </div>
               </div>
-              <span className="text-[10px] font-mono uppercase text-emerald-950 font-black bg-emerald-200 px-2.5 py-0.5 rounded border border-emerald-500 tracking-wider mt-1 flex items-center justify-center gap-1">
-                <span className="material-symbols-outlined text-xs">sports_cricket</span>
-                <span>30-YARD CRICKET OVAL</span>
-              </span>
+              <div className="flex flex-col gap-1.5 items-start">
+                {['C', 'D', 'E'].map(row => (
+                  <div key={`west-${row}`} className="flex gap-1 items-center justify-center">
+                    <span className="font-data-label text-[11px] text-teal-950 font-black w-4 text-right shrink-0">{row}</span>
+                    <div className="flex gap-1">
+                      {getRowSeats(row, 1, 7).map(seat => renderSeat(seat, true))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* CENTRAL FIELD */}
+          {isCricket ? (
+            /* CRICKET OVAL — Premium redesign */
+            <div className="shrink-0 flex-grow max-w-xs flex flex-col rounded-xl overflow-hidden neo-brutalism-shadow border-4 border-emerald-700" style={{background: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)'}}>
+              <div className="bg-emerald-950 border-b-2 border-emerald-700 py-1.5 px-3 flex items-center justify-between">
+                <span className="material-symbols-outlined text-emerald-400 text-sm">sports_cricket</span>
+                <span className="font-mono text-[10px] text-emerald-300 font-black uppercase tracking-widest">CRICKET STADIUM</span>
+                <span className="material-symbols-outlined text-emerald-400 text-sm">sports_cricket</span>
+              </div>
+              <div className="flex-grow flex items-center justify-center p-4 relative" style={{minHeight: '160px'}}>
+                {/* Outfield */}
+                <div className="w-full h-full absolute inset-4 rounded-full border-2 border-dashed border-emerald-400 opacity-40"></div>
+                {/* 30-yard circle */}
+                <div className="absolute w-28 h-20 rounded-full border-2 border-dashed border-emerald-300 opacity-60" style={{top: '50%', left: '50%', transform: 'translate(-50%,-50%)'}}></div>
+                {/* Pitch */}
+                <div className="relative z-10 flex flex-col items-center gap-1">
+                  <div className="w-3 h-1.5 bg-amber-400 rounded-sm"></div>
+                  <div className="w-14 h-24 bg-gradient-to-b from-amber-200 to-amber-300 border-2 border-amber-600 rounded-sm flex flex-col items-center justify-between py-1 shadow-md">
+                    <div className="flex gap-2">
+                      <div className="w-0.5 h-3 bg-amber-900"></div>
+                      <div className="w-0.5 h-3 bg-amber-900"></div>
+                      <div className="w-0.5 h-3 bg-amber-900"></div>
+                    </div>
+                    <span className="text-[8px] font-mono font-black text-amber-900 uppercase tracking-wider">PITCH</span>
+                    <div className="flex gap-2">
+                      <div className="w-0.5 h-3 bg-amber-900"></div>
+                      <div className="w-0.5 h-3 bg-amber-900"></div>
+                      <div className="w-0.5 h-3 bg-amber-900"></div>
+                    </div>
+                  </div>
+                  <div className="w-3 h-1.5 bg-amber-400 rounded-sm"></div>
+                </div>
+              </div>
+              <div className="bg-emerald-950 border-t-2 border-emerald-700 py-1 px-3 text-center">
+                <span className="font-mono text-[9px] text-emerald-400 uppercase tracking-widest font-black">30-YARD OVAL · 22-YARD PITCH</span>
+              </div>
             </div>
           ) : (
-            /* FOOTBALL RECTANGULAR PITCH */
-            <div className="shrink-0 w-64 h-48 bg-emerald-800 border-4 border-white neo-brutalism-shadow p-2 flex flex-col items-center justify-between text-center relative overflow-hidden my-2 xl:my-0">
-              <div className="w-full flex justify-between items-center text-xs">
-                <span className="material-symbols-outlined text-white">sports_soccer</span>
-                <span className="text-[10px] font-mono text-white font-black">SOCCER FIELD</span>
-                <span className="material-symbols-outlined text-white">sports_soccer</span>
+            /* FOOTBALL PITCH — Premium redesign */
+            <div className="shrink-0 flex-grow max-w-xs flex flex-col rounded-xl overflow-hidden neo-brutalism-shadow border-4 border-green-700" style={{background: 'linear-gradient(180deg, #14532d 0%, #166534 50%, #15803d 100%)'}}>
+              <div className="bg-green-950 border-b-2 border-green-700 py-1.5 px-3 flex items-center justify-between">
+                <span className="material-symbols-outlined text-green-400 text-sm">sports_soccer</span>
+                <span className="font-mono text-[10px] text-green-300 font-black uppercase tracking-widest">FOOTBALL PITCH</span>
+                <span className="material-symbols-outlined text-green-400 text-sm">sports_soccer</span>
               </div>
-              <div className="w-full border-t-2 border-white relative flex items-center justify-center my-auto">
-                <div className="w-16 h-16 border-2 border-white rounded-full absolute"></div>
+              <div className="flex-grow relative flex items-center justify-center p-2" style={{minHeight: '160px'}}>
+                {/* Pitch stripes */}
+                <div className="absolute inset-0 flex">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className={`flex-1 h-full ${i % 2 === 0 ? 'bg-green-700/40' : 'bg-transparent'}`}></div>
+                  ))}
+                </div>
+                {/* Field markings */}
+                <div className="relative z-10 w-full h-full flex flex-col items-center justify-between py-2">
+                  {/* Top goal */}
+                  <div className="w-10 h-3 border-2 border-white border-b-0 opacity-80"></div>
+                  {/* Center */}
+                  <div className="flex flex-col items-center gap-1 flex-grow justify-center">
+                    <div className="w-full border-t border-white opacity-60"></div>
+                    <div className="w-16 h-16 border-2 border-white rounded-full opacity-70 flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                    </div>
+                    <div className="w-full border-t border-white opacity-60"></div>
+                  </div>
+                  {/* Bottom goal */}
+                  <div className="w-10 h-3 border-2 border-white border-t-0 opacity-80"></div>
+                </div>
               </div>
-              <span className="text-[10px] font-mono uppercase text-white font-black tracking-wider flex items-center justify-center gap-1">
-                <span className="material-symbols-outlined text-xs">sports_soccer</span>
-                <span>TOUCHLINE & GOAL POSTS</span>
-              </span>
+              <div className="bg-green-950 border-t-2 border-green-700 py-1 px-3 text-center">
+                <span className="font-mono text-[9px] text-green-400 uppercase tracking-widest font-black">TOUCHLINE · CENTRE CIRCLE · GOAL POSTS</span>
+              </div>
             </div>
           )}
 
-          {/* EAST TIER SIDE STAND (Rows C, D, E, seats 8-14) */}
-          <div className="bg-teal-100 border-4 border-teal-600 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
-            <div className="font-headline-lg-mobile text-teal-950 uppercase tracking-wider mb-2 text-xs font-black flex items-center justify-center gap-1">
-              <span className="material-symbols-outlined text-sm">stadium</span>
-              <span>EAST STAND WING (₹850)</span>
-            </div>
-            <div className="flex flex-col gap-1.5 items-center">
-              {['C', 'D', 'E'].map(row => (
-                <div key={`east-${row}`} className="flex gap-1.5 items-center justify-center">
-                  <div className="flex gap-1">
-                    {getRowSeats(row, 8, 14).map(seat => renderSeat(seat, true))}
+          {/* EAST STAND (C, D, E seats 8–14) */}
+          <div className="relative overflow-hidden rounded-xl border-4 border-teal-500 neo-brutalism-shadow shrink-0" style={{background: 'linear-gradient(200deg, #ccfbf1 0%, #99f6e4 60%, #5eead4 100%)'}}>
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-teal-500"></div>
+            <div className="p-3 pt-4">
+              <div className="flex items-center gap-1.5 mb-2 justify-center">
+                <span className="material-symbols-outlined text-teal-900 text-sm">stadium</span>
+                <div className="text-center">
+                  <div className="font-black text-teal-950 uppercase text-[11px] tracking-widest">EAST STAND</div>
+                  <div className="text-[9px] font-mono text-teal-800 font-bold">ROWS C–E · SEATS 8–14 · ₹850</div>
+                </div>
+              </div>
+              <div className="flex flex-col gap-1.5 items-end">
+                {['C', 'D', 'E'].map(row => (
+                  <div key={`east-${row}`} className="flex gap-1 items-center justify-center">
+                    <div className="flex gap-1">
+                      {getRowSeats(row, 8, 14).map(seat => renderSeat(seat, true))}
+                    </div>
+                    <span className="font-data-label text-[11px] text-teal-950 font-black w-4 text-left shrink-0">{row}</span>
                   </div>
-                  <span className="font-data-label text-xs text-teal-950 font-black w-4">{row}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 3. UPPER DECK BLEACHERS (Rows F, G, H) */}
+        <div className="w-full max-w-4xl relative overflow-hidden rounded-xl border-4 border-slate-600 neo-brutalism-shadow" style={{background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%)'}}>
+          <div className="absolute inset-0 opacity-5" style={{backgroundImage: 'repeating-linear-gradient(0deg, #ffffff 0px, #ffffff 1px, transparent 1px, transparent 24px), repeating-linear-gradient(90deg, #ffffff 0px, #ffffff 1px, transparent 1px, transparent 24px)'}}></div>
+          <div className="relative p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-slate-600 border-2 border-slate-400 flex items-center justify-center rounded">
+                  <span className="material-symbols-outlined text-slate-200 text-base">chair</span>
+                </div>
+                <div>
+                  <div className="font-black text-slate-100 uppercase tracking-widest text-xs">UPPER DECK STADIUM BLEACHERS</div>
+                  <div className="text-[10px] font-mono text-slate-400 font-bold">ROWS F–H · ELEVATED TIER · PANORAMIC VIEW</div>
+                </div>
+              </div>
+              <div className="bg-slate-800 text-slate-300 font-mono text-xs font-black px-3 py-1.5 border border-slate-500 tracking-widest">₹400 / SEAT</div>
+            </div>
+            <div className="flex flex-col gap-2 items-center overflow-x-auto pb-1">
+              {['F', 'G', 'H'].map(row => (
+                <div key={row} className="flex gap-2 items-center justify-center">
+                  <span className="font-data-label text-xs text-slate-300 font-black w-5 text-right shrink-0">{row}</span>
+                  <div className="flex gap-1.5">
+                    {getRowSeats(row).map(seat => renderSeat(seat, true))}
+                  </div>
+                  <span className="font-data-label text-xs text-slate-300 font-black w-5 text-left shrink-0">{row}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* 3. SOUTH BLEACHERS (Rows F, G, H) */}
-        <div className="w-full max-w-4xl bg-slate-900 border-4 border-slate-700 p-3 neo-brutalism-shadow rounded-lg text-center">
-          <div className="font-headline-lg-mobile text-slate-100 uppercase tracking-widest mb-2 text-xs font-black flex items-center justify-center gap-1">
-            <span className="material-symbols-outlined text-sm">chair</span>
-            <span>UPPER DECK STADIUM BLEACHERS (₹400)</span>
-          </div>
-          <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
-            {['F', 'G', 'H'].map(row => (
-              <div key={row} className="flex gap-2 items-center justify-center">
-                <span className="font-data-label text-xs text-slate-200 w-4 font-bold">{row}</span>
-                <div className="flex gap-1.5">
-                  {getRowSeats(row).map(seat => renderSeat(seat, true))}
-                </div>
-                <span className="font-data-label text-xs text-slate-200 w-4 font-bold">{row}</span>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     );
   };
+
 
   // Dedicated Cinema Movie Theater Layout with Clear Tier Visual Distinction
   const renderCinemaLayout = () => {
