@@ -79,7 +79,7 @@ async function main() {
       title: 'Midnight Paradox',
       type: 'movie',
       description: 'A gripping mystery thriller that twists the fabric of time.',
-      poster_url: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=2025&auto=format&fit=crop'
+      poster_url: '/images/movie_3_1787333184688.png'
     },
     {
       title: 'Echoes of Eternity',
@@ -117,7 +117,7 @@ async function main() {
       title: 'Bass Drop Riot',
       type: 'concert',
       description: 'Heavy dubstep and bass music that will shake the floor.',
-      poster_url: 'https://images.unsplash.com/photo-1470229722913-7c090be5c524?q=80&w=2070&auto=format&fit=crop'
+      poster_url: '/images/concert_4_1787333219101.png'
     },
     {
       title: 'The Golden Era Tour',
@@ -149,13 +149,13 @@ async function main() {
       title: 'Stand-Up Showdown',
       type: 'comedy',
       description: 'Comedians face off to win the ultimate title in a boxing-ring style stage.',
-      poster_url: 'https://images.unsplash.com/photo-1527224857830-43a7ae858368?q=80&w=2069&auto=format&fit=crop'
+      poster_url: '/images/comedy_4_1787332545212.png'
     },
     {
       title: 'Midnight Giggles',
       type: 'comedy',
       description: 'A late-night special featuring dark humor and satire.',
-      poster_url: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?q=80&w=2070&auto=format&fit=crop'
+      poster_url: '/images/comedy_5_1787332562947.png'
     },
 
     // SPORTS
@@ -163,31 +163,31 @@ async function main() {
       title: 'Apex Fight Night',
       type: 'sports',
       description: 'The premier MMA championship event of the year.',
-      poster_url: 'https://images.unsplash.com/photo-1544365558-35aa4afcf11f?q=80&w=2036&auto=format&fit=crop'
+      poster_url: '/images/sports_1_1787332917988.png'
     },
     {
       title: 'The Grand Slam Finale',
       type: 'sports',
       description: 'World-class tennis finals on clay courts.',
-      poster_url: 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?q=80&w=2074&auto=format&fit=crop'
+      poster_url: '/images/sports_2_1787333026606.png'
     },
     {
       title: 'Hoops & Dreams',
       type: 'sports',
       description: 'The ultimate city-wide basketball championship.',
-      poster_url: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=2090&auto=format&fit=crop'
+      poster_url: '/images/sports_3_1787333040876.png'
     },
     {
       title: 'Velocity Racing Cup',
       type: 'sports',
       description: 'High-speed formula racing on a challenging street circuit.',
-      poster_url: 'https://images.unsplash.com/photo-1532906806733-1456d9539d0d?q=80&w=2070&auto=format&fit=crop'
+      poster_url: '/images/sports_4_1787333056253.png'
     },
     {
       title: 'Gridiron Clash',
       type: 'sports',
       description: 'Two massive rival football teams face off in the stadium.',
-      poster_url: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?q=80&w=1926&auto=format&fit=crop'
+      poster_url: '/images/sports_5_1787333158050.png'
     }
   ];
 
