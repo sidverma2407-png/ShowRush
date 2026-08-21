@@ -54,7 +54,7 @@ async function main() {
 
   // --- VENUE 1: Grand Cinema Multiplex (For Movies) ---
   const cinemaVenue = await prisma.venue.create({
-    data: { name: 'Seatzy Grand Cinema', address: '456 Hollywood Blvd', created_by: admin.id }
+    data: { name: 'Seatzy Grand Cinema', address: '456 Hollywood Blvd', city: 'New York', created_by: admin.id }
   });
 
   const cinemaSeats = [];
@@ -78,7 +78,7 @@ async function main() {
 
   // --- VENUE 2: Travis Scott Stadium Arena (For Concerts) ---
   const stadiumVenue = await prisma.venue.create({
-    data: { name: 'Travis Scott Stadium Arena', address: '789 AstroWorld Way', created_by: admin.id }
+    data: { name: 'Travis Scott Stadium Arena', address: '789 AstroWorld Way', city: 'Los Angeles', created_by: admin.id }
   });
 
   const stadiumSeats = [];
@@ -98,7 +98,7 @@ async function main() {
 
   // --- VENUE 3: Seatzy Underground Comedy Club (For Comedy) ---
   const comedyVenue = await prisma.venue.create({
-    data: { name: 'Seatzy Underground Comedy Club', address: '123 Laugh Corner', created_by: admin.id }
+    data: { name: 'Seatzy Underground Comedy Club', address: '123 Laugh Corner', city: 'Chicago', created_by: admin.id }
   });
 
   const comedySeats = [];
@@ -112,7 +112,7 @@ async function main() {
 
   // --- VENUE 4: Metropolitan Cricket Stadium (For Cricket Sports Events) ---
   const cricketVenue = await prisma.venue.create({
-    data: { name: 'Metropolitan Cricket Stadium', address: '100 Pitch Oval Way', created_by: admin.id }
+    data: { name: 'Metropolitan Cricket Stadium', address: '100 Pitch Oval Way', city: 'London', created_by: admin.id }
   });
 
   const cricketSeats = [];
@@ -129,7 +129,7 @@ async function main() {
 
   // --- VENUE 5: National Soccer Arena (For Football Sports Events) ---
   const footballVenue = await prisma.venue.create({
-    data: { name: 'National Soccer Arena', address: '500 Goalpost Blvd', created_by: admin.id }
+    data: { name: 'National Soccer Arena', address: '500 Goalpost Blvd', city: 'Mumbai', created_by: admin.id }
   });
 
   const footballSeats = [];

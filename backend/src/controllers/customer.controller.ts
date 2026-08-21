@@ -7,7 +7,7 @@ import { sendBookingEmail, sendWaitlistOfferEmail } from '../utils/email';
 
 export const getEvents = async (req: Request, res: Response) => {
   const events = await prisma.event.findMany({
-    include: { shows: true }
+    include: { shows: { include: { venue: true } } }
   });
   res.json({ status: 'success', data: events });
 };

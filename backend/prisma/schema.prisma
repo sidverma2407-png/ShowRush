@@ -66,6 +66,7 @@ model Venue {
   id         String   @id @default(uuid()) @db.Uuid
   name       String
   address    String
+  city       String   @default("New York")
   created_by String   @db.Uuid
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
