@@ -169,28 +169,28 @@ export default function Events() {
       </section>
 
       {/* Search / Filter Bar & Active City Marker */}
-      <section ref={eventsGridRef} className="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-gutter flex flex-col md:flex-row gap-gutter items-center">
-        <div className="flex-grow flex relative w-full">
+      <section ref={eventsGridRef} className="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-gutter flex flex-col md:flex-row gap-4 items-stretch md:items-center">
+        <div className="flex-grow min-w-0 flex relative">
           <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-on-surface-variant z-10" style={{ fontVariationSettings: "'FILL' 1" }}>search</span>
           <input 
-            className="w-full bg-surface border-border-width border-on-background pl-14 pr-4 py-4 font-data-label text-data-label placeholder:font-data-label placeholder:text-on-surface-variant focus:outline-none focus:ring-0 neo-brutalist-shadow neo-brutalist-hover transition-all font-bold" 
+            className="w-full bg-surface border-border-width border-on-background pl-14 pr-4 py-3.5 font-data-label text-data-label placeholder:font-data-label placeholder:text-on-surface-variant focus:outline-none focus:ring-0 neo-brutalist-shadow neo-brutalist-hover transition-all font-bold" 
             placeholder={`SEARCH VENUES, ARTISTS IN ${selectedCity.toUpperCase()}...`} 
             type="text" 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="flex gap-3 overflow-x-auto pb-4 md:pb-0 hide-scrollbar items-center w-full md:w-auto">
+        <div className="flex-shrink-0 flex gap-3 items-center">
           <input 
             type="date"
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="bg-surface text-on-surface border-border-width border-on-background px-4 py-4 font-data-label text-data-label uppercase whitespace-nowrap neo-brutalist-shadow neo-brutalist-hover focus:outline-none transition-all font-bold"
+            className="bg-surface text-on-surface border-border-width border-on-background px-3 py-3.5 font-data-label text-data-label uppercase whitespace-nowrap neo-brutalist-shadow neo-brutalist-hover focus:outline-none transition-all font-bold min-w-[140px]"
           />
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="bg-tertiary-fixed text-on-tertiary-fixed border-border-width border-on-background px-6 py-4 font-data-label text-data-label uppercase whitespace-nowrap neo-brutalist-shadow neo-brutalist-hover focus:outline-none transition-all cursor-pointer font-bold"
+            className="bg-tertiary-fixed text-on-tertiary-fixed border-border-width border-on-background px-4 py-3.5 font-data-label text-data-label uppercase whitespace-nowrap neo-brutalist-shadow neo-brutalist-hover focus:outline-none transition-all cursor-pointer font-bold"
           >
             <option value="">ALL TYPES</option>
             <option value="movie">MOVIE</option>
