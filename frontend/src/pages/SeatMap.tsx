@@ -237,7 +237,7 @@ export default function SeatMap() {
     );
   };
 
-  // Dedicated 360-Degree Concert Arena Layout (Clean Material Symbols)
+  // Dedicated 360-Degree Concert Arena Layout (Optimized Contrast)
   const renderConcertStadiumLayout = () => {
     const getRowSeats = (row: string, startNum?: number, endNum?: number) => {
       let rowSeats = seats
@@ -252,20 +252,20 @@ export default function SeatMap() {
     return (
       <div className="flex flex-col gap-6 items-center w-full max-w-full px-2">
         {/* 1. NORTH: VIP PIT (Rows A & B) */}
-        <div className="w-full max-w-4xl bg-amber-500/10 border-4 border-amber-500 p-3 neo-brutalism-shadow rounded-lg text-center">
-          <div className="font-headline-lg-mobile text-amber-500 uppercase tracking-widest mb-2 flex items-center justify-center gap-2 text-xs font-bold">
+        <div className="w-full max-w-4xl bg-amber-100 border-4 border-amber-600 p-3 neo-brutalism-shadow rounded-lg text-center">
+          <div className="font-headline-lg-mobile text-amber-950 uppercase tracking-widest mb-2 flex items-center justify-center gap-2 text-xs font-black">
             <span className="material-symbols-outlined text-sm">star</span>
-            VIP STAGE PIT (FRONT ACCESS)
+            <span>VIP STAGE PIT (FRONT ACCESS)</span>
             <span className="material-symbols-outlined text-sm">star</span>
           </div>
           <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
             {['A', 'B'].map(row => (
               <div key={row} className="flex gap-2 items-center justify-center">
-                <span className="font-data-label text-[10px] text-amber-400 w-4 font-bold">{row}</span>
+                <span className="font-data-label text-xs text-amber-900 w-4 font-black">{row}</span>
                 <div className="flex gap-1.5">
                   {getRowSeats(row).map(seat => renderSeat(seat, true))}
                 </div>
-                <span className="font-data-label text-[10px] text-amber-400 w-4 font-bold">{row}</span>
+                <span className="font-data-label text-xs text-amber-900 w-4 font-black">{row}</span>
               </div>
             ))}
           </div>
@@ -274,15 +274,15 @@ export default function SeatMap() {
         {/* 2. CENTER STAGE & SIDE WINGS HUB */}
         <div className="w-full max-w-4xl flex flex-col xl:flex-row gap-4 items-center justify-center">
           {/* WEST TIER (Left Wing - Rows F, G, H, seats 1-8) */}
-          <div className="bg-cyan-950/20 border-4 border-cyan-500 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
-            <div className="font-headline-lg-mobile text-cyan-400 uppercase tracking-wider mb-2 text-xs font-bold flex items-center justify-center gap-1">
+          <div className="bg-teal-100 border-4 border-teal-600 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
+            <div className="font-headline-lg-mobile text-teal-950 uppercase tracking-wider mb-2 text-xs font-black flex items-center justify-center gap-1">
               <span className="material-symbols-outlined text-sm">stadium</span>
               <span>WEST TIER WING</span>
             </div>
             <div className="flex flex-col gap-1.5 items-center">
               {['F', 'G', 'H'].map(row => (
                 <div key={`west-${row}`} className="flex gap-1.5 items-center justify-center">
-                  <span className="font-data-label text-[10px] text-cyan-400 font-bold w-4">{row}</span>
+                  <span className="font-data-label text-xs text-teal-950 font-black w-4">{row}</span>
                   <div className="flex gap-1">
                     {getRowSeats(row, 1, 8).map(seat => renderSeat(seat, true))}
                   </div>
@@ -293,21 +293,21 @@ export default function SeatMap() {
 
           {/* 360 STAGE CENTER PIECE */}
           <div className="shrink-0 w-56 bg-on-background text-primary-fixed border-4 border-on-background neo-brutalism-shadow p-4 flex flex-col items-center justify-center text-center relative overflow-hidden my-2 xl:my-0">
-            <div className="absolute top-1 left-1 text-[8px] font-mono text-amber-400 animate-pulse">AUDIO STACK</div>
-            <div className="absolute top-1 right-1 text-[8px] font-mono text-amber-400 animate-pulse">AUDIO STACK</div>
+            <div className="absolute top-1 left-1 text-[9px] font-mono text-amber-300 font-bold">AUDIO STACK</div>
+            <div className="absolute top-1 right-1 text-[9px] font-mono text-amber-300 font-bold">AUDIO STACK</div>
             <span className="material-symbols-outlined text-3xl text-amber-400 mb-1 animate-bounce">graphic_eq</span>
-            <span className="font-headline-lg text-xs uppercase tracking-widest text-primary-fixed leading-tight">
+            <span className="font-headline-lg text-xs uppercase tracking-widest text-primary-fixed leading-tight font-black">
               CENTRAL STAGE
             </span>
             <div className="w-full h-1.5 bg-amber-400 border border-on-background my-1.5 animate-pulse"></div>
-            <span className="text-[9px] font-mono uppercase text-amber-300 font-bold tracking-wider">
+            <span className="text-[10px] font-mono uppercase text-amber-300 font-bold tracking-wider">
               360° STADIUM HUB
             </span>
           </div>
 
           {/* EAST TIER (Right Wing - Rows F, G, H, seats 9-16) */}
-          <div className="bg-cyan-950/20 border-4 border-cyan-500 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
-            <div className="font-headline-lg-mobile text-cyan-400 uppercase tracking-wider mb-2 text-xs font-bold flex items-center justify-center gap-1">
+          <div className="bg-teal-100 border-4 border-teal-600 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
+            <div className="font-headline-lg-mobile text-teal-950 uppercase tracking-wider mb-2 text-xs font-black flex items-center justify-center gap-1">
               <span className="material-symbols-outlined text-sm">stadium</span>
               <span>EAST TIER WING</span>
             </div>
@@ -317,7 +317,7 @@ export default function SeatMap() {
                   <div className="flex gap-1">
                     {getRowSeats(row, 9, 16).map(seat => renderSeat(seat, true))}
                   </div>
-                  <span className="font-data-label text-[10px] text-cyan-400 font-bold w-4">{row}</span>
+                  <span className="font-data-label text-xs text-teal-950 font-black w-4">{row}</span>
                 </div>
               ))}
             </div>
@@ -325,20 +325,20 @@ export default function SeatMap() {
         </div>
 
         {/* 3. SOUTH INNER: GOLDEN CIRCLE GA FLOOR (Rows C, D & E) */}
-        <div className="w-full max-w-4xl bg-purple-950/20 border-4 border-purple-500 p-3 neo-brutalism-shadow rounded-lg text-center">
-          <div className="font-headline-lg-mobile text-purple-400 uppercase tracking-widest mb-2 flex items-center justify-center gap-2 text-xs font-bold">
+        <div className="w-full max-w-4xl bg-purple-100 border-4 border-purple-600 p-3 neo-brutalism-shadow rounded-lg text-center">
+          <div className="font-headline-lg-mobile text-purple-950 uppercase tracking-widest mb-2 flex items-center justify-center gap-2 text-xs font-black">
             <span className="material-symbols-outlined text-sm">bolt</span>
-            GOLDEN CIRCLE DANCE FLOOR
+            <span>GOLDEN CIRCLE DANCE FLOOR</span>
             <span className="material-symbols-outlined text-sm">bolt</span>
           </div>
           <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
             {['C', 'D', 'E'].map(row => (
               <div key={row} className="flex gap-2 items-center justify-center">
-                <span className="font-data-label text-[10px] text-purple-400 w-4 font-bold">{row}</span>
+                <span className="font-data-label text-xs text-purple-950 w-4 font-black">{row}</span>
                 <div className="flex gap-1.5">
                   {getRowSeats(row).map(seat => renderSeat(seat, true))}
                 </div>
-                <span className="font-data-label text-[10px] text-purple-400 w-4 font-bold">{row}</span>
+                <span className="font-data-label text-xs text-purple-950 w-4 font-black">{row}</span>
               </div>
             ))}
           </div>
@@ -346,18 +346,18 @@ export default function SeatMap() {
 
         {/* 4. SOUTH OUTER: UPPER DECK BLEACHERS (Rows I, J & K) */}
         <div className="w-full max-w-4xl bg-slate-900 border-4 border-slate-700 p-3 neo-brutalism-shadow rounded-lg text-center">
-          <div className="font-headline-lg-mobile text-slate-300 uppercase tracking-widest mb-2 text-xs font-bold flex items-center justify-center gap-1">
+          <div className="font-headline-lg-mobile text-slate-100 uppercase tracking-widest mb-2 text-xs font-black flex items-center justify-center gap-1">
             <span className="material-symbols-outlined text-sm">chair</span>
             <span>UPPER DECK BLEACHERS & REAR ARENA</span>
           </div>
           <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
             {['I', 'J', 'K'].map(row => (
               <div key={row} className="flex gap-2 items-center justify-center">
-                <span className="font-data-label text-[10px] text-slate-400 w-4 font-bold">{row}</span>
+                <span className="font-data-label text-xs text-slate-200 w-4 font-bold">{row}</span>
                 <div className="flex gap-1.5">
                   {getRowSeats(row).map(seat => renderSeat(seat, true))}
                 </div>
-                <span className="font-data-label text-[10px] text-slate-400 w-4 font-bold">{row}</span>
+                <span className="font-data-label text-xs text-slate-200 w-4 font-bold">{row}</span>
               </div>
             ))}
           </div>
@@ -366,34 +366,34 @@ export default function SeatMap() {
     );
   };
 
-  // Dedicated Intimate Comedy Club Layout (Clean Material Symbols)
+  // Dedicated Intimate Comedy Club Layout (Optimized Contrast)
   const renderComedyLayout = () => {
     return (
       <div className="flex flex-col gap-6 items-center w-full max-w-4xl mx-auto px-2">
-        <div className="w-full bg-amber-400 text-on-background border-4 border-on-background p-3 neo-brutalism-shadow font-bold text-center uppercase tracking-widest text-xs flex items-center justify-center gap-2">
+        <div className="w-full bg-amber-400 text-on-background border-4 border-on-background p-3 neo-brutalism-shadow font-black text-center uppercase tracking-widest text-xs flex items-center justify-center gap-2">
           <span className="material-symbols-outlined text-base">mic</span>
-          INTIMATE COMEDY CLUB — ALL SEATS FLAT $35.00
+          <span>INTIMATE COMEDY CLUB — ALL SEATS FLAT $35.00</span>
           <span className="material-symbols-outlined text-base">mic</span>
         </div>
 
         {/* Center Mic Spotlight */}
-        <div className="w-48 h-20 bg-yellow-400/20 border-4 border-dashed border-yellow-400 rounded-full flex flex-col items-center justify-center my-2 text-center neo-brutalism-shadow">
-          <span className="material-symbols-outlined text-yellow-400 text-2xl animate-pulse">mic</span>
-          <span className="font-mono text-[9px] text-yellow-300 font-bold uppercase tracking-wider">SPOTLIGHT MIC STAND</span>
+        <div className="w-48 h-20 bg-yellow-200 border-4 border-dashed border-yellow-600 rounded-full flex flex-col items-center justify-center my-2 text-center neo-brutalism-shadow">
+          <span className="material-symbols-outlined text-yellow-800 text-2xl animate-pulse">mic</span>
+          <span className="font-mono text-[10px] text-amber-950 font-black uppercase tracking-wider">SPOTLIGHT MIC STAND</span>
         </div>
 
         {/* Club Seats in clustered layout */}
         <div className="flex flex-col gap-3 items-center w-full">
           {rows.map(row => (
             <div key={row as string} className="flex gap-2 items-center justify-center bg-surface border-2 border-on-background p-2 neo-brutalism-shadow-sm rounded-lg">
-              <span className="font-data-label text-xs font-bold text-primary-fixed w-6 text-right">{row as string}</span>
+              <span className="font-data-label text-xs font-black text-on-background w-6 text-right">{row as string}</span>
               <div className="flex gap-1.5 flex-wrap justify-center">
                 {seats
                   .filter(s => s.venue_seat.row_label === row)
                   .sort((a, b) => a.venue_seat.seat_number - b.venue_seat.seat_number)
                   .map(seat => renderSeat(seat, true))}
               </div>
-              <span className="font-data-label text-xs font-bold text-primary-fixed w-6 text-left">{row as string}</span>
+              <span className="font-data-label text-xs font-black text-on-background w-6 text-left">{row as string}</span>
             </div>
           ))}
         </div>
@@ -401,7 +401,7 @@ export default function SeatMap() {
     );
   };
 
-  // Dedicated Sports Stadium Layout (Clean Material Symbols)
+  // Dedicated Sports Stadium Layout (Optimized Contrast)
   const renderSportsLayout = () => {
     const isCricket = showData?.event?.title?.toLowerCase().includes('cricket') || showData?.venue?.name?.toLowerCase().includes('cricket');
 
@@ -418,20 +418,20 @@ export default function SeatMap() {
     return (
       <div className="flex flex-col gap-6 items-center w-full max-w-5xl mx-auto px-2">
         {/* 1. VIP PAVILION BOX (NORTH) */}
-        <div className="w-full max-w-4xl bg-amber-500/10 border-4 border-amber-500 p-3 neo-brutalism-shadow rounded-lg text-center">
-          <div className="font-headline-lg-mobile text-amber-400 uppercase tracking-widest mb-2 flex items-center justify-center gap-2 text-xs font-bold">
+        <div className="w-full max-w-4xl bg-amber-100 border-4 border-amber-600 p-3 neo-brutalism-shadow rounded-lg text-center">
+          <div className="font-headline-lg-mobile text-amber-950 uppercase tracking-widest mb-2 flex items-center justify-center gap-2 text-xs font-black">
             <span className="material-symbols-outlined text-sm">workspace_premium</span>
-            VIP PAVILION & SUITE BOX ($150)
+            <span>VIP PAVILION & SUITE BOX ($150)</span>
             <span className="material-symbols-outlined text-sm">workspace_premium</span>
           </div>
           <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
             {['A', 'B'].map(row => (
               <div key={row} className="flex gap-2 items-center justify-center">
-                <span className="font-data-label text-[10px] text-amber-400 w-4 font-bold">{row}</span>
+                <span className="font-data-label text-xs text-amber-900 w-4 font-black">{row}</span>
                 <div className="flex gap-1.5">
                   {getRowSeats(row).map(seat => renderSeat(seat, true))}
                 </div>
-                <span className="font-data-label text-[10px] text-amber-400 w-4 font-bold">{row}</span>
+                <span className="font-data-label text-xs text-amber-900 w-4 font-black">{row}</span>
               </div>
             ))}
           </div>
@@ -440,15 +440,15 @@ export default function SeatMap() {
         {/* 2. CENTRAL SPORTS FIELD & SIDE WINGS */}
         <div className="w-full max-w-4xl flex flex-col xl:flex-row gap-4 items-center justify-center">
           {/* WEST TIER SIDE STAND (Rows C, D, E, seats 1-7) */}
-          <div className="bg-emerald-950/30 border-4 border-emerald-500 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
-            <div className="font-headline-lg-mobile text-emerald-400 uppercase tracking-wider mb-2 text-xs font-bold flex items-center justify-center gap-1">
+          <div className="bg-teal-100 border-4 border-teal-600 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
+            <div className="font-headline-lg-mobile text-teal-950 uppercase tracking-wider mb-2 text-xs font-black flex items-center justify-center gap-1">
               <span className="material-symbols-outlined text-sm">stadium</span>
               <span>WEST STAND WING ($85)</span>
             </div>
             <div className="flex flex-col gap-1.5 items-center">
               {['C', 'D', 'E'].map(row => (
                 <div key={`west-${row}`} className="flex gap-1.5 items-center justify-center">
-                  <span className="font-data-label text-[10px] text-emerald-400 font-bold w-4">{row}</span>
+                  <span className="font-data-label text-xs text-teal-950 font-black w-4">{row}</span>
                   <div className="flex gap-1">
                     {getRowSeats(row, 1, 7).map(seat => renderSeat(seat, true))}
                   </div>
@@ -460,16 +460,16 @@ export default function SeatMap() {
           {/* CENTRAL FIELD VISIBILITY ENGINE */}
           {isCricket ? (
             /* CRICKET CIRCULAR OVAL FIELD */
-            <div className="shrink-0 w-64 h-48 bg-emerald-900/50 border-4 border-emerald-400 rounded-full neo-brutalism-shadow p-3 flex flex-col items-center justify-center text-center relative overflow-hidden my-2 xl:my-0">
-              <div className="w-48 h-32 border-2 border-dashed border-emerald-300 rounded-full flex flex-col items-center justify-center relative">
+            <div className="shrink-0 w-64 h-48 bg-emerald-900/40 border-4 border-emerald-600 rounded-full neo-brutalism-shadow p-3 flex flex-col items-center justify-center text-center relative overflow-hidden my-2 xl:my-0">
+              <div className="w-48 h-32 border-2 border-dashed border-emerald-400 rounded-full flex flex-col items-center justify-center relative">
                 {/* 22-Yard Pitch Strip */}
-                <div className="w-16 h-20 bg-amber-200/20 border-2 border-amber-300 flex flex-col justify-between items-center py-1">
-                  <div className="w-8 h-1 bg-white"></div>
-                  <span className="text-[9px] font-mono font-bold text-amber-300">CRICKET PITCH</span>
-                  <div className="w-8 h-1 bg-white"></div>
+                <div className="w-20 h-20 bg-amber-100 border-2 border-amber-600 flex flex-col justify-between items-center py-1 rounded">
+                  <div className="w-10 h-1 bg-amber-800"></div>
+                  <span className="text-[10px] font-mono font-black text-amber-950">CRICKET PITCH</span>
+                  <div className="w-10 h-1 bg-amber-800"></div>
                 </div>
               </div>
-              <span className="text-[10px] font-mono uppercase text-emerald-200 font-bold tracking-wider mt-1 flex items-center justify-center gap-1">
+              <span className="text-[10px] font-mono uppercase text-emerald-950 font-black bg-emerald-200 px-2.5 py-0.5 rounded border border-emerald-500 tracking-wider mt-1 flex items-center justify-center gap-1">
                 <span className="material-symbols-outlined text-xs">sports_cricket</span>
                 <span>30-YARD CRICKET OVAL</span>
               </span>
@@ -479,13 +479,13 @@ export default function SeatMap() {
             <div className="shrink-0 w-64 h-48 bg-emerald-800 border-4 border-white neo-brutalism-shadow p-2 flex flex-col items-center justify-between text-center relative overflow-hidden my-2 xl:my-0">
               <div className="w-full flex justify-between items-center text-xs">
                 <span className="material-symbols-outlined text-white">sports_soccer</span>
-                <span className="text-[9px] font-mono text-white font-bold">SOCCER FIELD</span>
+                <span className="text-[10px] font-mono text-white font-black">SOCCER FIELD</span>
                 <span className="material-symbols-outlined text-white">sports_soccer</span>
               </div>
               <div className="w-full border-t-2 border-white relative flex items-center justify-center my-auto">
                 <div className="w-16 h-16 border-2 border-white rounded-full absolute"></div>
               </div>
-              <span className="text-[10px] font-mono uppercase text-white font-bold tracking-wider flex items-center justify-center gap-1">
+              <span className="text-[10px] font-mono uppercase text-white font-black tracking-wider flex items-center justify-center gap-1">
                 <span className="material-symbols-outlined text-xs">sports_soccer</span>
                 <span>TOUCHLINE & GOAL POSTS</span>
               </span>
@@ -493,8 +493,8 @@ export default function SeatMap() {
           )}
 
           {/* EAST TIER SIDE STAND (Rows C, D, E, seats 8-14) */}
-          <div className="bg-emerald-950/30 border-4 border-emerald-500 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
-            <div className="font-headline-lg-mobile text-emerald-400 uppercase tracking-wider mb-2 text-xs font-bold flex items-center justify-center gap-1">
+          <div className="bg-teal-100 border-4 border-teal-600 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
+            <div className="font-headline-lg-mobile text-teal-950 uppercase tracking-wider mb-2 text-xs font-black flex items-center justify-center gap-1">
               <span className="material-symbols-outlined text-sm">stadium</span>
               <span>EAST STAND WING ($85)</span>
             </div>
@@ -504,7 +504,7 @@ export default function SeatMap() {
                   <div className="flex gap-1">
                     {getRowSeats(row, 8, 14).map(seat => renderSeat(seat, true))}
                   </div>
-                  <span className="font-data-label text-[10px] text-emerald-400 font-bold w-4">{row}</span>
+                  <span className="font-data-label text-xs text-teal-950 font-black w-4">{row}</span>
                 </div>
               ))}
             </div>
@@ -513,18 +513,18 @@ export default function SeatMap() {
 
         {/* 3. SOUTH BLEACHERS (Rows F, G, H) */}
         <div className="w-full max-w-4xl bg-slate-900 border-4 border-slate-700 p-3 neo-brutalism-shadow rounded-lg text-center">
-          <div className="font-headline-lg-mobile text-slate-300 uppercase tracking-widest mb-2 text-xs font-bold flex items-center justify-center gap-1">
+          <div className="font-headline-lg-mobile text-slate-100 uppercase tracking-widest mb-2 text-xs font-black flex items-center justify-center gap-1">
             <span className="material-symbols-outlined text-sm">chair</span>
             <span>UPPER DECK STADIUM BLEACHERS ($35)</span>
           </div>
           <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
             {['F', 'G', 'H'].map(row => (
               <div key={row} className="flex gap-2 items-center justify-center">
-                <span className="font-data-label text-[10px] text-slate-400 w-4 font-bold">{row}</span>
+                <span className="font-data-label text-xs text-slate-200 w-4 font-bold">{row}</span>
                 <div className="flex gap-1.5">
                   {getRowSeats(row).map(seat => renderSeat(seat, true))}
                 </div>
-                <span className="font-data-label text-[10px] text-slate-400 w-4 font-bold">{row}</span>
+                <span className="font-data-label text-xs text-slate-200 w-4 font-bold">{row}</span>
               </div>
             ))}
           </div>
@@ -545,15 +545,15 @@ export default function SeatMap() {
             <h1 className="font-headline-lg-mobile md:font-headline-lg uppercase text-primary-fixed tracking-tight leading-none">VENUE MAP</h1>
             {showData && (
               <div className="hidden md:flex flex-wrap gap-3 mt-2">
-                <span className="font-data-label text-data-label uppercase bg-primary-fixed text-on-primary-fixed px-3 py-1 flex items-center gap-1">
+                <span className="font-data-label text-data-label uppercase bg-primary-fixed text-on-primary-fixed px-3 py-1 flex items-center gap-1 font-bold">
                   <span className="material-symbols-outlined text-[16px]">calendar_today</span>
                   {new Date(showData.date).toLocaleDateString()}
                 </span>
-                <span className="font-data-label text-data-label uppercase bg-secondary-fixed text-on-secondary-fixed px-3 py-1 flex items-center gap-1">
+                <span className="font-data-label text-data-label uppercase bg-secondary-fixed text-on-secondary-fixed px-3 py-1 flex items-center gap-1 font-bold">
                   <span className="material-symbols-outlined text-[16px]">schedule</span>
                   {showData.time}
                 </span>
-                <span className="font-data-label text-data-label uppercase bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 flex items-center gap-1">
+                <span className="font-data-label text-data-label uppercase bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 flex items-center gap-1 font-bold">
                   <span className="material-symbols-outlined text-[16px]">location_on</span>
                   {showData.venue?.name}
                 </span>
@@ -562,7 +562,7 @@ export default function SeatMap() {
           </div>
         </div>
         {countdown !== null && (
-          <div className="font-data-label text-data-label bg-error text-on-error border-border-width border-on-background px-4 py-2 neo-brutalism-shadow animate-pulse">
+          <div className="font-data-label text-data-label bg-error text-on-error border-border-width border-on-background px-4 py-2 neo-brutalism-shadow animate-pulse font-bold">
             HOLD EXPIRES IN {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
           </div>
         )}
@@ -571,15 +571,15 @@ export default function SeatMap() {
       {/* Mobile Details Bar */}
       {showData && (
         <div className="md:hidden bg-surface border-b-4 border-on-background p-4 flex flex-wrap gap-2 justify-center">
-          <span className="font-data-label text-data-label uppercase bg-primary-fixed text-on-primary-fixed border-border-width border-on-background px-3 py-1 flex items-center gap-1 neo-brutalism-shadow-sm">
+          <span className="font-data-label text-data-label uppercase bg-primary-fixed text-on-primary-fixed border-border-width border-on-background px-3 py-1 flex items-center gap-1 neo-brutalism-shadow-sm font-bold">
             <span className="material-symbols-outlined text-[16px]">calendar_today</span>
             {new Date(showData.date).toLocaleDateString()}
           </span>
-          <span className="font-data-label text-data-label uppercase bg-secondary-fixed text-on-secondary-fixed border-border-width border-on-background px-3 py-1 flex items-center gap-1 neo-brutalism-shadow-sm">
+          <span className="font-data-label text-data-label uppercase bg-secondary-fixed text-on-secondary-fixed border-border-width border-on-background px-3 py-1 flex items-center gap-1 neo-brutalism-shadow-sm font-bold">
             <span className="material-symbols-outlined text-[16px]">schedule</span>
             {showData.time}
           </span>
-          <span className="font-data-label text-data-label uppercase bg-tertiary-fixed text-on-tertiary-fixed border-border-width border-on-background px-3 py-1 flex items-center gap-1 neo-brutalism-shadow-sm">
+          <span className="font-data-label text-data-label uppercase bg-tertiary-fixed text-on-tertiary-fixed border-border-width border-on-background px-3 py-1 flex items-center gap-1 neo-brutalism-shadow-sm font-bold">
             <span className="material-symbols-outlined text-[16px]">location_on</span>
             {showData.venue?.name}
           </span>
@@ -649,7 +649,7 @@ export default function SeatMap() {
                       <div className="w-full h-10 bg-on-background text-primary-fixed font-headline-lg-mobile text-center flex items-center justify-center border-4 border-on-background neo-brutalism-shadow rounded-b-[40%] overflow-hidden bg-gradient-to-r from-on-background via-slate-800 to-on-background">
                         <span className="tracking-[0.25em] font-black text-sm text-yellow-300 animate-pulse">CINEMA CURVED SCREEN</span>
                       </div>
-                      <div className="text-center text-[10px] uppercase font-mono font-bold text-on-surface-variant mt-2 tracking-widest flex items-center justify-center gap-1">
+                      <div className="text-center text-[10px] uppercase font-mono font-black text-on-surface mt-2 tracking-widest flex items-center justify-center gap-1">
                         <span className="material-symbols-outlined text-xs">arrow_drop_up</span>
                         <span>AUDIENCE FACING SCREEN</span>
                         <span className="material-symbols-outlined text-xs">arrow_drop_up</span>
@@ -660,7 +660,7 @@ export default function SeatMap() {
 
                 {rows.map(row => (
                   <div key={row as string} className="flex gap-4 items-center justify-center">
-                    <span className="font-data-label text-data-label text-on-surface-variant w-8 text-right shrink-0">{row as string}</span>
+                    <span className="font-data-label text-data-label text-on-surface font-black w-8 text-right shrink-0">{row as string}</span>
                     <div className="flex gap-2">
                       {seats
                         .filter(s => s.venue_seat.row_label === row)
@@ -672,7 +672,7 @@ export default function SeatMap() {
                           return (
                             <div key={seat.id} className="flex items-center">
                               {showAisleGap && (
-                                <div className="w-8 h-full flex items-center justify-center font-mono text-[10px] text-on-surface-variant opacity-40 uppercase px-1">
+                                <div className="w-8 h-full flex items-center justify-center font-mono text-[10px] text-on-surface font-bold opacity-60 uppercase px-1">
                                   AISLE
                                 </div>
                               )}
@@ -681,7 +681,7 @@ export default function SeatMap() {
                           );
                         })}
                     </div>
-                    <span className="font-data-label text-data-label text-on-surface-variant w-8 text-left shrink-0">{row as string}</span>
+                    <span className="font-data-label text-data-label text-on-surface font-black w-8 text-left shrink-0">{row as string}</span>
                   </div>
                 ))}
               </div>
@@ -692,19 +692,19 @@ export default function SeatMap() {
           <div className="absolute bottom-4 left-4 right-4 md:left-margin-desktop md:right-auto bg-surface border-border-width border-on-background p-4 neo-brutalism-shadow flex flex-wrap gap-4 items-center z-10">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 border-2 border-on-background bg-surface"></div>
-              <span className="font-data-label text-data-label uppercase">Available</span>
+              <span className="font-data-label text-data-label uppercase font-bold">Available</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 border-2 border-on-background bg-tertiary-fixed"></div>
-              <span className="font-data-label text-data-label uppercase">Selected</span>
+              <span className="font-data-label text-data-label uppercase font-bold">Selected</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 border-2 border-on-background bg-secondary-container"></div>
-              <span className="font-data-label text-data-label uppercase">Your Hold</span>
+              <span className="font-data-label text-data-label uppercase font-bold">Your Hold</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 border-2 border-on-background bg-primary-fixed opacity-70"></div>
-              <span className="font-data-label text-data-label uppercase">Unavailable</span>
+              <span className="font-data-label text-data-label uppercase font-bold">Unavailable</span>
             </div>
           </div>
         </section>
@@ -757,13 +757,13 @@ export default function SeatMap() {
                     <div className="absolute left-[-10px] top-1/2 transform -translate-y-1/2 w-[20px] h-[20px] rounded-full bg-surface-container border-r-4 border-on-background"></div>
                     <div className="flex justify-between items-start ml-4">
                       <div>
-                        <div className="font-data-label text-data-label bg-tertiary-fixed text-on-tertiary-fixed px-2 py-1 border-2 border-on-background inline-block mb-2">
+                        <div className="font-data-label text-data-label bg-tertiary-fixed text-on-tertiary-fixed px-2 py-1 border-2 border-on-background inline-block mb-2 font-bold">
                           {getCategoryName(s.venue_seat.category_id)}
                         </div>
-                        <div className="font-headline-lg-mobile text-on-surface">ROW {s.venue_seat.row_label} <br /> NUM {s.venue_seat.seat_number}</div>
+                        <div className="font-headline-lg-mobile text-on-surface font-black">ROW {s.venue_seat.row_label} <br /> NUM {s.venue_seat.seat_number}</div>
                       </div>
                       <div className="flex flex-col items-end gap-2">
-                        <div className="font-headline-lg-mobile text-secondary">${getPrice(s.venue_seat.category_id)}</div>
+                        <div className="font-headline-lg-mobile text-secondary font-black">${getPrice(s.venue_seat.category_id)}</div>
                         <button 
                           onClick={() => handleReleaseSingle(s.id)}
                           className="bg-error text-on-error p-1 border-2 border-on-background hover:bg-red-600 transition-colors"
@@ -782,21 +782,21 @@ export default function SeatMap() {
           {/* Checkout Details Form */}
           {myHolds.length > 0 && (
             <div className="p-margin-mobile bg-surface-variant border-b-4 border-on-background">
-               <h3 className="font-headline-lg-mobile text-sm uppercase mb-3 text-on-surface">Guest Details</h3>
+               <h3 className="font-headline-lg-mobile text-sm uppercase mb-3 text-on-surface font-bold">Guest Details</h3>
                <div className="flex flex-col gap-3">
                  <input 
                    type="text" 
                    placeholder="FULL NAME" 
                    value={customerName}
                    onChange={e => setCustomerName(e.target.value)}
-                   className="w-full bg-surface border-2 border-on-background p-2 font-data-label text-data-label focus:outline-none focus:border-primary-fixed"
+                   className="w-full bg-surface border-2 border-on-background p-2 font-data-label text-data-label focus:outline-none focus:border-primary-fixed font-bold"
                  />
                  <input 
                    type="tel" 
                    placeholder="PHONE NUMBER" 
                    value={customerPhone}
                    onChange={e => setCustomerPhone(e.target.value)}
-                   className="w-full bg-surface border-2 border-on-background p-2 font-data-label text-data-label focus:outline-none focus:border-primary-fixed"
+                   className="w-full bg-surface border-2 border-on-background p-2 font-data-label text-data-label focus:outline-none focus:border-primary-fixed font-bold"
                  />
                </div>
             </div>
@@ -805,16 +805,16 @@ export default function SeatMap() {
           {/* Total & Checkout */}
           <div className="p-margin-mobile bg-surface mt-auto">
             <div className="flex justify-between items-center mb-4">
-              <span className="font-data-label text-data-label uppercase">Subtotal ({myHolds.length} Tickets)</span>
-              <span className="font-headline-lg text-primary">${subtotal.toFixed(2)}</span>
+              <span className="font-data-label text-data-label uppercase font-bold">Subtotal ({myHolds.length} Tickets)</span>
+              <span className="font-headline-lg text-primary font-black">${subtotal.toFixed(2)}</span>
             </div>
             <button 
               onClick={handleCheckout}
               disabled={myHolds.length === 0 || checkingOut}
-              className="w-full bg-primary-fixed text-on-primary-fixed border-border-width border-on-background py-4 font-headline-lg uppercase neo-brutalism-shadow neo-brutalism-shadow-hover neo-brutalism-shadow-active transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-primary-fixed text-on-primary-fixed border-border-width border-on-background py-4 font-headline-lg uppercase neo-brutalism-shadow neo-brutalism-shadow-hover neo-brutalism-shadow-active transition-all disabled:opacity-50 flex items-center justify-center gap-2 font-black"
             >
               <span>{checkingOut ? 'Processing...' : 'Checkout'}</span>
-              <span className="material-symbols-outlined">arrow_forward</span>
+              <span className="material-symbols-outlined font-bold">arrow_forward</span>
             </button>
           </div>
         </aside>
