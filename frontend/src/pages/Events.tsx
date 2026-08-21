@@ -264,7 +264,7 @@ export default function Events() {
                 >
                   <div className="relative h-64 border-b-4 border-on-background overflow-hidden">
                     <div 
-                      className="bg-cover bg-center w-full h-full grayscale group-hover:grayscale-0 transition-all duration-500 scale-105 group-hover:scale-100" 
+                      className="bg-cover bg-center w-full h-full transition-transform duration-500 scale-100 group-hover:scale-105" 
                       style={{ backgroundImage: event.poster_url ? `url(${event.poster_url})` : 'none', backgroundColor: event.poster_url ? 'transparent' : '#e2e2e2' }}
                     >
                       {!event.poster_url && (
