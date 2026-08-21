@@ -217,20 +217,41 @@ export default function SeatMap() {
   const hasAvailableSelected = selectedSeats.some(s => s.status === 'available');
   const onlyOtherHeldSelected = selectedSeats.length === 1 && (selectedSeats[0].status === 'booked' || (selectedSeats[0].status === 'held' && selectedSeats[0].held_by !== user?.id));
 
+  const getSeatCategoryColor = (seat: any) => {
+    const isSelected = selectedSeats.some(s => s.id === seat.id);
+    const isMyHold = seat.status === 'held' && seat.held_by === user?.id;
+    const isBooked = seat.status === 'booked';
+    const isOtherHold = seat.status === 'held' && seat.held_by !== user?.id;
+
+    if (isBooked || isOtherHold || isMyHold || isSelected) return '';
+
+    const categoryName = getCategoryName(seat.venue_seat.category_id).toLowerCase();
+    const price = getPrice(seat.venue_seat.category_id);
+
+    if (categoryName.includes('recliner') || price >= 400) {
+      return '!bg-amber-300 !text-amber-950 !border-amber-900 hover:!bg-amber-400 font-black shadow-sm';
+    }
+    if (categoryName.includes('premium') || price >= 300) {
+      return '!bg-cyan-300 !text-cyan-950 !border-cyan-900 hover:!bg-cyan-400 font-black shadow-sm';
+    }
+    return '!bg-slate-200 !text-slate-900 !border-slate-700 hover:!bg-slate-300 font-bold';
+  };
+
   const renderSeat = (seat: any, compact = false) => {
     const isZoneFiltered = selectedCategory !== 'all' && seat.venue_seat.category_id !== selectedCategory;
+    const categoryClass = getSeatCategoryColor(seat);
 
     return (
       <button
         key={seat.id}
         onClick={() => toggleSeatSelection(seat)}
         disabled={isZoneFiltered}
-        className={`seat-btn ${compact ? '!w-7 !h-7 !text-[10px]' : ''} ${getSeatClass(seat)} ${
+        className={`seat-btn ${compact ? '!w-7 !h-7 !text-[10px]' : ''} ${getSeatClass(seat)} ${categoryClass} ${
           isZoneFiltered ? 'opacity-20 grayscale pointer-events-none scale-90' : ''
         } ${
           !isZoneFiltered && selectedCategory !== 'all' ? 'ring-4 ring-primary-fixed scale-110 z-10' : ''
         }`}
-        title={`${seat.venue_seat.row_label}${seat.venue_seat.seat_number} — ${seat.status} (₹${getPrice(seat.venue_seat.category_id)})`}
+        title={`${seat.venue_seat.row_label}${seat.venue_seat.seat_number} — ${getCategoryName(seat.venue_seat.category_id)} (₹${getPrice(seat.venue_seat.category_id)})`}
       >
         {seat.venue_seat.seat_number}
       </button>
@@ -533,6 +554,136 @@ export default function SeatMap() {
     );
   };
 
+  // Dedicated Cinema Movie Theater Layout with Clear Tier Visual Distinction
+  const renderCinemaLayout = () => {
+    const getRowSeats = (row: string) => {
+      return seats
+        .filter(s => s.venue_seat.row_label === row)
+        .sort((a, b) => a.venue_seat.seat_number - b.venue_seat.seat_number);
+    };
+
+    return (
+      <div className="flex flex-col gap-6 items-center w-full max-w-5xl mx-auto px-2">
+        {/* Curved Cinema Screen Header */}
+        <div className="w-full max-w-4xl mx-auto mb-2">
+          <div className="relative">
+            <div className="w-full h-12 bg-on-background text-primary-fixed font-headline-lg-mobile text-center flex items-center justify-center border-4 border-on-background neo-brutalism-shadow rounded-b-[40%] overflow-hidden bg-gradient-to-r from-on-background via-slate-800 to-on-background">
+              <span className="tracking-[0.25em] font-black text-sm text-yellow-300 animate-pulse flex items-center gap-2">
+                <span className="material-symbols-outlined text-base">movie</span>
+                CINEMA CURVED SCREEN
+                <span className="material-symbols-outlined text-base">movie</span>
+              </span>
+            </div>
+            <div className="text-center text-[10px] uppercase font-mono font-black text-on-surface mt-2 tracking-widest flex items-center justify-center gap-1">
+              <span className="material-symbols-outlined text-xs">arrow_drop_up</span>
+              <span>ALL EYES ON SCREEN — AUDIENCE FACING</span>
+              <span className="material-symbols-outlined text-xs">arrow_drop_up</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 1. 👑 EXECUTIVE RECLINER ZONE (Rows G & H) - ₹450 */}
+        <div className="w-full max-w-4xl bg-amber-100/90 border-4 border-amber-600 p-4 neo-brutalism-shadow rounded-xl text-center">
+          <div className="font-headline-lg-mobile text-amber-950 uppercase tracking-widest mb-3 flex items-center justify-between px-3 py-2 bg-amber-300/90 border-2 border-amber-800 rounded-lg">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-base text-amber-950 font-black">chair</span>
+              <span className="font-black text-xs md:text-sm">👑 EXECUTIVE RECLINER ZONE</span>
+            </div>
+            <span className="font-mono text-xs font-black bg-amber-950 text-amber-300 px-3 py-1 border border-amber-900 shadow-sm">
+              ₹450 / SEAT — LUXURY RECLINERS
+            </span>
+          </div>
+          <div className="flex flex-col gap-2.5 items-center overflow-x-auto pb-1">
+            {['G', 'H'].map(row => (
+              <div key={row} className="flex gap-2 items-center justify-center">
+                <span className="font-data-label text-xs text-amber-950 font-black w-6 text-right shrink-0">{row}</span>
+                <div className="flex gap-2">
+                  {getRowSeats(row).map(seat => (
+                    <div key={seat.id} className="flex items-center">
+                      {seat.venue_seat.seat_number === 8 && (
+                        <div className="w-8 h-full flex items-center justify-center font-mono text-[9px] text-amber-950 font-black opacity-80 uppercase px-1">
+                          AISLE
+                        </div>
+                      )}
+                      {renderSeat(seat)}
+                    </div>
+                  ))}
+                </div>
+                <span className="font-data-label text-xs text-amber-950 font-black w-6 text-left shrink-0">{row}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 2. ⭐ PREMIUM CLUB ZONE (Rows D, E & F) - ₹300 */}
+        <div className="w-full max-w-4xl bg-cyan-100/90 border-4 border-cyan-600 p-4 neo-brutalism-shadow rounded-xl text-center">
+          <div className="font-headline-lg-mobile text-cyan-950 uppercase tracking-widest mb-3 flex items-center justify-between px-3 py-2 bg-cyan-300/90 border-2 border-cyan-800 rounded-lg">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-base text-cyan-950 font-black">visibility</span>
+              <span className="font-black text-xs md:text-sm">⭐ PREMIUM CLUB — PRIME VIEWING ANGLE</span>
+            </div>
+            <span className="font-mono text-xs font-black bg-cyan-950 text-cyan-300 px-3 py-1 border border-cyan-900 shadow-sm">
+              ₹300 / SEAT — EYE-LEVEL CENTER
+            </span>
+          </div>
+          <div className="flex flex-col gap-2.5 items-center overflow-x-auto pb-1">
+            {['D', 'E', 'F'].map(row => (
+              <div key={row} className="flex gap-2 items-center justify-center">
+                <span className="font-data-label text-xs text-cyan-950 font-black w-6 text-right shrink-0">{row}</span>
+                <div className="flex gap-2">
+                  {getRowSeats(row).map(seat => (
+                    <div key={seat.id} className="flex items-center">
+                      {seat.venue_seat.seat_number === 8 && (
+                        <div className="w-8 h-full flex items-center justify-center font-mono text-[9px] text-cyan-950 font-black opacity-80 uppercase px-1">
+                          AISLE
+                        </div>
+                      )}
+                      {renderSeat(seat)}
+                    </div>
+                  ))}
+                </div>
+                <span className="font-data-label text-xs text-cyan-950 font-black w-6 text-left shrink-0">{row}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 3. 🎬 STANDARD CINEMA ZONE (Rows A, B & C) - ₹200 */}
+        <div className="w-full max-w-4xl bg-slate-200/90 border-4 border-slate-600 p-4 neo-brutalism-shadow rounded-xl text-center">
+          <div className="font-headline-lg-mobile text-slate-950 uppercase tracking-widest mb-3 flex items-center justify-between px-3 py-2 bg-slate-300 border-2 border-slate-700 rounded-lg">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-base text-slate-950 font-black">theater_comedy</span>
+              <span className="font-black text-xs md:text-sm">🎬 STANDARD CINEMA SEATING</span>
+            </div>
+            <span className="font-mono text-xs font-black bg-slate-950 text-slate-200 px-3 py-1 border border-slate-700 shadow-sm">
+              ₹200 / SEAT — FRONT ROWS
+            </span>
+          </div>
+          <div className="flex flex-col gap-2.5 items-center overflow-x-auto pb-1">
+            {['A', 'B', 'C'].map(row => (
+              <div key={row} className="flex gap-2 items-center justify-center">
+                <span className="font-data-label text-xs text-slate-950 font-black w-6 text-right shrink-0">{row}</span>
+                <div className="flex gap-2">
+                  {getRowSeats(row).map(seat => (
+                    <div key={seat.id} className="flex items-center">
+                      {seat.venue_seat.seat_number === 8 && (
+                        <div className="w-8 h-full flex items-center justify-center font-mono text-[9px] text-slate-950 font-black opacity-80 uppercase px-1">
+                          AISLE
+                        </div>
+                      )}
+                      {renderSeat(seat)}
+                    </div>
+                  ))}
+                </div>
+                <span className="font-data-label text-xs text-slate-950 font-black w-6 text-left shrink-0">{row}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="w-full flex-grow flex flex-col bg-background relative selection:bg-primary-fixed selection:text-on-primary-fixed">
       {/* Header */}
@@ -641,70 +792,31 @@ export default function SeatMap() {
             ) : showData?.event?.type === 'sports' ? (
               renderSportsLayout()
             ) : (
-              <div className="flex flex-col gap-6 w-max mx-auto">
-                {/* Cinema Screen Header */}
-                {showData?.event?.type === 'movie' && (
-                  <div className="max-w-4xl mx-auto w-full mb-8">
-                    <div className="relative">
-                      <div className="w-full h-10 bg-on-background text-primary-fixed font-headline-lg-mobile text-center flex items-center justify-center border-4 border-on-background neo-brutalism-shadow rounded-b-[40%] overflow-hidden bg-gradient-to-r from-on-background via-slate-800 to-on-background">
-                        <span className="tracking-[0.25em] font-black text-sm text-yellow-300 animate-pulse">CINEMA CURVED SCREEN</span>
-                      </div>
-                      <div className="text-center text-[10px] uppercase font-mono font-black text-on-surface mt-2 tracking-widest flex items-center justify-center gap-1">
-                        <span className="material-symbols-outlined text-xs">arrow_drop_up</span>
-                        <span>AUDIENCE FACING SCREEN</span>
-                        <span className="material-symbols-outlined text-xs">arrow_drop_up</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {rows.map(row => (
-                  <div key={row as string} className="flex gap-4 items-center justify-center">
-                    <span className="font-data-label text-data-label text-on-surface font-black w-8 text-right shrink-0">{row as string}</span>
-                    <div className="flex gap-2">
-                      {seats
-                        .filter(s => s.venue_seat.row_label === row)
-                        .sort((a, b) => a.venue_seat.seat_number - b.venue_seat.seat_number)
-                        .map(seat => {
-                          const isMovie = showData?.event?.type === 'movie';
-                          const showAisleGap = isMovie && seat.venue_seat.seat_number === 8;
-
-                          return (
-                            <div key={seat.id} className="flex items-center">
-                              {showAisleGap && (
-                                <div className="w-8 h-full flex items-center justify-center font-mono text-[10px] text-on-surface font-bold opacity-60 uppercase px-1">
-                                  AISLE
-                                </div>
-                              )}
-                              {renderSeat(seat)}
-                            </div>
-                          );
-                        })}
-                    </div>
-                    <span className="font-data-label text-data-label text-on-surface font-black w-8 text-left shrink-0">{row as string}</span>
-                  </div>
-                ))}
-              </div>
+              renderCinemaLayout()
             )}
           </div>
 
-          {/* Seat Status Legend */}
-          <div className="absolute bottom-4 left-4 right-4 md:left-margin-desktop md:right-auto bg-surface border-border-width border-on-background p-4 neo-brutalism-shadow flex flex-wrap gap-4 items-center z-10">
+          {/* Seat Status & Category Legend */}
+          <div className="absolute bottom-4 left-4 right-4 md:left-margin-desktop md:right-auto bg-surface border-4 border-on-background p-4 neo-brutalism-shadow flex flex-wrap gap-4 items-center z-10">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 border-2 border-on-background bg-surface"></div>
-              <span className="font-data-label text-data-label uppercase font-bold">Available</span>
+              <div className="w-6 h-6 border-2 border-amber-900 bg-amber-300 font-black text-amber-950 flex items-center justify-center text-[10px]">👑</div>
+              <span className="font-data-label text-data-label uppercase font-bold text-on-surface">Recliner (₹450)</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 border-2 border-on-background bg-tertiary-fixed"></div>
-              <span className="font-data-label text-data-label uppercase font-bold">Selected</span>
+              <div className="w-6 h-6 border-2 border-cyan-900 bg-cyan-300 font-black text-cyan-950 flex items-center justify-center text-[10px]">⭐</div>
+              <span className="font-data-label text-data-label uppercase font-bold text-on-surface">Premium (₹300)</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 border-2 border-on-background bg-secondary-container"></div>
-              <span className="font-data-label text-data-label uppercase font-bold">Your Hold</span>
+              <div className="w-6 h-6 border-2 border-slate-700 bg-slate-200 font-black text-slate-900 flex items-center justify-center text-[10px]">🎬</div>
+              <span className="font-data-label text-data-label uppercase font-bold text-on-surface">Standard (₹200)</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 border-2 border-on-background bg-primary-fixed opacity-70"></div>
-              <span className="font-data-label text-data-label uppercase font-bold">Unavailable</span>
+              <div className="w-6 h-6 border-2 border-on-background bg-tertiary-fixed font-black text-on-tertiary-fixed flex items-center justify-center text-[10px]">✓</div>
+              <span className="font-data-label text-data-label uppercase font-bold text-on-surface">Selected</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 border-2 border-on-background bg-secondary-container opacity-60 flex items-center justify-center text-[10px]">✕</div>
+              <span className="font-data-label text-data-label uppercase font-bold text-on-surface">Booked/Held</span>
             </div>
           </div>
         </section>
