@@ -58,14 +58,14 @@ async function main() {
   });
 
   const cinemaSeats = [];
-  const cinemaRows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']; // 8 rows
+  const cinemaRows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
   for (let r = 0; r < cinemaRows.length; r++) {
     const rowLabel = cinemaRows[r];
     let categoryId = standardCat.id;
     if (r >= 2 && r <= 5) categoryId = premiumCat.id;
     if (r >= 6) categoryId = reclinerCat.id;
 
-    for (let i = 1; i <= 14; i++) { // 14 seats per row
+    for (let i = 1; i <= 14; i++) {
       cinemaSeats.push({
         venue_id: cinemaVenue.id,
         row_label: rowLabel,
@@ -96,7 +96,7 @@ async function main() {
   });
   await prisma.venueSeat.createMany({ data: stadiumSeats });
 
-  // --- VENUE 3: Seatzy Underground Comedy Club (For Comedy — FLAT PRICING FOR ALL SEATS) ---
+  // --- VENUE 3: Seatzy Underground Comedy Club (For Comedy) ---
   const comedyVenue = await prisma.venue.create({
     data: { name: 'Seatzy Underground Comedy Club', address: '123 Laugh Corner', created_by: admin.id }
   });
@@ -144,35 +144,140 @@ async function main() {
   });
   await prisma.venueSeat.createMany({ data: footballSeats });
 
-  // --- 20 EVENTS ---
+  // --- 20 EVENTS WITH MATCHING THEMATIC POSTER IMAGES ---
   const eventData = [
     // MOVIES
-    { title: 'Neon Chronicles', type: 'movie', description: 'A cyberpunk neo-noir film set in a dystopian future where human memories are traded as currency.', poster_url: '/images/movie_1_1787259781700.png' },
-    { title: 'The Last Voyage', type: 'movie', description: 'A sci-fi epic following a lone starship searching for a new habitable world.', poster_url: '/images/movie_2_1787259806699.png' },
-    { title: 'Midnight Paradox', type: 'movie', description: 'A gripping mystery thriller that twists the fabric of time.', poster_url: '/images/movie_3_1787333184688.png' },
-    { title: 'Echoes of Eternity', type: 'movie', description: 'A sweeping fantasy epic detailing the fall of an ancient magical empire.', poster_url: '/images/movie_4_1787259842743.png' },
-    { title: 'Velocity Shift', type: 'movie', description: 'High octane racing action across neon-lit city streets.', poster_url: '/images/movie_5_1787259860945.png' },
+    {
+      title: 'Neon Chronicles',
+      type: 'movie',
+      description: 'A cyberpunk neo-noir film set in a dystopian future where human memories are traded as currency.',
+      poster_url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      title: 'The Last Voyage',
+      type: 'movie',
+      description: 'A sci-fi epic following a lone starship searching for a new habitable world.',
+      poster_url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      title: 'Midnight Paradox',
+      type: 'movie',
+      description: 'A gripping mystery thriller that twists the fabric of time.',
+      poster_url: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      title: 'Echoes of Eternity',
+      type: 'movie',
+      description: 'A sweeping fantasy epic detailing the fall of an ancient magical empire.',
+      poster_url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      title: 'Velocity Shift',
+      type: 'movie',
+      description: 'High octane racing action across neon-lit city streets.',
+      poster_url: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80'
+    },
 
     // CONCERTS
-    { title: 'Electric Symphony', type: 'concert', description: 'A massive EDM festival featuring cutting-edge laser shows and massive drops.', poster_url: '/images/concert_1_1787259877711.png' },
-    { title: 'Echoes of the Underground', type: 'concert', description: 'An intimate indie rock gig showcasing the best upcoming bands.', poster_url: '/images/concert_2_1787259889930.png' },
-    { title: 'Jazz Under the Stars', type: 'concert', description: 'Smooth and elegant jazz performance under an open sky.', poster_url: '/images/concert_3_1787259917113.png' },
-    { title: 'Bass Drop Riot', type: 'concert', description: 'Heavy dubstep and bass music that will shake the floor.', poster_url: '/images/concert_4_178733219101.png' },
-    { title: 'The Golden Era Tour', type: 'concert', description: 'A tribute to the greatest classic rock anthems of the 70s and 80s.', poster_url: '/images/concert_5_1787259941929.png' },
+    {
+      title: 'Electric Symphony',
+      type: 'concert',
+      description: 'A massive EDM festival featuring cutting-edge laser shows and massive drops.',
+      poster_url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      title: 'Echoes of the Underground',
+      type: 'concert',
+      description: 'An intimate indie rock gig showcasing the best upcoming bands.',
+      poster_url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      title: 'Jazz Under the Stars',
+      type: 'concert',
+      description: 'Smooth and elegant jazz performance under an open sky.',
+      poster_url: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      title: 'Bass Drop Riot',
+      type: 'concert',
+      description: 'Heavy dubstep and bass music that will shake the floor.',
+      poster_url: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      title: 'The Golden Era Tour',
+      type: 'concert',
+      description: 'A tribute to the greatest classic rock anthems of the 70s and 80s.',
+      poster_url: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=800&q=80'
+    },
 
-    // COMEDY (NO STAGE, ALL SEATS SAME PRICE)
-    { title: 'Laugh Riot: Unfiltered', type: 'comedy', description: 'No holds barred standup comedy from the best rising stars.', poster_url: '/images/comedy_1_1787259957907.png' },
-    { title: 'The Daily Roast', type: 'comedy', description: 'A brutal and hilarious roast battle between top comedians.', poster_url: '/images/comedy_2_1787259970477.png' },
-    { title: 'Chuckles & Cheers', type: 'comedy', description: 'A family-friendly improv show filled with unexpected turns.', poster_url: '/images/comedy_3_1787259983214.png' },
-    { title: 'Stand-Up Showdown', type: 'comedy', description: 'Comedians face off to win the ultimate title in a boxing-ring style stage.', poster_url: '/images/comedy_4_1787332545212.png' },
-    { title: 'Midnight Giggles', type: 'comedy', description: 'A late-night special featuring dark humor and satire.', poster_url: '/images/comedy_5_1787332562947.png' },
+    // COMEDY
+    {
+      title: 'Laugh Riot: Unfiltered',
+      type: 'comedy',
+      description: 'No holds barred standup comedy from the best rising stars.',
+      poster_url: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      title: 'The Daily Roast',
+      type: 'comedy',
+      description: 'A brutal and hilarious roast battle between top comedians.',
+      poster_url: 'https://images.unsplash.com/photo-1527269534026-c86f54994082?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      title: 'Chuckles & Cheers',
+      type: 'comedy',
+      description: 'A family-friendly improv show filled with unexpected turns.',
+      poster_url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      title: 'Stand-Up Showdown',
+      type: 'comedy',
+      description: 'Comedians face off to win the ultimate title in a boxing-ring style stage.',
+      poster_url: 'https://images.unsplash.com/photo-1485579149621-3123dd979885?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      title: 'Midnight Giggles',
+      type: 'comedy',
+      description: 'A late-night special featuring dark humor and satire.',
+      poster_url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80'
+    },
 
-    // SPORTS (CRICKET & FOOTBALL STADIUMS)
-    { title: 'T20 Premier Cricket League Derby', type: 'sports', subType: 'cricket', description: 'High stakes T20 Cricket derby with boundary sixes and electric crowd.', poster_url: '/images/sports_2_1787333026606.png' },
-    { title: 'Champions Trophy Football Final', type: 'sports', subType: 'football', description: 'The ultimate soccer showdown under stadium floodlights.', poster_url: '/images/sports_5_1787333158050.png' },
-    { title: 'World Cricket Super Clash', type: 'sports', subType: 'cricket', description: 'International cricket heavyweights clash on the central pitch.', poster_url: '/images/sports_1_1787332917988.png' },
-    { title: 'Gridiron Football Championship', type: 'sports', subType: 'football', description: 'Two massive rival football teams face off in the grand stadium.', poster_url: '/images/sports_3_1787333040876.png' },
-    { title: 'Apex Fight Championship', type: 'sports', subType: 'boxing', description: 'The premier championship fight event of the year.', poster_url: '/images/sports_4_1787333056253.png' }
+    // SPORTS
+    {
+      title: 'T20 Premier Cricket League Derby',
+      type: 'sports',
+      subType: 'cricket',
+      description: 'High stakes T20 Cricket derby with boundary sixes and electric crowd.',
+      poster_url: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      title: 'Champions Trophy Football Final',
+      type: 'sports',
+      subType: 'football',
+      description: 'The ultimate soccer showdown under stadium floodlights.',
+      poster_url: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      title: 'World Cricket Super Clash',
+      type: 'sports',
+      subType: 'cricket',
+      description: 'International cricket heavyweights clash on the central pitch.',
+      poster_url: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      title: 'Gridiron Football Championship',
+      type: 'sports',
+      subType: 'football',
+      description: 'Two massive rival football teams face off in the grand stadium.',
+      poster_url: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      title: 'Apex Fight Championship',
+      type: 'sports',
+      subType: 'boxing',
+      description: 'The premier championship fight event of the year.',
+      poster_url: 'https://images.unsplash.com/photo-1517649763962-0c623266010b?auto=format&fit=crop&w=800&q=80'
+    }
   ];
 
   for (let i = 0; i < eventData.length; i++) {
@@ -225,12 +330,10 @@ async function main() {
           { show_id: show.id, category_id: upperDeckCat.id, price: 65.00 }
         );
       } else if (ev.type === 'comedy') {
-        // COMEDY: SINGLE FLAT PRICE FOR ALL SEATS ($35.00)
         pricingData.push(
           { show_id: show.id, category_id: generalComedyCat.id, price: 35.00 }
         );
       } else if (ev.type === 'sports') {
-        // SPORTS: MULTI-TIER STADIUM PRICING
         pricingData.push(
           { show_id: show.id, category_id: vipPavilionCat.id, price: 150.00 },
           { show_id: show.id, category_id: lowerTierCat.id, price: 85.00 },
@@ -251,7 +354,7 @@ async function main() {
     }
   }
 
-  console.log('Database successfully re-seeded with specialized Movie, Concert, Comedy, and Sports (Cricket/Football) venues!');
+  console.log('Database successfully re-seeded with 20 event-matched high-definition poster images!');
 }
 
 main()
