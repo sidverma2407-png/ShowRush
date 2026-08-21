@@ -7,7 +7,16 @@ import { EventType, ShowStatus } from '@prisma/client';
 export const getMyEvents = async (req: AuthRequest, res: Response) => {
   const events = await prisma.event.findMany({
     where: { organiser_id: req.user!.id },
-    include: { shows: true }
+    include: {
+      shows: {
+        include: {
+          venue: true,
+          pricing: { include: { category: true } },
+          seat_statuses: true,
+          bookings: { where: { status: 'confirmed' } }
+        }
+      }
+    }
   });
   res.json({ status: 'success', data: events });
 };
@@ -35,7 +44,6 @@ export const updateEvent = async (req: AuthRequest, res: Response) => {
   const id = req.params.id as string;
   const { title, type, description, poster_url } = req.body;
 
-  // Verify ownership
   const event = await prisma.event.findUnique({ where: { id } });
   if (!event || event.organiser_id !== req.user!.id) {
     throw new NotFoundError('Event not found or not owned by you');
@@ -51,43 +59,40 @@ export const updateEvent = async (req: AuthRequest, res: Response) => {
 
 export const createShow = async (req: AuthRequest, res: Response) => {
   const event_id = req.params.id as string;
-  const { venue_id, date, time } = req.body; // e.g. date: '2026-10-15T00:00:00Z', time: '19:00'
+  const { venue_id, date, time, pricing } = req.body;
 
   if (!venue_id || !date || !time) throw new BadRequestError('Venue, date, and time required');
 
-  // Verify ownership
   const event = await prisma.event.findUnique({ where: { id: event_id } });
   if (!event || event.organiser_id !== req.user!.id) {
     throw new NotFoundError('Event not found or not owned by you');
   }
 
-  // Create show and bulk insert seat_status (CRITICAL WORKFLOW)
-  // We use interactive transaction to ensure both happen or neither
   const show = await prisma.$transaction(async (tx) => {
-    // 1. Create the show
     const newShow = await tx.show.create({
-      data: {
-        event_id,
-        venue_id,
-        date: new Date(date),
-        time,
-        status: ShowStatus.scheduled
-      }
+      data: { event_id, venue_id, date: new Date(date), time, status: ShowStatus.scheduled }
     });
 
-    // 2. Fetch all seats for the venue
-    const venueSeats = await tx.venueSeat.findMany({
-      where: { venue_id }
-    });
+    const venueSeats = await tx.venueSeat.findMany({ where: { venue_id } });
 
     if (venueSeats.length > 0) {
-      // 3. Bulk insert seat_status rows for every seat at this venue
       await tx.seatStatus.createMany({
         data: venueSeats.map(seat => ({
           show_id: newShow.id,
           venue_seat_id: seat.id,
           status: 'available'
         }))
+      });
+    }
+
+    if (Array.isArray(pricing) && pricing.length > 0) {
+      await tx.showCategoryPricing.createMany({
+        data: pricing.map((p: any) => ({
+          show_id: newShow.id,
+          category_id: p.category_id,
+          price: p.price
+        })),
+        skipDuplicates: true
       });
     }
 
@@ -99,11 +104,10 @@ export const createShow = async (req: AuthRequest, res: Response) => {
 
 export const updateShowPricing = async (req: AuthRequest, res: Response) => {
   const show_id = req.params.id as string;
-  const { pricing } = req.body; // Array of { category_id, price }
+  const { pricing } = req.body;
 
   if (!Array.isArray(pricing)) throw new BadRequestError('Pricing array required');
 
-  // Verify ownership via show -> event -> organiser
   const show = await prisma.show.findUnique({
     where: { id: show_id },
     include: { event: true }
@@ -113,12 +117,9 @@ export const updateShowPricing = async (req: AuthRequest, res: Response) => {
     throw new NotFoundError('Show not found or not owned by you');
   }
 
-  // Upsert pricing for each category
   for (const item of pricing) {
     await prisma.showCategoryPricing.upsert({
-      where: {
-        show_id_category_id: { show_id, category_id: item.category_id }
-      },
+      where: { show_id_category_id: { show_id, category_id: item.category_id } },
       update: { price: item.price },
       create: { show_id, category_id: item.category_id, price: item.price }
     });
@@ -127,26 +128,40 @@ export const updateShowPricing = async (req: AuthRequest, res: Response) => {
   res.json({ status: 'success', message: 'Pricing updated' });
 };
 
+export const cancelShow = async (req: AuthRequest, res: Response) => {
+  const show_id = req.params.id as string;
+
+  const show = await prisma.show.findUnique({
+    where: { id: show_id },
+    include: { event: true }
+  });
+
+  if (!show || show.event.organiser_id !== req.user!.id) {
+    throw new NotFoundError('Show not found or not owned by you');
+  }
+
+  await prisma.show.update({ where: { id: show_id }, data: { status: ShowStatus.cancelled } });
+  res.json({ status: 'success', message: 'Show cancelled' });
+};
+
 export const getEventSummary = async (req: AuthRequest, res: Response) => {
   const event_id = req.params.id as string;
 
-  // Verify ownership
   const event = await prisma.event.findUnique({ where: { id: event_id } });
   if (!event || event.organiser_id !== req.user!.id) {
     throw new NotFoundError('Event not found or not owned by you');
   }
 
-  // Get total revenue
   const bookings = await prisma.booking.findMany({
     where: { show: { event_id }, status: 'confirmed' }
   });
   const totalRevenue = bookings.reduce((sum, b) => sum + Number(b.total_price), 0);
 
-  // Seat stats per show -> waitlist, etc. (simplified for this return)
-  // In a real app we'd aggregate carefully
   const shows = await prisma.show.findMany({
     where: { event_id },
     include: {
+      venue: true,
+      pricing: { include: { category: true } },
       seat_statuses: true,
       waitlist_entries: true
     }
@@ -157,12 +172,14 @@ export const getEventSummary = async (req: AuthRequest, res: Response) => {
     const booked = show.seat_statuses.filter((s: any) => s.status === 'booked').length;
     const held = show.seat_statuses.filter((s: any) => s.status === 'held').length;
     const waitlist = show.waitlist_entries.filter((w: any) => w.status === 'waiting').length;
-
     return {
       show_id: show.id,
       date: show.date,
       time: show.time,
-      seats: { available, booked, held },
+      status: show.status,
+      venue: show.venue,
+      pricing: show.pricing,
+      seats: { available, booked, held, total: show.seat_statuses.length },
       waitlist_waiting: waitlist
     };
   });
@@ -181,10 +198,60 @@ export const getEventSummary = async (req: AuthRequest, res: Response) => {
 
   res.json({
     status: 'success',
-    data: {
-      total_revenue: totalRevenue,
-      shows: summary,
-      recent_bookings
+    data: { total_revenue: totalRevenue, total_tickets: bookings.length, shows: summary, recent_bookings }
+  });
+};
+
+export const getMyVenues = async (req: AuthRequest, res: Response) => {
+  const venues = await prisma.venue.findMany({
+    where: { created_by: req.user!.id },
+    include: {
+      seats: { include: { category: true } },
+      _count: { select: { seats: true, shows: true } }
     }
   });
+  res.json({ status: 'success', data: venues });
+};
+
+export const createVenue = async (req: AuthRequest, res: Response) => {
+  const { name, address, city, layout } = req.body;
+  if (!name || !address || !city) throw new BadRequestError('Name, address, and city are required');
+
+  const getCategoryId = async (catName: string) => {
+    let cat = await prisma.seatCategory.findFirst({ where: { name: catName } });
+    if (!cat) cat = await prisma.seatCategory.create({ data: { name: catName } });
+    return cat.id;
+  };
+
+  const venue = await prisma.$transaction(async (tx) => {
+    const newVenue = await tx.venue.create({
+      data: { name, address, city, created_by: req.user!.id }
+    });
+
+    if (Array.isArray(layout?.rows)) {
+      for (const row of layout.rows) {
+        const category_id = await getCategoryId(row.category_name || 'Standard');
+        const seatData = [];
+        for (let n = 1; n <= (row.seats || 0); n++) {
+          seatData.push({ venue_id: newVenue.id, row_label: row.label, seat_number: n, category_id });
+        }
+        if (seatData.length > 0) {
+          await tx.venueSeat.createMany({ data: seatData, skipDuplicates: true });
+        }
+      }
+    }
+    return newVenue;
+  });
+
+  const fullVenue = await prisma.venue.findUnique({
+    where: { id: venue.id },
+    include: { seats: { include: { category: true } }, _count: { select: { seats: true, shows: true } } }
+  });
+
+  res.status(201).json({ status: 'success', data: fullVenue });
+};
+
+export const getSeatCategories = async (_req: Request, res: Response) => {
+  const categories = await prisma.seatCategory.findMany({ orderBy: { name: 'asc' } });
+  res.json({ status: 'success', data: categories });
 };
