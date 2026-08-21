@@ -582,26 +582,26 @@ export default function SeatMap() {
           </div>
         </div>
 
-        {/* 1. 👑 EXECUTIVE RECLINER ZONE (Rows G & H) - ₹450 */}
-        <div className="w-full max-w-4xl bg-amber-100/90 border-4 border-amber-600 p-4 neo-brutalism-shadow rounded-xl text-center">
-          <div className="font-headline-lg-mobile text-amber-950 uppercase tracking-widest mb-3 flex items-center justify-between px-3 py-2 bg-amber-300/90 border-2 border-amber-800 rounded-lg">
+        {/* 1. 🎬 STANDARD CINEMA ZONE (Rows A, B & C) - ₹200 (CLOSEST TO SCREEN) */}
+        <div className="w-full max-w-4xl bg-slate-200/90 border-4 border-slate-600 p-4 neo-brutalism-shadow rounded-xl text-center">
+          <div className="font-headline-lg-mobile text-slate-950 uppercase tracking-widest mb-3 flex items-center justify-between px-3 py-2 bg-slate-300 border-2 border-slate-700 rounded-lg">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-base text-amber-950 font-black">chair</span>
-              <span className="font-black text-xs md:text-sm">👑 EXECUTIVE RECLINER ZONE</span>
+              <span className="material-symbols-outlined text-base text-slate-950 font-black">theater_comedy</span>
+              <span className="font-black text-xs md:text-sm">🎬 STANDARD CINEMA SEATING</span>
             </div>
-            <span className="font-mono text-xs font-black bg-amber-950 text-amber-300 px-3 py-1 border border-amber-900 shadow-sm">
-              ₹450 / SEAT — LUXURY RECLINERS
+            <span className="font-mono text-xs font-black bg-slate-950 text-slate-200 px-3 py-1 border border-slate-700 shadow-sm">
+              ₹200 / SEAT — FRONT ROWS (A, B, C)
             </span>
           </div>
           <div className="flex flex-col gap-2.5 items-center overflow-x-auto pb-1">
-            {['G', 'H'].map(row => (
+            {['A', 'B', 'C'].map(row => (
               <div key={row} className="flex gap-2 items-center justify-center">
-                <span className="font-data-label text-xs text-amber-950 font-black w-6 text-right shrink-0">{row}</span>
+                <span className="font-data-label text-xs text-slate-950 font-black w-6 text-right shrink-0">{row}</span>
                 <div className="flex gap-2">
                   {getRowSeats(row).map(seat => (
                     <div key={seat.id} className="flex items-center">
                       {seat.venue_seat.seat_number === 8 && (
-                        <div className="w-8 h-full flex items-center justify-center font-mono text-[9px] text-amber-950 font-black opacity-80 uppercase px-1">
+                        <div className="w-8 h-full flex items-center justify-center font-mono text-[9px] text-slate-950 font-black opacity-80 uppercase px-1">
                           AISLE
                         </div>
                       )}
@@ -609,13 +609,13 @@ export default function SeatMap() {
                     </div>
                   ))}
                 </div>
-                <span className="font-data-label text-xs text-amber-950 font-black w-6 text-left shrink-0">{row}</span>
+                <span className="font-data-label text-xs text-slate-950 font-black w-6 text-left shrink-0">{row}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* 2. ⭐ PREMIUM CLUB ZONE (Rows D, E & F) - ₹300 */}
+        {/* 2. ⭐ PREMIUM CLUB ZONE (Rows D, E & F) - ₹300 (MIDDLE ROWS) */}
         <div className="w-full max-w-4xl bg-cyan-100/90 border-4 border-cyan-600 p-4 neo-brutalism-shadow rounded-xl text-center">
           <div className="font-headline-lg-mobile text-cyan-950 uppercase tracking-widest mb-3 flex items-center justify-between px-3 py-2 bg-cyan-300/90 border-2 border-cyan-800 rounded-lg">
             <div className="flex items-center gap-2">
@@ -623,7 +623,7 @@ export default function SeatMap() {
               <span className="font-black text-xs md:text-sm">⭐ PREMIUM CLUB — PRIME VIEWING ANGLE</span>
             </div>
             <span className="font-mono text-xs font-black bg-cyan-950 text-cyan-300 px-3 py-1 border border-cyan-900 shadow-sm">
-              ₹300 / SEAT — EYE-LEVEL CENTER
+              ₹300 / SEAT — EYE-LEVEL CENTER (D, E, F)
             </span>
           </div>
           <div className="flex flex-col gap-2.5 items-center overflow-x-auto pb-1">
@@ -648,26 +648,26 @@ export default function SeatMap() {
           </div>
         </div>
 
-        {/* 3. 🎬 STANDARD CINEMA ZONE (Rows A, B & C) - ₹200 */}
-        <div className="w-full max-w-4xl bg-slate-200/90 border-4 border-slate-600 p-4 neo-brutalism-shadow rounded-xl text-center">
-          <div className="font-headline-lg-mobile text-slate-950 uppercase tracking-widest mb-3 flex items-center justify-between px-3 py-2 bg-slate-300 border-2 border-slate-700 rounded-lg">
+        {/* 3. 👑 EXECUTIVE RECLINER ZONE (Rows G & H) - ₹450 (REAR LUXURY ROWS) */}
+        <div className="w-full max-w-4xl bg-amber-100/90 border-4 border-amber-600 p-4 neo-brutalism-shadow rounded-xl text-center">
+          <div className="font-headline-lg-mobile text-amber-950 uppercase tracking-widest mb-3 flex items-center justify-between px-3 py-2 bg-amber-300/90 border-2 border-amber-800 rounded-lg">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-base text-slate-950 font-black">theater_comedy</span>
-              <span className="font-black text-xs md:text-sm">🎬 STANDARD CINEMA SEATING</span>
+              <span className="material-symbols-outlined text-base text-amber-950 font-black">chair</span>
+              <span className="font-black text-xs md:text-sm">👑 EXECUTIVE RECLINER ZONE</span>
             </div>
-            <span className="font-mono text-xs font-black bg-slate-950 text-slate-200 px-3 py-1 border border-slate-700 shadow-sm">
-              ₹200 / SEAT — FRONT ROWS
+            <span className="font-mono text-xs font-black bg-amber-950 text-amber-300 px-3 py-1 border border-amber-900 shadow-sm">
+              ₹450 / SEAT — LUXURY RECLINERS (G, H)
             </span>
           </div>
           <div className="flex flex-col gap-2.5 items-center overflow-x-auto pb-1">
-            {['A', 'B', 'C'].map(row => (
+            {['G', 'H'].map(row => (
               <div key={row} className="flex gap-2 items-center justify-center">
-                <span className="font-data-label text-xs text-slate-950 font-black w-6 text-right shrink-0">{row}</span>
+                <span className="font-data-label text-xs text-amber-950 font-black w-6 text-right shrink-0">{row}</span>
                 <div className="flex gap-2">
                   {getRowSeats(row).map(seat => (
                     <div key={seat.id} className="flex items-center">
                       {seat.venue_seat.seat_number === 8 && (
-                        <div className="w-8 h-full flex items-center justify-center font-mono text-[9px] text-slate-950 font-black opacity-80 uppercase px-1">
+                        <div className="w-8 h-full flex items-center justify-center font-mono text-[9px] text-amber-950 font-black opacity-80 uppercase px-1">
                           AISLE
                         </div>
                       )}
@@ -675,7 +675,7 @@ export default function SeatMap() {
                     </div>
                   ))}
                 </div>
-                <span className="font-data-label text-xs text-slate-950 font-black w-6 text-left shrink-0">{row}</span>
+                <span className="font-data-label text-xs text-amber-950 font-black w-6 text-left shrink-0">{row}</span>
               </div>
             ))}
           </div>
