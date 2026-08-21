@@ -1,21 +1,21 @@
-# 🎟️ Seatzy — High-Concurrency Ticket Booking & Reservation Platform
+# Seatzy: High-Concurrency Ticket Booking and Reservation Platform
 
 Seatzy is a full-stack, production-ready ticket booking engine for Movies, Concerts, and Sports events designed to handle high-demand ticket sales, zero-double-booking concurrency control, automatic waitlist reallocation, real-time seat maps, and QR code ticket generation.
 
 ---
 
-## 🌟 Key Features
+## Key Features
 
-- **🎭 Visual Seat Map Engine**: Dedicated, interactive layouts for Movies (Executive, Premium, Standard), Concerts (VIP Pit, Golden Circle, Upper Deck), and Sports Stadiums (VIP Pavilion, Touchline/30-Yard Field, Bleachers).
-- **🔒 Pessimistic Concurrency Control**: Prevents simultaneous double-holds or double-bookings using PostgreSQL row-level locks (`SELECT ... FOR UPDATE`).
-- **⏳ 10-Minute Hold TTL & Auto-Release**: Temporary seat holds on checkout auto-expire if abandoned, with live WebSocket updates (`Socket.IO`) to all connected users.
-- **⚡ Automatic Waitlist Reallocation**: Sold-out categories support FIFO waitlists. On booking cancellation, the freed seat is automatically held and offered to the next waitlisted user via a time-limited email link.
-- **✉️ QR Code Ticket Delivery**: Confirmed bookings generate a unique QR code ticket containing the booking reference code and email it directly to the customer via `nodemailer`.
-- **📊 Organiser & Admin Command Center**: Comprehensive dashboard tracking Gross Revenue (₹ INR), Tickets Sold, Capacity Utilization %, Show Schedules, Per-Category Pricing, and Booking Logs.
+- **Visual Seat Map Engine**: Dedicated, interactive layouts for Movies (Executive, Premium, Standard), Concerts (VIP Pit, Golden Circle, Upper Deck), and Sports Stadiums (VIP Pavilion, Touchline/30-Yard Field, Bleachers).
+- **Pessimistic Concurrency Control**: Prevents simultaneous double-holds or double-bookings using PostgreSQL row-level locks (`SELECT ... FOR UPDATE`).
+- **10-Minute Hold TTL and Auto-Release**: Temporary seat holds on checkout auto-expire if abandoned, with live WebSocket updates (`Socket.IO`) to all connected users.
+- **Automatic Waitlist Reallocation**: Sold-out categories support FIFO waitlists. On booking cancellation, the freed seat is automatically held and offered to the next waitlisted user via a time-limited email link.
+- **QR Code Ticket Delivery**: Confirmed bookings generate a unique QR code ticket containing the booking reference code and email it directly to the customer via `nodemailer`.
+- **Organiser and Admin Command Center**: Comprehensive dashboard tracking Gross Revenue (INR), Tickets Sold, Capacity Utilization %, Show Schedules, Per-Category Pricing, and Booking Logs.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend**: React 18, Vite, Tailwind CSS (Neo-Brutalist design system), Material Symbols.
 - **Backend**: Node.js, Express, TypeScript, Prisma ORM, Socket.IO, Nodemailer, Node-Cron, QRCode.
@@ -23,11 +23,11 @@ Seatzy is a full-stack, production-ready ticket booking engine for Movies, Conce
 
 ---
 
-## 🚀 Quick Setup Guide
+## Quick Setup Guide
 
 ### 1. Prerequisites
-- Node.js v18+ & `npm`
-- Docker & Docker Desktop (for local PostgreSQL database)
+- Node.js v18+ and `npm`
+- Docker and Docker Desktop (for local PostgreSQL database)
 
 ### 2. Environment Setup
 Copy the sample environment configuration in the root directory:
@@ -40,7 +40,7 @@ cp .env.example .env
 docker-compose up -d
 ```
 
-### 4. Backend Setup & Database Migration
+### 4. Backend Setup and Database Migration
 ```bash
 cd backend
 npm install
@@ -60,7 +60,7 @@ npm run dev
 
 ---
 
-## 🗄️ Database Schema Summary
+## Database Schema Summary
 
 The platform uses Prisma ORM connected to PostgreSQL with the following core entities:
 
@@ -77,34 +77,34 @@ The platform uses Prisma ORM connected to PostgreSQL with the following core ent
 
 ---
 
-## 📡 Core API Endpoints
+## Core API Endpoints
 
-### 🔐 Authentication (`/api/auth`)
-- `POST /api/auth/register` — Register new account (Role: Customer/Organiser)
-- `POST /api/auth/login` — Authenticate and receive JWT token
+### Authentication (`/api/auth`)
+- `POST /api/auth/register`: Register new account (Role: Customer/Organiser)
+- `POST /api/auth/login`: Authenticate and receive JWT token
 
-### 🎬 Customer & Browsing (`/api`)
-- `GET /api/events` — Filter events by city, category type, date range
-- `GET /api/events/:id` — View event details & scheduled shows
-- `GET /api/shows/:id/map` — Get visual seat grid with real-time status & pricing
-- `POST /api/shows/:id/hold` — Place temporary 10-min hold on selected seats
-- `POST /api/shows/:id/book` — Confirm booking, lock seats, generate QR ticket & email
-- `DELETE /api/bookings/:id` — Cancel booking, release seats, trigger waitlist reallocation
-- `POST /api/shows/:id/waitlist` — Join waitlist for sold-out category
+### Customer and Browsing (`/api`)
+- `GET /api/events`: Filter events by city, category type, date range
+- `GET /api/events/:id`: View event details and scheduled shows
+- `GET /api/shows/:id/map`: Get visual seat grid with real-time status and pricing
+- `POST /api/shows/:id/hold`: Place temporary 10-min hold on selected seats
+- `POST /api/shows/:id/book`: Confirm booking, lock seats, generate QR ticket and email
+- `DELETE /api/bookings/:id`: Cancel booking, release seats, trigger waitlist reallocation
+- `POST /api/shows/:id/waitlist`: Join waitlist for sold-out category
 
-### 🏛️ Organiser & Admin (`/api/organiser`)
-- `GET /api/organiser/events` — Get organiser's managed events & gross metrics
-- `POST /api/events` — Create new event listing
-- `POST /api/events/:id/shows` — Schedule new show with date, time, & venue
-- `PUT /api/shows/:id/pricing` — Set dynamic per-category seat prices
-- `GET /api/events/:id/summary` — Event revenue summary, occupancy, & booking logs
-- `GET /api/organiser/venues` / `POST /api/organiser/venues` — Manage partner venues & seat layouts
+### Organiser and Admin (`/api/organiser`)
+- `GET /api/organiser/events`: Get organiser's managed events and gross metrics
+- `POST /api/events`: Create new event listing
+- `POST /api/events/:id/shows`: Schedule new show with date, time, and venue
+- `PUT /api/shows/:id/pricing`: Set dynamic per-category seat prices
+- `GET /api/events/:id/summary`: Event revenue summary, occupancy, and booking logs
+- `GET /api/organiser/venues` / `POST /api/organiser/venues`: Manage partner venues and seat layouts
 
 ---
 
-## 🏛️ System Design Write-Up
+## System Design Write-Up
 
-### 1. Seat Hold & TTL Expiry Mechanism
+### 1. Seat Hold and TTL Expiry Mechanism
 When a customer selects seats on the interactive visual map and initiates checkout, a request is sent to `POST /api/shows/:id/hold`. The system verifies availability and updates the `SeatStatus` records:
 - Status transitions from `available` to `held`.
 - Sets `held_by` to the customer's user ID.
@@ -123,7 +123,7 @@ To eliminate double-booking and race conditions during high-concurrency ticket d
 
 This strict database-level serialization guarantees that no two users can hold or book the same seat, even under thousands of concurrent requests per second.
 
-### 3. Waitlist Auto-Assignment & Time-Limited Offer Chaining
+### 3. Waitlist Auto-Assignment and Time-Limited Offer Chaining
 When a show's category is sold out, customers can join a First-In-First-Out (FIFO) waitlist queue (`WaitlistEntry`), receiving an incremental queue `position`.
 
 When an existing customer cancels a booking (`DELETE /api/bookings/:id`):
@@ -140,6 +140,6 @@ When an existing customer cancels a booking (`DELETE /api/bookings/:id`):
 
 ---
 
-## 📄 License & Compliance
+## License and Compliance
 
 Built for high-concurrency ticket reservation standards. All requirements are fully implemented and verified.
