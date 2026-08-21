@@ -8,7 +8,9 @@ export default function SeatMap() {
   const { showId } = useParams();
   const [seats, setSeats] = useState<any[]>([]);
   const [pricing, setPricing] = useState<any[]>([]);
+  const [showData, setShowData] = useState<any>(null);
   const [selectedSeats, setSelectedSeats] = useState<any[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [holding, setHolding] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
@@ -26,6 +28,7 @@ export default function SeatMap() {
       .then(res => {
         setSeats(res.data.seats || []);
         setPricing(res.data.pricing || []);
+        setShowData(res.data.show || null);
       })
       .catch(err => console.error('Failed to fetch seats:', err))
       .finally(() => setLoading(false));
@@ -33,12 +36,8 @@ export default function SeatMap() {
     const newSocket = io((import.meta as any).env?.VITE_API_URL || 'http://localhost:3000');
     newSocket.emit('join_room', showId);
     newSocket.on('seat_status_updated', (updatedSeat: any) => {
-      setSeats(prev => prev.map(s => s.id === updatedSeat.id ? updatedSeat : s));
-      setSelectedSeats(prev => {
-        // If an externally updated seat is in our selection and it became unavailable/booked by someone else, we might want to remove it
-        // Or if we held it successfully, we want to reflect the updated state (hold_expires_at)
-        return prev.map(s => s.id === updatedSeat.id ? updatedSeat : s);
-      });
+      setSeats(prev => prev.map(s => s.id === updatedSeat.id ? { ...s, ...updatedSeat, venue_seat: updatedSeat.venue_seat || s.venue_seat } : s));
+      setSelectedSeats(prev => prev.map(s => s.id === updatedSeat.id ? { ...s, ...updatedSeat, venue_seat: updatedSeat.venue_seat || s.venue_seat } : s));
     });
     return () => { newSocket.disconnect(); };
   }, [showId]);
@@ -57,7 +56,6 @@ export default function SeatMap() {
       const remaining = Math.max(0, Math.floor((minExpiry - Date.now()) / 1000));
       setCountdown(remaining);
       if (remaining === 0) {
-        // Auto clear selection on frontend when expired
         setSelectedSeats(prev => prev.filter(s => s.status !== 'held' || s.held_by !== user?.id));
       }
     }, 1000);
@@ -67,7 +65,6 @@ export default function SeatMap() {
 
   const toggleSeatSelection = (seat: any) => {
     if (seat.status === 'booked' || (seat.status === 'held' && seat.held_by !== user?.id)) {
-      // It's taken or held by someone else, but allow selecting ONE taken seat for waitlisting
       setSelectedSeats([seat]);
       return;
     }
@@ -75,7 +72,6 @@ export default function SeatMap() {
     setSelectedSeats(prev => {
       const isSelected = prev.some(s => s.id === seat.id);
       if (isSelected) return prev.filter(s => s.id !== seat.id);
-      // Ensure we don't mix available/own-held seats with other-held/booked seats in selection
       const filteredPrev = prev.filter(s => s.status === 'available' || (s.status === 'held' && s.held_by === user?.id));
       return [...filteredPrev, seat];
     });
@@ -90,19 +86,17 @@ export default function SeatMap() {
         method: 'POST',
         body: JSON.stringify({ seat_ids: seatsToHold.map(s => s.id) })
       });
-      // The socket will update 'seats', but we can manually update to avoid lag
       const updatedFromServer = res.data;
       setSeats(prev => prev.map(s => {
         const up = updatedFromServer.find((u: any) => u.id === s.id);
-        return up || s;
+        return up ? { ...s, ...up, venue_seat: up.venue_seat || s.venue_seat } : s;
       }));
       setSelectedSeats(prev => prev.map(s => {
         const up = updatedFromServer.find((u: any) => u.id === s.id);
-        return up || s;
+        return up ? { ...s, ...up, venue_seat: up.venue_seat || s.venue_seat } : s;
       }));
     } catch (err: any) {
-      alert(err.message); // Should clearly say 409 Conflict if someone grabbed it
-      // Refresh seats to clear dirty state
+      alert(err.message);
       fetchApi(`/shows/${showId}/seats`).then(res => setSeats(res.data.seats || []));
       setSelectedSeats([]);
     } finally {
@@ -114,12 +108,25 @@ export default function SeatMap() {
     const myHolds = seats.filter(s => s.status === 'held' && s.held_by === user?.id);
     for (const hold of myHolds) {
       try {
-        await fetchApi(`/holds/${hold.id}`, { method: 'DELETE' });
+        const res = await fetchApi(`/holds/${hold.id}`, { method: 'DELETE' });
+        setSeats(prev => prev.map(s => s.id === hold.id ? { ...s, ...res.data, venue_seat: res.data.venue_seat || s.venue_seat } : s));
       } catch (err: any) {
         console.error(err);
+        alert(err.message || 'Failed to release hold');
       }
     }
     setSelectedSeats([]);
+  };
+
+  const handleReleaseSingle = async (holdId: string) => {
+    try {
+      const res = await fetchApi(`/holds/${holdId}`, { method: 'DELETE' });
+      setSeats(prev => prev.map(s => s.id === holdId ? { ...s, ...res.data, venue_seat: res.data.venue_seat || s.venue_seat } : s));
+      setSelectedSeats(prev => prev.filter(s => s.id !== holdId));
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || 'Failed to release hold');
+    }
   };
 
   const handleCheckout = async () => {
@@ -162,7 +169,7 @@ export default function SeatMap() {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="bg-primary-container text-on-background border-4 border-on-background neo-brutalist-shadow px-12 py-8">
-        <p className="font-display-xl text-4xl uppercase tracking-tighter">Loading Map...</p>
+        <p className="font-display-xl text-4xl uppercase tracking-tighter">Loading Seat Map...</p>
       </div>
     </div>
   );
@@ -173,6 +180,23 @@ export default function SeatMap() {
   const getPrice = (categoryId: string) => {
     const p = pricing.find(p => p.category_id === categoryId);
     return p ? Number(p.price) : 0;
+  };
+
+  const getCategoryName = (categoryId: string) => {
+    const pricingItem = pricing.find(p => p.category_id === categoryId);
+    if (pricingItem?.category?.name) return pricingItem.category.name;
+    const seat = seats.find(s => s.venue_seat?.category_id === categoryId);
+    if (seat?.venue_seat?.category?.name) return seat.venue_seat.category.name;
+
+    // Smart fallbacks based on price
+    const price = getPrice(categoryId);
+    if (price >= 250) return 'VIP Pit';
+    if (price >= 150) return 'Golden Circle / VIP Pavilion';
+    if (price >= 100) return 'Lower Tier';
+    if (price >= 50) return 'Upper Deck / Stand';
+    if (price >= 30) return 'Executive Recliner / General Admission';
+    if (price >= 20) return 'Premium Club';
+    return 'Standard';
   };
 
   const subtotal = myHolds.reduce((sum, s) => sum + getPrice(s.venue_seat.category_id), 0);
@@ -193,14 +217,349 @@ export default function SeatMap() {
   const hasAvailableSelected = selectedSeats.some(s => s.status === 'available');
   const onlyOtherHeldSelected = selectedSeats.length === 1 && (selectedSeats[0].status === 'booked' || (selectedSeats[0].status === 'held' && selectedSeats[0].held_by !== user?.id));
 
+  const renderSeat = (seat: any, compact = false) => {
+    const isZoneFiltered = selectedCategory !== 'all' && seat.venue_seat.category_id !== selectedCategory;
+
+    return (
+      <button
+        key={seat.id}
+        onClick={() => toggleSeatSelection(seat)}
+        disabled={isZoneFiltered}
+        className={`seat-btn ${compact ? '!w-7 !h-7 !text-[10px]' : ''} ${getSeatClass(seat)} ${
+          isZoneFiltered ? 'opacity-20 grayscale pointer-events-none scale-90' : ''
+        } ${
+          !isZoneFiltered && selectedCategory !== 'all' ? 'ring-4 ring-primary-fixed scale-110 z-10' : ''
+        }`}
+        title={`${seat.venue_seat.row_label}${seat.venue_seat.seat_number} — ${seat.status} ($${getPrice(seat.venue_seat.category_id)})`}
+      >
+        {seat.venue_seat.seat_number}
+      </button>
+    );
+  };
+
+  // Dedicated 360-Degree Concert Arena Layout (Clean Material Symbols)
+  const renderConcertStadiumLayout = () => {
+    const getRowSeats = (row: string, startNum?: number, endNum?: number) => {
+      let rowSeats = seats
+        .filter(s => s.venue_seat.row_label === row)
+        .sort((a, b) => a.venue_seat.seat_number - b.venue_seat.seat_number);
+      if (startNum !== undefined && endNum !== undefined) {
+        rowSeats = rowSeats.filter(s => s.venue_seat.seat_number >= startNum && s.venue_seat.seat_number <= endNum);
+      }
+      return rowSeats;
+    };
+
+    return (
+      <div className="flex flex-col gap-6 items-center w-full max-w-full px-2">
+        {/* 1. NORTH: VIP PIT (Rows A & B) */}
+        <div className="w-full max-w-4xl bg-amber-500/10 border-4 border-amber-500 p-3 neo-brutalism-shadow rounded-lg text-center">
+          <div className="font-headline-lg-mobile text-amber-500 uppercase tracking-widest mb-2 flex items-center justify-center gap-2 text-xs font-bold">
+            <span className="material-symbols-outlined text-sm">star</span>
+            VIP STAGE PIT (FRONT ACCESS)
+            <span className="material-symbols-outlined text-sm">star</span>
+          </div>
+          <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
+            {['A', 'B'].map(row => (
+              <div key={row} className="flex gap-2 items-center justify-center">
+                <span className="font-data-label text-[10px] text-amber-400 w-4 font-bold">{row}</span>
+                <div className="flex gap-1.5">
+                  {getRowSeats(row).map(seat => renderSeat(seat, true))}
+                </div>
+                <span className="font-data-label text-[10px] text-amber-400 w-4 font-bold">{row}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 2. CENTER STAGE & SIDE WINGS HUB */}
+        <div className="w-full max-w-4xl flex flex-col xl:flex-row gap-4 items-center justify-center">
+          {/* WEST TIER (Left Wing - Rows F, G, H, seats 1-8) */}
+          <div className="bg-cyan-950/20 border-4 border-cyan-500 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
+            <div className="font-headline-lg-mobile text-cyan-400 uppercase tracking-wider mb-2 text-xs font-bold flex items-center justify-center gap-1">
+              <span className="material-symbols-outlined text-sm">stadium</span>
+              <span>WEST TIER WING</span>
+            </div>
+            <div className="flex flex-col gap-1.5 items-center">
+              {['F', 'G', 'H'].map(row => (
+                <div key={`west-${row}`} className="flex gap-1.5 items-center justify-center">
+                  <span className="font-data-label text-[10px] text-cyan-400 font-bold w-4">{row}</span>
+                  <div className="flex gap-1">
+                    {getRowSeats(row, 1, 8).map(seat => renderSeat(seat, true))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 360 STAGE CENTER PIECE */}
+          <div className="shrink-0 w-56 bg-on-background text-primary-fixed border-4 border-on-background neo-brutalism-shadow p-4 flex flex-col items-center justify-center text-center relative overflow-hidden my-2 xl:my-0">
+            <div className="absolute top-1 left-1 text-[8px] font-mono text-amber-400 animate-pulse">AUDIO STACK</div>
+            <div className="absolute top-1 right-1 text-[8px] font-mono text-amber-400 animate-pulse">AUDIO STACK</div>
+            <span className="material-symbols-outlined text-3xl text-amber-400 mb-1 animate-bounce">graphic_eq</span>
+            <span className="font-headline-lg text-xs uppercase tracking-widest text-primary-fixed leading-tight">
+              CENTRAL STAGE
+            </span>
+            <div className="w-full h-1.5 bg-amber-400 border border-on-background my-1.5 animate-pulse"></div>
+            <span className="text-[9px] font-mono uppercase text-amber-300 font-bold tracking-wider">
+              360° STADIUM HUB
+            </span>
+          </div>
+
+          {/* EAST TIER (Right Wing - Rows F, G, H, seats 9-16) */}
+          <div className="bg-cyan-950/20 border-4 border-cyan-500 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
+            <div className="font-headline-lg-mobile text-cyan-400 uppercase tracking-wider mb-2 text-xs font-bold flex items-center justify-center gap-1">
+              <span className="material-symbols-outlined text-sm">stadium</span>
+              <span>EAST TIER WING</span>
+            </div>
+            <div className="flex flex-col gap-1.5 items-center">
+              {['F', 'G', 'H'].map(row => (
+                <div key={`east-${row}`} className="flex gap-1.5 items-center justify-center">
+                  <div className="flex gap-1">
+                    {getRowSeats(row, 9, 16).map(seat => renderSeat(seat, true))}
+                  </div>
+                  <span className="font-data-label text-[10px] text-cyan-400 font-bold w-4">{row}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* 3. SOUTH INNER: GOLDEN CIRCLE GA FLOOR (Rows C, D & E) */}
+        <div className="w-full max-w-4xl bg-purple-950/20 border-4 border-purple-500 p-3 neo-brutalism-shadow rounded-lg text-center">
+          <div className="font-headline-lg-mobile text-purple-400 uppercase tracking-widest mb-2 flex items-center justify-center gap-2 text-xs font-bold">
+            <span className="material-symbols-outlined text-sm">bolt</span>
+            GOLDEN CIRCLE DANCE FLOOR
+            <span className="material-symbols-outlined text-sm">bolt</span>
+          </div>
+          <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
+            {['C', 'D', 'E'].map(row => (
+              <div key={row} className="flex gap-2 items-center justify-center">
+                <span className="font-data-label text-[10px] text-purple-400 w-4 font-bold">{row}</span>
+                <div className="flex gap-1.5">
+                  {getRowSeats(row).map(seat => renderSeat(seat, true))}
+                </div>
+                <span className="font-data-label text-[10px] text-purple-400 w-4 font-bold">{row}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 4. SOUTH OUTER: UPPER DECK BLEACHERS (Rows I, J & K) */}
+        <div className="w-full max-w-4xl bg-slate-900 border-4 border-slate-700 p-3 neo-brutalism-shadow rounded-lg text-center">
+          <div className="font-headline-lg-mobile text-slate-300 uppercase tracking-widest mb-2 text-xs font-bold flex items-center justify-center gap-1">
+            <span className="material-symbols-outlined text-sm">chair</span>
+            <span>UPPER DECK BLEACHERS & REAR ARENA</span>
+          </div>
+          <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
+            {['I', 'J', 'K'].map(row => (
+              <div key={row} className="flex gap-2 items-center justify-center">
+                <span className="font-data-label text-[10px] text-slate-400 w-4 font-bold">{row}</span>
+                <div className="flex gap-1.5">
+                  {getRowSeats(row).map(seat => renderSeat(seat, true))}
+                </div>
+                <span className="font-data-label text-[10px] text-slate-400 w-4 font-bold">{row}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Dedicated Intimate Comedy Club Layout (Clean Material Symbols)
+  const renderComedyLayout = () => {
+    return (
+      <div className="flex flex-col gap-6 items-center w-full max-w-4xl mx-auto px-2">
+        <div className="w-full bg-amber-400 text-on-background border-4 border-on-background p-3 neo-brutalism-shadow font-bold text-center uppercase tracking-widest text-xs flex items-center justify-center gap-2">
+          <span className="material-symbols-outlined text-base">mic</span>
+          INTIMATE COMEDY CLUB — ALL SEATS FLAT $35.00
+          <span className="material-symbols-outlined text-base">mic</span>
+        </div>
+
+        {/* Center Mic Spotlight */}
+        <div className="w-48 h-20 bg-yellow-400/20 border-4 border-dashed border-yellow-400 rounded-full flex flex-col items-center justify-center my-2 text-center neo-brutalism-shadow">
+          <span className="material-symbols-outlined text-yellow-400 text-2xl animate-pulse">mic</span>
+          <span className="font-mono text-[9px] text-yellow-300 font-bold uppercase tracking-wider">SPOTLIGHT MIC STAND</span>
+        </div>
+
+        {/* Club Seats in clustered layout */}
+        <div className="flex flex-col gap-3 items-center w-full">
+          {rows.map(row => (
+            <div key={row as string} className="flex gap-2 items-center justify-center bg-surface border-2 border-on-background p-2 neo-brutalism-shadow-sm rounded-lg">
+              <span className="font-data-label text-xs font-bold text-primary-fixed w-6 text-right">{row as string}</span>
+              <div className="flex gap-1.5 flex-wrap justify-center">
+                {seats
+                  .filter(s => s.venue_seat.row_label === row)
+                  .sort((a, b) => a.venue_seat.seat_number - b.venue_seat.seat_number)
+                  .map(seat => renderSeat(seat, true))}
+              </div>
+              <span className="font-data-label text-xs font-bold text-primary-fixed w-6 text-left">{row as string}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // Dedicated Sports Stadium Layout (Clean Material Symbols)
+  const renderSportsLayout = () => {
+    const isCricket = showData?.event?.title?.toLowerCase().includes('cricket') || showData?.venue?.name?.toLowerCase().includes('cricket');
+
+    const getRowSeats = (row: string, startNum?: number, endNum?: number) => {
+      let rowSeats = seats
+        .filter(s => s.venue_seat.row_label === row)
+        .sort((a, b) => a.venue_seat.seat_number - b.venue_seat.seat_number);
+      if (startNum !== undefined && endNum !== undefined) {
+        rowSeats = rowSeats.filter(s => s.venue_seat.seat_number >= startNum && s.venue_seat.seat_number <= endNum);
+      }
+      return rowSeats;
+    };
+
+    return (
+      <div className="flex flex-col gap-6 items-center w-full max-w-5xl mx-auto px-2">
+        {/* 1. VIP PAVILION BOX (NORTH) */}
+        <div className="w-full max-w-4xl bg-amber-500/10 border-4 border-amber-500 p-3 neo-brutalism-shadow rounded-lg text-center">
+          <div className="font-headline-lg-mobile text-amber-400 uppercase tracking-widest mb-2 flex items-center justify-center gap-2 text-xs font-bold">
+            <span className="material-symbols-outlined text-sm">workspace_premium</span>
+            VIP PAVILION & SUITE BOX ($150)
+            <span className="material-symbols-outlined text-sm">workspace_premium</span>
+          </div>
+          <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
+            {['A', 'B'].map(row => (
+              <div key={row} className="flex gap-2 items-center justify-center">
+                <span className="font-data-label text-[10px] text-amber-400 w-4 font-bold">{row}</span>
+                <div className="flex gap-1.5">
+                  {getRowSeats(row).map(seat => renderSeat(seat, true))}
+                </div>
+                <span className="font-data-label text-[10px] text-amber-400 w-4 font-bold">{row}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 2. CENTRAL SPORTS FIELD & SIDE WINGS */}
+        <div className="w-full max-w-4xl flex flex-col xl:flex-row gap-4 items-center justify-center">
+          {/* WEST TIER SIDE STAND (Rows C, D, E, seats 1-7) */}
+          <div className="bg-emerald-950/30 border-4 border-emerald-500 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
+            <div className="font-headline-lg-mobile text-emerald-400 uppercase tracking-wider mb-2 text-xs font-bold flex items-center justify-center gap-1">
+              <span className="material-symbols-outlined text-sm">stadium</span>
+              <span>WEST STAND WING ($85)</span>
+            </div>
+            <div className="flex flex-col gap-1.5 items-center">
+              {['C', 'D', 'E'].map(row => (
+                <div key={`west-${row}`} className="flex gap-1.5 items-center justify-center">
+                  <span className="font-data-label text-[10px] text-emerald-400 font-bold w-4">{row}</span>
+                  <div className="flex gap-1">
+                    {getRowSeats(row, 1, 7).map(seat => renderSeat(seat, true))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* CENTRAL FIELD VISIBILITY ENGINE */}
+          {isCricket ? (
+            /* CRICKET CIRCULAR OVAL FIELD */
+            <div className="shrink-0 w-64 h-48 bg-emerald-900/50 border-4 border-emerald-400 rounded-full neo-brutalism-shadow p-3 flex flex-col items-center justify-center text-center relative overflow-hidden my-2 xl:my-0">
+              <div className="w-48 h-32 border-2 border-dashed border-emerald-300 rounded-full flex flex-col items-center justify-center relative">
+                {/* 22-Yard Pitch Strip */}
+                <div className="w-16 h-20 bg-amber-200/20 border-2 border-amber-300 flex flex-col justify-between items-center py-1">
+                  <div className="w-8 h-1 bg-white"></div>
+                  <span className="text-[9px] font-mono font-bold text-amber-300">CRICKET PITCH</span>
+                  <div className="w-8 h-1 bg-white"></div>
+                </div>
+              </div>
+              <span className="text-[10px] font-mono uppercase text-emerald-200 font-bold tracking-wider mt-1 flex items-center justify-center gap-1">
+                <span className="material-symbols-outlined text-xs">sports_cricket</span>
+                <span>30-YARD CRICKET OVAL</span>
+              </span>
+            </div>
+          ) : (
+            /* FOOTBALL RECTANGULAR PITCH */
+            <div className="shrink-0 w-64 h-48 bg-emerald-800 border-4 border-white neo-brutalism-shadow p-2 flex flex-col items-center justify-between text-center relative overflow-hidden my-2 xl:my-0">
+              <div className="w-full flex justify-between items-center text-xs">
+                <span className="material-symbols-outlined text-white">sports_soccer</span>
+                <span className="text-[9px] font-mono text-white font-bold">SOCCER FIELD</span>
+                <span className="material-symbols-outlined text-white">sports_soccer</span>
+              </div>
+              <div className="w-full border-t-2 border-white relative flex items-center justify-center my-auto">
+                <div className="w-16 h-16 border-2 border-white rounded-full absolute"></div>
+              </div>
+              <span className="text-[10px] font-mono uppercase text-white font-bold tracking-wider flex items-center justify-center gap-1">
+                <span className="material-symbols-outlined text-xs">sports_soccer</span>
+                <span>TOUCHLINE & GOAL POSTS</span>
+              </span>
+            </div>
+          )}
+
+          {/* EAST TIER SIDE STAND (Rows C, D, E, seats 8-14) */}
+          <div className="bg-emerald-950/30 border-4 border-emerald-500 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
+            <div className="font-headline-lg-mobile text-emerald-400 uppercase tracking-wider mb-2 text-xs font-bold flex items-center justify-center gap-1">
+              <span className="material-symbols-outlined text-sm">stadium</span>
+              <span>EAST STAND WING ($85)</span>
+            </div>
+            <div className="flex flex-col gap-1.5 items-center">
+              {['C', 'D', 'E'].map(row => (
+                <div key={`east-${row}`} className="flex gap-1.5 items-center justify-center">
+                  <div className="flex gap-1">
+                    {getRowSeats(row, 8, 14).map(seat => renderSeat(seat, true))}
+                  </div>
+                  <span className="font-data-label text-[10px] text-emerald-400 font-bold w-4">{row}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* 3. SOUTH BLEACHERS (Rows F, G, H) */}
+        <div className="w-full max-w-4xl bg-slate-900 border-4 border-slate-700 p-3 neo-brutalism-shadow rounded-lg text-center">
+          <div className="font-headline-lg-mobile text-slate-300 uppercase tracking-widest mb-2 text-xs font-bold flex items-center justify-center gap-1">
+            <span className="material-symbols-outlined text-sm">chair</span>
+            <span>UPPER DECK STADIUM BLEACHERS ($35)</span>
+          </div>
+          <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
+            {['F', 'G', 'H'].map(row => (
+              <div key={row} className="flex gap-2 items-center justify-center">
+                <span className="font-data-label text-[10px] text-slate-400 w-4 font-bold">{row}</span>
+                <div className="flex gap-1.5">
+                  {getRowSeats(row).map(seat => renderSeat(seat, true))}
+                </div>
+                <span className="font-data-label text-[10px] text-slate-400 w-4 font-bold">{row}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="w-full flex-grow flex flex-col bg-background relative selection:bg-primary-fixed selection:text-on-primary-fixed">
+      {/* Header */}
       <header className="bg-on-background text-on-primary border-b-4 border-on-background flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 sticky top-0 z-50">
         <div className="flex items-center gap-4">
           <button onClick={() => navigate(-1)} aria-label="Go Back" className="bg-surface text-on-surface hover:bg-primary-fixed hover:text-on-primary-fixed border-border-width border-on-background p-2 neo-brutalism-shadow neo-brutalism-shadow-hover neo-brutalism-shadow-active transition-all">
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>arrow_back</span>
           </button>
-          <h1 className="font-headline-lg-mobile md:font-headline-lg uppercase text-primary-fixed tracking-tight">VENUE MAP</h1>
+          <div className="flex flex-col">
+            <h1 className="font-headline-lg-mobile md:font-headline-lg uppercase text-primary-fixed tracking-tight leading-none">VENUE MAP</h1>
+            {showData && (
+              <div className="hidden md:flex flex-wrap gap-3 mt-2">
+                <span className="font-data-label text-data-label uppercase bg-primary-fixed text-on-primary-fixed px-3 py-1 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[16px]">calendar_today</span>
+                  {new Date(showData.date).toLocaleDateString()}
+                </span>
+                <span className="font-data-label text-data-label uppercase bg-secondary-fixed text-on-secondary-fixed px-3 py-1 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[16px]">schedule</span>
+                  {showData.time}
+                </span>
+                <span className="font-data-label text-data-label uppercase bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[16px]">location_on</span>
+                  {showData.venue?.name}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
         {countdown !== null && (
           <div className="font-data-label text-data-label bg-error text-on-error border-border-width border-on-background px-4 py-2 neo-brutalism-shadow animate-pulse">
@@ -209,37 +568,127 @@ export default function SeatMap() {
         )}
       </header>
 
+      {/* Mobile Details Bar */}
+      {showData && (
+        <div className="md:hidden bg-surface border-b-4 border-on-background p-4 flex flex-wrap gap-2 justify-center">
+          <span className="font-data-label text-data-label uppercase bg-primary-fixed text-on-primary-fixed border-border-width border-on-background px-3 py-1 flex items-center gap-1 neo-brutalism-shadow-sm">
+            <span className="material-symbols-outlined text-[16px]">calendar_today</span>
+            {new Date(showData.date).toLocaleDateString()}
+          </span>
+          <span className="font-data-label text-data-label uppercase bg-secondary-fixed text-on-secondary-fixed border-border-width border-on-background px-3 py-1 flex items-center gap-1 neo-brutalism-shadow-sm">
+            <span className="material-symbols-outlined text-[16px]">schedule</span>
+            {showData.time}
+          </span>
+          <span className="font-data-label text-data-label uppercase bg-tertiary-fixed text-on-tertiary-fixed border-border-width border-on-background px-3 py-1 flex items-center gap-1 neo-brutalism-shadow-sm">
+            <span className="material-symbols-outlined text-[16px]">location_on</span>
+            {showData.venue?.name}
+          </span>
+        </div>
+      )}
+
       <div className="flex-grow flex flex-col md:flex-row relative">
-        <section className="flex-grow bg-surface-container blueprint-bg relative overflow-hidden flex flex-col p-margin-mobile md:p-margin-desktop border-b-4 md:border-b-0 md:border-r-4 border-on-background">
-          <div className="max-w-4xl mx-auto w-full mb-8">
-            <div className="stage-area neo-brutalism-shadow">STAGE</div>
-          </div>
-          <div className="seat-map-container overflow-auto flex-grow pb-24">
-            <div className="flex flex-col gap-6 w-max mx-auto">
-              {rows.map(row => (
-                <div key={row as string} className="flex gap-4 items-center justify-center">
-                  <span className="font-data-label text-data-label text-on-surface-variant w-8 text-right shrink-0">{row as string}</span>
-                  <div className="flex gap-2">
-                    {seats
-                      .filter(s => s.venue_seat.row_label === row)
-                      .sort((a, b) => a.venue_seat.seat_number - b.venue_seat.seat_number)
-                      .map(seat => (
-                        <button
-                          key={seat.id}
-                          onClick={() => toggleSeatSelection(seat)}
-                          className={`seat-btn ${getSeatClass(seat)}`}
-                          title={`${seat.venue_seat.row_label}${seat.venue_seat.seat_number} — ${seat.status} ($${getPrice(seat.venue_seat.category_id)})`}
-                        >
-                          {seat.venue_seat.seat_number}
-                        </button>
-                      ))}
-                  </div>
-                  <span className="font-data-label text-data-label text-on-surface-variant w-8 text-left shrink-0">{row as string}</span>
-                </div>
-              ))}
+        {/* Main Seat Canvas */}
+        <section className="flex-grow bg-surface-container blueprint-bg relative overflow-x-auto flex flex-col p-4 md:p-6 border-b-4 md:border-b-0 md:border-r-4 border-on-background">
+
+          {/* Zone Selector Filter Bar */}
+          {pricing.length > 0 && (
+            <div className="max-w-5xl mx-auto w-full mb-6 bg-surface border-4 border-on-background p-3 neo-brutalism-shadow flex flex-wrap gap-2 items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary-fixed text-lg">filter_alt</span>
+                <span className="font-data-label text-data-label uppercase font-bold text-on-surface">SELECT ZONE:</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setSelectedCategory('all')}
+                  className={`px-3 py-1 font-data-label text-data-label uppercase border-2 border-on-background transition-all ${
+                    selectedCategory === 'all'
+                      ? 'bg-on-background text-on-primary font-bold neo-brutalism-shadow-sm'
+                      : 'bg-surface text-on-surface hover:bg-surface-container'
+                  }`}
+                >
+                  ALL ZONES
+                </button>
+                {pricing.map(p => {
+                  const categoryName = getCategoryName(p.category_id);
+                  const isSelected = selectedCategory === p.category_id;
+                  return (
+                    <button
+                      key={p.category_id}
+                      onClick={() => setSelectedCategory(isSelected ? 'all' : p.category_id)}
+                      className={`px-3 py-1 font-data-label text-data-label uppercase border-2 border-on-background transition-all flex items-center gap-2 ${
+                        isSelected
+                          ? 'bg-primary-fixed text-on-primary-fixed font-bold scale-105 neo-brutalism-shadow-sm'
+                          : 'bg-surface text-on-surface hover:bg-primary-container'
+                      }`}
+                    >
+                      <span>{categoryName}</span>
+                      <span className="bg-on-background text-on-primary px-1.5 py-0.5 text-[10px] font-mono">
+                        ${Number(p.price)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+          )}
+
+          {/* Seat Map Canvas Rendering */}
+          <div className="seat-map-container overflow-x-auto flex-grow pb-24 w-full flex justify-center">
+            {showData?.event?.type === 'concert' ? (
+              renderConcertStadiumLayout()
+            ) : showData?.event?.type === 'comedy' ? (
+              renderComedyLayout()
+            ) : showData?.event?.type === 'sports' ? (
+              renderSportsLayout()
+            ) : (
+              <div className="flex flex-col gap-6 w-max mx-auto">
+                {/* Cinema Screen Header */}
+                {showData?.event?.type === 'movie' && (
+                  <div className="max-w-4xl mx-auto w-full mb-8">
+                    <div className="relative">
+                      <div className="w-full h-10 bg-on-background text-primary-fixed font-headline-lg-mobile text-center flex items-center justify-center border-4 border-on-background neo-brutalism-shadow rounded-b-[40%] overflow-hidden bg-gradient-to-r from-on-background via-slate-800 to-on-background">
+                        <span className="tracking-[0.25em] font-black text-sm text-yellow-300 animate-pulse">CINEMA CURVED SCREEN</span>
+                      </div>
+                      <div className="text-center text-[10px] uppercase font-mono font-bold text-on-surface-variant mt-2 tracking-widest flex items-center justify-center gap-1">
+                        <span className="material-symbols-outlined text-xs">arrow_drop_up</span>
+                        <span>AUDIENCE FACING SCREEN</span>
+                        <span className="material-symbols-outlined text-xs">arrow_drop_up</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {rows.map(row => (
+                  <div key={row as string} className="flex gap-4 items-center justify-center">
+                    <span className="font-data-label text-data-label text-on-surface-variant w-8 text-right shrink-0">{row as string}</span>
+                    <div className="flex gap-2">
+                      {seats
+                        .filter(s => s.venue_seat.row_label === row)
+                        .sort((a, b) => a.venue_seat.seat_number - b.venue_seat.seat_number)
+                        .map(seat => {
+                          const isMovie = showData?.event?.type === 'movie';
+                          const showAisleGap = isMovie && seat.venue_seat.seat_number === 8;
+
+                          return (
+                            <div key={seat.id} className="flex items-center">
+                              {showAisleGap && (
+                                <div className="w-8 h-full flex items-center justify-center font-mono text-[10px] text-on-surface-variant opacity-40 uppercase px-1">
+                                  AISLE
+                                </div>
+                              )}
+                              {renderSeat(seat)}
+                            </div>
+                          );
+                        })}
+                    </div>
+                    <span className="font-data-label text-data-label text-on-surface-variant w-8 text-left shrink-0">{row as string}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
+          {/* Seat Status Legend */}
           <div className="absolute bottom-4 left-4 right-4 md:left-margin-desktop md:right-auto bg-surface border-border-width border-on-background p-4 neo-brutalism-shadow flex flex-wrap gap-4 items-center z-10">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 border-2 border-on-background bg-surface"></div>
@@ -260,6 +709,7 @@ export default function SeatMap() {
           </div>
         </section>
 
+        {/* Sidebar */}
         <aside className="w-full md:w-[400px] flex-shrink-0 bg-surface flex flex-col h-auto md:h-[calc(100vh-80px)] md:sticky md:top-[80px]">
           <div className="p-margin-mobile border-b-4 border-on-background bg-on-background text-on-primary">
             {selectedSeats.length > 0 ? (
@@ -275,9 +725,9 @@ export default function SeatMap() {
                 )}
                 
                 {onlyOtherHeldSelected && (
-                  <button onClick={() => handleWaitlist(selectedSeats[0])} className="mt-4 w-full bg-tertiary-fixed text-on-tertiary-fixed border-border-width border-on-background py-2 font-headline-lg-mobile text-sm uppercase neo-brutalism-shadow neo-brutalism-shadow-hover neo-brutalism-shadow-active transition-all">
-                    Join Waitlist for Category
-                  </button>
+                   <button onClick={() => handleWaitlist(selectedSeats[0])} className="mt-4 w-full bg-tertiary-fixed text-on-tertiary-fixed border-border-width border-on-background py-2 font-headline-lg-mobile text-sm uppercase neo-brutalism-shadow neo-brutalism-shadow-hover neo-brutalism-shadow-active transition-all">
+                     Join Waitlist for Category
+                   </button>
                 )}
                </>
             ) : (
@@ -307,11 +757,20 @@ export default function SeatMap() {
                     <div className="absolute left-[-10px] top-1/2 transform -translate-y-1/2 w-[20px] h-[20px] rounded-full bg-surface-container border-r-4 border-on-background"></div>
                     <div className="flex justify-between items-start ml-4">
                       <div>
-                        <div className="font-data-label text-data-label bg-tertiary-fixed text-on-tertiary-fixed px-2 py-1 border-2 border-on-background inline-block mb-2">SEAT</div>
+                        <div className="font-data-label text-data-label bg-tertiary-fixed text-on-tertiary-fixed px-2 py-1 border-2 border-on-background inline-block mb-2">
+                          {getCategoryName(s.venue_seat.category_id)}
+                        </div>
                         <div className="font-headline-lg-mobile text-on-surface">ROW {s.venue_seat.row_label} <br /> NUM {s.venue_seat.seat_number}</div>
                       </div>
-                      <div className="text-right">
+                      <div className="flex flex-col items-end gap-2">
                         <div className="font-headline-lg-mobile text-secondary">${getPrice(s.venue_seat.category_id)}</div>
+                        <button 
+                          onClick={() => handleReleaseSingle(s.id)}
+                          className="bg-error text-on-error p-1 border-2 border-on-background hover:bg-red-600 transition-colors"
+                          title="Release Hold"
+                        >
+                          <span className="material-symbols-outlined text-[16px] block">close</span>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -343,18 +802,19 @@ export default function SeatMap() {
             </div>
           )}
 
-          <div className="p-margin-mobile bg-surface z-20">
-            <div className="flex justify-between items-end mb-4">
-              <span className="font-data-label text-data-label uppercase text-on-surface-variant">Subtotal ({myHolds.length} tickets)</span>
-              <span className="font-headline-lg-mobile text-on-background">${subtotal.toFixed(2)}</span>
+          {/* Total & Checkout */}
+          <div className="p-margin-mobile bg-surface mt-auto">
+            <div className="flex justify-between items-center mb-4">
+              <span className="font-data-label text-data-label uppercase">Subtotal ({myHolds.length} Tickets)</span>
+              <span className="font-headline-lg text-primary">${subtotal.toFixed(2)}</span>
             </div>
             <button 
               onClick={handleCheckout}
-              disabled={myHolds.length === 0 || !customerName || !customerPhone || checkingOut}
-              className="w-full bg-primary-fixed text-on-primary-fixed border-border-width border-on-background py-4 font-headline-lg-mobile uppercase neo-brutalism-shadow neo-brutalism-shadow-hover neo-brutalism-shadow-active transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+              disabled={myHolds.length === 0 || checkingOut}
+              className="w-full bg-primary-fixed text-on-primary-fixed border-border-width border-on-background py-4 font-headline-lg uppercase neo-brutalism-shadow neo-brutalism-shadow-hover neo-brutalism-shadow-active transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {checkingOut ? 'PROCESSING...' : 'CHECKOUT'}
-              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>arrow_forward</span>
+              <span>{checkingOut ? 'Processing...' : 'Checkout'}</span>
+              <span className="material-symbols-outlined">arrow_forward</span>
             </button>
           </div>
         </aside>

@@ -16,15 +16,15 @@ export const getSeatMap = async (req: Request, res: Response) => {
   const show_id = req.params.id as string;
   const showDetails = await prisma.show.findUnique({
     where: { id: show_id },
-    include: { pricing: true }
+    include: { pricing: { include: { category: true } }, event: true, venue: true }
   });
   
   const seatStatuses = await prisma.seatStatus.findMany({
     where: { show_id },
-    include: { venue_seat: true }
+    include: { venue_seat: { include: { category: true } } }
   });
   
-  res.json({ status: 'success', data: { seats: seatStatuses, pricing: showDetails?.pricing || [] } });
+  res.json({ status: 'success', data: { seats: seatStatuses, pricing: showDetails?.pricing || [], show: showDetails } });
 };
 
 export const holdSeats = async (req: AuthRequest, res: Response) => {
@@ -173,7 +173,8 @@ export const releaseHold = async (req: AuthRequest, res: Response) => {
 
     return await tx.seatStatus.update({
       where: { id },
-      data: { status: 'available', held_by: null, hold_expires_at: null }
+      data: { status: 'available', held_by: null, hold_expires_at: null },
+      include: { venue_seat: { include: { category: true } } }
     });
   });
 

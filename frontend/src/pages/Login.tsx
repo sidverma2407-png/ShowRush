@@ -66,8 +66,9 @@ export default function Login() {
           </div>
           
           {error && (
-            <div className="bg-error text-on-error neo-border px-4 py-3 font-data-label text-data-label">
-              ⚠ {error}
+            <div className="bg-error text-on-error neo-border px-4 py-3 font-data-label text-data-label flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm">warning</span>
+              <span>{error}</span>
             </div>
           )}
 
