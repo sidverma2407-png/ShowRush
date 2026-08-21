@@ -197,7 +197,7 @@ export default function Bookings() {
                 </div>
                 <div className="flex justify-between border-b-2 border-on-background pb-2">
                   <span className="font-data-label text-xs uppercase text-on-surface-variant">Total Paid</span>
-                  <span className="font-body-md font-bold">${selectedBooking.total_price}</span>
+                  <span className="font-body-md font-bold">₹{selectedBooking.total_price}</span>
                 </div>
                 {selectedBooking.customer_name && (
                   <div className="flex justify-between border-b-2 border-on-background pb-2">

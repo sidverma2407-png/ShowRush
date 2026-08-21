@@ -88,7 +88,7 @@ export default function OrganiserDashboard() {
           </div>
           <div className="bg-surface border-border-width border-on-background p-6 neo-brutalist-shadow flex flex-col relative overflow-hidden">
              <span className="font-data-label text-data-label uppercase text-on-surface-variant mb-2">Total Revenue</span>
-             <span className="font-display-xl text-6xl text-on-background">$0</span>
+             <span className="font-display-xl text-6xl text-on-background">₹0</span>
              <div className="mt-4 border-t-2 border-on-background pt-4 flex justify-between items-center">
                 <span className="font-data-label text-data-label uppercase text-on-surface-variant">Waiting for sales</span>
                 <span className="material-symbols-outlined text-on-surface-variant" style={{ fontVariationSettings: "'FILL' 1" }}>account_balance</span>
@@ -178,7 +178,7 @@ export default function OrganiserDashboard() {
             <div className="p-6 flex-grow overflow-y-auto blueprint-bg flex flex-col gap-6">
                <div className="bg-primary-fixed text-on-primary-fixed border-4 border-on-background p-6 neo-brutalist-shadow text-center">
                  <span className="font-data-label text-data-label uppercase mb-2 block">Total Revenue</span>
-                 <span className="font-display-xl text-6xl block">${summaryModal.total_revenue.toFixed(2)}</span>
+                 <span className="font-display-xl text-6xl block">₹{summaryModal.total_revenue.toFixed(2)}</span>
                </div>
 
                <div>
@@ -205,7 +205,7 @@ export default function OrganiserDashboard() {
                              <td className="p-3 border-r-2 border-on-background font-bold">{b.reference}</td>
                              <td className="p-3 border-r-2 border-on-background">{b.customer_name}</td>
                              <td className="p-3 border-r-2 border-on-background">{b.customer_phone}</td>
-                             <td className="p-3 border-r-2 border-on-background text-right">${b.total_price.toFixed(2)}</td>
+                             <td className="p-3 border-r-2 border-on-background text-right">₹{b.total_price.toFixed(2)}</td>
                              <td className="p-3">{new Date(b.date).toLocaleDateString()}</td>
                            </tr>
                          ))}

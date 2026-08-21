@@ -230,7 +230,7 @@ export default function SeatMap() {
         } ${
           !isZoneFiltered && selectedCategory !== 'all' ? 'ring-4 ring-primary-fixed scale-110 z-10' : ''
         }`}
-        title={`${seat.venue_seat.row_label}${seat.venue_seat.seat_number} — ${seat.status} ($${getPrice(seat.venue_seat.category_id)})`}
+        title={`${seat.venue_seat.row_label}${seat.venue_seat.seat_number} — ${seat.status} (₹${getPrice(seat.venue_seat.category_id)})`}
       >
         {seat.venue_seat.seat_number}
       </button>
@@ -372,7 +372,7 @@ export default function SeatMap() {
       <div className="flex flex-col gap-6 items-center w-full max-w-4xl mx-auto px-2">
         <div className="w-full bg-amber-400 text-on-background border-4 border-on-background p-3 neo-brutalism-shadow font-black text-center uppercase tracking-widest text-xs flex items-center justify-center gap-2">
           <span className="material-symbols-outlined text-base">mic</span>
-          <span>INTIMATE COMEDY CLUB — ALL SEATS FLAT $35.00</span>
+          <span>INTIMATE COMEDY CLUB — ALL SEATS FLAT ₹350</span>
           <span className="material-symbols-outlined text-base">mic</span>
         </div>
 
@@ -421,7 +421,7 @@ export default function SeatMap() {
         <div className="w-full max-w-4xl bg-amber-100 border-4 border-amber-600 p-3 neo-brutalism-shadow rounded-lg text-center">
           <div className="font-headline-lg-mobile text-amber-950 uppercase tracking-widest mb-2 flex items-center justify-center gap-2 text-xs font-black">
             <span className="material-symbols-outlined text-sm">workspace_premium</span>
-            <span>VIP PAVILION & SUITE BOX ($150)</span>
+            <span>VIP PAVILION & SUITE BOX (₹1,500)</span>
             <span className="material-symbols-outlined text-sm">workspace_premium</span>
           </div>
           <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
@@ -443,7 +443,7 @@ export default function SeatMap() {
           <div className="bg-teal-100 border-4 border-teal-600 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
             <div className="font-headline-lg-mobile text-teal-950 uppercase tracking-wider mb-2 text-xs font-black flex items-center justify-center gap-1">
               <span className="material-symbols-outlined text-sm">stadium</span>
-              <span>WEST STAND WING ($85)</span>
+              <span>WEST STAND WING (₹850)</span>
             </div>
             <div className="flex flex-col gap-1.5 items-center">
               {['C', 'D', 'E'].map(row => (
@@ -496,7 +496,7 @@ export default function SeatMap() {
           <div className="bg-teal-100 border-4 border-teal-600 p-3 neo-brutalism-shadow rounded-lg text-center shrink-0">
             <div className="font-headline-lg-mobile text-teal-950 uppercase tracking-wider mb-2 text-xs font-black flex items-center justify-center gap-1">
               <span className="material-symbols-outlined text-sm">stadium</span>
-              <span>EAST STAND WING ($85)</span>
+              <span>EAST STAND WING (₹850)</span>
             </div>
             <div className="flex flex-col gap-1.5 items-center">
               {['C', 'D', 'E'].map(row => (
@@ -515,7 +515,7 @@ export default function SeatMap() {
         <div className="w-full max-w-4xl bg-slate-900 border-4 border-slate-700 p-3 neo-brutalism-shadow rounded-lg text-center">
           <div className="font-headline-lg-mobile text-slate-100 uppercase tracking-widest mb-2 text-xs font-black flex items-center justify-center gap-1">
             <span className="material-symbols-outlined text-sm">chair</span>
-            <span>UPPER DECK STADIUM BLEACHERS ($35)</span>
+            <span>UPPER DECK STADIUM BLEACHERS (₹400)</span>
           </div>
           <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
             {['F', 'G', 'H'].map(row => (
@@ -623,7 +623,7 @@ export default function SeatMap() {
                     >
                       <span>{categoryName}</span>
                       <span className="bg-on-background text-on-primary px-1.5 py-0.5 text-[10px] font-mono">
-                        ${Number(p.price)}
+                        ₹{Number(p.price)}
                       </span>
                     </button>
                   );
@@ -763,7 +763,7 @@ export default function SeatMap() {
                         <div className="font-headline-lg-mobile text-on-surface font-black">ROW {s.venue_seat.row_label} <br /> NUM {s.venue_seat.seat_number}</div>
                       </div>
                       <div className="flex flex-col items-end gap-2">
-                        <div className="font-headline-lg-mobile text-secondary font-black">${getPrice(s.venue_seat.category_id)}</div>
+                        <div className="font-headline-lg-mobile text-secondary font-black">₹{getPrice(s.venue_seat.category_id)}</div>
                         <button 
                           onClick={() => handleReleaseSingle(s.id)}
                           className="bg-error text-on-error p-1 border-2 border-on-background hover:bg-red-600 transition-colors"
@@ -806,7 +806,7 @@ export default function SeatMap() {
           <div className="p-margin-mobile bg-surface mt-auto">
             <div className="flex justify-between items-center mb-4">
               <span className="font-data-label text-data-label uppercase font-bold">Subtotal ({myHolds.length} Tickets)</span>
-              <span className="font-headline-lg text-primary font-black">${subtotal.toFixed(2)}</span>
+              <span className="font-headline-lg text-primary font-black">₹{subtotal.toFixed(2)}</span>
             </div>
             <button 
               onClick={handleCheckout}

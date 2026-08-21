@@ -12,7 +12,7 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log('Clearing old data and seeding database with specialized multi-venue layouts...');
+  console.log('Clearing old data and seeding database with specialized multi-venue layouts & Indian cities...');
 
   // Clean wipe tables for fresh layout seeding
   await prisma.$executeRawUnsafe(`TRUNCATE TABLE "bookings", "booking_seats", "waitlist_entries", "seat_status", "show_category_pricing", "shows", "events", "venue_seats", "seat_categories", "venues" CASCADE;`);
@@ -52,9 +52,9 @@ async function main() {
   const vipPavilionCat = await getCategory('VIP Pavilion');
   const generalComedyCat = await getCategory('General Admission');
 
-  // --- VENUE 1: Grand Cinema Multiplex (For Movies) ---
+  // --- VENUE 1: Grand Cinema Multiplex (Delhi NCR) ---
   const cinemaVenue = await prisma.venue.create({
-    data: { name: 'Seatzy Grand Cinema', address: '456 Hollywood Blvd', city: 'New York', created_by: admin.id }
+    data: { name: 'Seatzy Grand Cinema', address: 'Select CITYWALK, Saket', city: 'Delhi NCR', created_by: admin.id }
   });
 
   const cinemaSeats = [];
@@ -76,9 +76,9 @@ async function main() {
   }
   await prisma.venueSeat.createMany({ data: cinemaSeats });
 
-  // --- VENUE 2: Travis Scott Stadium Arena (For Concerts) ---
+  // --- VENUE 2: Jio World Arena (Mumbai) ---
   const stadiumVenue = await prisma.venue.create({
-    data: { name: 'Travis Scott Stadium Arena', address: '789 AstroWorld Way', city: 'Los Angeles', created_by: admin.id }
+    data: { name: 'Jio World Arena', address: 'Bandra Kurla Complex', city: 'Mumbai', created_by: admin.id }
   });
 
   const stadiumSeats = [];
@@ -96,9 +96,9 @@ async function main() {
   });
   await prisma.venueSeat.createMany({ data: stadiumSeats });
 
-  // --- VENUE 3: Seatzy Underground Comedy Club (For Comedy) ---
+  // --- VENUE 3: Seatzy Comedy Club (Bengaluru) ---
   const comedyVenue = await prisma.venue.create({
-    data: { name: 'Seatzy Underground Comedy Club', address: '123 Laugh Corner', city: 'Chicago', created_by: admin.id }
+    data: { name: 'Seatzy Comedy Club', address: 'Koramangala 5th Block', city: 'Bengaluru', created_by: admin.id }
   });
 
   const comedySeats = [];
@@ -110,9 +110,9 @@ async function main() {
   }
   await prisma.venueSeat.createMany({ data: comedySeats });
 
-  // --- VENUE 4: Metropolitan Cricket Stadium (For Cricket Sports Events) ---
+  // --- VENUE 4: Noida International Stadium (Noida) ---
   const cricketVenue = await prisma.venue.create({
-    data: { name: 'Metropolitan Cricket Stadium', address: '100 Pitch Oval Way', city: 'London', created_by: admin.id }
+    data: { name: 'Noida International Cricket Stadium', address: 'Sector 21A', city: 'Noida', created_by: admin.id }
   });
 
   const cricketSeats = [];
@@ -127,9 +127,9 @@ async function main() {
   });
   await prisma.venueSeat.createMany({ data: cricketSeats });
 
-  // --- VENUE 5: National Soccer Arena (For Football Sports Events) ---
+  // --- VENUE 5: Balewadi Football Arena (Pune) ---
   const footballVenue = await prisma.venue.create({
-    data: { name: 'National Soccer Arena', address: '500 Goalpost Blvd', city: 'Mumbai', created_by: admin.id }
+    data: { name: 'Balewadi Football Arena', address: 'Shree Shiv Chhatrapati Sports Complex', city: 'Pune', created_by: admin.id }
   });
 
   const footballSeats = [];
@@ -144,102 +144,102 @@ async function main() {
   });
   await prisma.venueSeat.createMany({ data: footballSeats });
 
-  // --- 20 EVENTS WITH MATCHING THEMATIC POSTER IMAGES ---
+  // --- 20 EVENTS WITH USER CUSTOM GENERATED POSTERS ---
   const eventData = [
     // MOVIES
     {
       title: 'Neon Chronicles',
       type: 'movie',
-      description: 'A cyberpunk neo-noir film set in a dystopian future where human memories are traded as currency.',
-      poster_url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'
+      description: 'A cyberpunk neo-noir sci-fi film set in a dystopian future where human memories are traded as currency.',
+      poster_url: '/images/neon_movie.png'
     },
     {
       title: 'The Last Voyage',
       type: 'movie',
-      description: 'A sci-fi epic following a lone starship searching for a new habitable world.',
-      poster_url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80'
+      description: 'A sci-fi epic following a lone starship searching for a new habitable world in uncharted galaxy.',
+      poster_url: '/images/lost_voyage_movie.png'
     },
     {
       title: 'Midnight Paradox',
       type: 'movie',
-      description: 'A gripping mystery thriller that twists the fabric of time.',
-      poster_url: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80'
+      description: 'A gripping mystery thriller that twists the fabric of time and human consciousness.',
+      poster_url: '/images/midnight_movie.png'
     },
     {
       title: 'Echoes of Eternity',
       type: 'movie',
-      description: 'A sweeping fantasy epic detailing the fall of an ancient magical empire.',
-      poster_url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80'
+      description: 'A sweeping fantasy epic detailing the fall of an ancient magical empire and rising hero.',
+      poster_url: '/images/echoes_movie.png'
     },
     {
       title: 'Velocity Shift',
       type: 'movie',
-      description: 'High octane racing action across neon-lit city streets.',
-      poster_url: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80'
+      description: 'High octane street racing action across neon-lit city highways and illegal night tracks.',
+      poster_url: '/images/velocity_movie.png'
     },
 
     // CONCERTS
     {
       title: 'Electric Symphony',
       type: 'concert',
-      description: 'A massive EDM festival featuring cutting-edge laser shows and massive drops.',
-      poster_url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80'
+      description: 'A massive EDM festival featuring cutting-edge laser shows, heavy drops, and 360-degree arena sound.',
+      poster_url: '/images/electric_concert.png'
     },
     {
       title: 'Echoes of the Underground',
       type: 'concert',
-      description: 'An intimate indie rock gig showcasing the best upcoming bands.',
-      poster_url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80'
+      description: 'An intimate indie rock gig showcasing electric guitars and raw upcoming indie talent.',
+      poster_url: '/images/underground_concert.png'
     },
     {
       title: 'Jazz Under the Stars',
       type: 'concert',
-      description: 'Smooth and elegant jazz performance under an open sky.',
-      poster_url: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=800&q=80'
+      description: 'Smooth and elegant saxophone jazz performance under a clear moonlit open sky.',
+      poster_url: '/images/jazz_concert.png'
     },
     {
       title: 'Bass Drop Riot',
       type: 'concert',
-      description: 'Heavy dubstep and bass music that will shake the floor.',
-      poster_url: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80'
+      description: 'Heavy dubstep and bass music festival that will shake the stadium floor.',
+      poster_url: '/images/bass_drop_concert.png'
     },
     {
       title: 'The Golden Era Tour',
       type: 'concert',
-      description: 'A tribute to the greatest classic rock anthems of the 70s and 80s.',
-      poster_url: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=800&q=80'
+      description: 'A grand tribute concert celebrating the greatest classic rock anthems of all time.',
+      poster_url: '/images/golden_concert.png'
     },
 
     // COMEDY
     {
       title: 'Laugh Riot: Unfiltered',
       type: 'comedy',
-      description: 'No holds barred standup comedy from the best rising stars.',
-      poster_url: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=800&q=80'
+      description: 'No holds barred raw standup comedy from top national touring comedians.',
+      poster_url: '/images/laugh_comedy.png'
     },
     {
       title: 'The Daily Roast',
       type: 'comedy',
-      description: 'A brutal and hilarious roast battle between top comedians.',
-      poster_url: 'https://images.unsplash.com/photo-1527269534026-c86f54994082?auto=format&fit=crop&w=800&q=80'
+      description: 'A brutal and hilarious roast battle featuring razor-sharp punchlines.',
+      poster_url: '/images/roast_comedy.png'
     },
     {
       title: 'Chuckles & Cheers',
       type: 'comedy',
-      description: 'A family-friendly improv show filled with unexpected turns.',
-      poster_url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80'
+      description: 'A family-friendly improv comedy show filled with spontaneous laughs.',
+      poster_url: '/images/chuckles_comedy.png'
     },
     {
       title: 'Stand-Up Showdown',
       type: 'comedy',
-      description: 'Comedians face off to win the ultimate title in a boxing-ring style stage.',
-      poster_url: 'https://images.unsplash.com/photo-1485579149621-3123dd979885?auto=format&fit=crop&w=800&q=80'
+      description: 'Top comedians face off in a ring to win the ultimate title of comedy champion.',
+      poster_url: '/images/standup_comedy.png'
     },
     {
       title: 'Midnight Giggles',
       type: 'comedy',
-      description: 'A late-night special featuring dark humor and satire.',
-      poster_url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80'
+      description: 'A late-night comedy special featuring dark humor, satire, and unscripted crowd work.',
+      poster_url: '/images/midnight_comedy.png'
     },
 
     // SPORTS
@@ -247,36 +247,36 @@ async function main() {
       title: 'T20 Premier Cricket League Derby',
       type: 'sports',
       subType: 'cricket',
-      description: 'High stakes T20 Cricket derby with boundary sixes and electric crowd.',
-      poster_url: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=800&q=80'
+      description: 'High stakes T20 Cricket derby packed with boundary sixes and electric stadium energy.',
+      poster_url: '/images/t20_sports.png'
     },
     {
       title: 'Champions Trophy Football Final',
       type: 'sports',
       subType: 'football',
-      description: 'The ultimate soccer showdown under stadium floodlights.',
-      poster_url: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80'
+      description: 'The ultimate football championship match under intense stadium floodlights.',
+      poster_url: '/images/champions_sports.png'
     },
     {
       title: 'World Cricket Super Clash',
       type: 'sports',
       subType: 'cricket',
-      description: 'International cricket heavyweights clash on the central pitch.',
-      poster_url: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=800&q=80'
+      description: 'International cricket powerhouses clash live on the central pitch.',
+      poster_url: '/images/world_sports.png'
     },
     {
       title: 'Gridiron Football Championship',
       type: 'sports',
       subType: 'football',
-      description: 'Two massive rival football teams face off in the grand stadium.',
-      poster_url: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?auto=format&fit=crop&w=800&q=80'
+      description: 'Two massive rival football clubs battle for the trophy on the pitch.',
+      poster_url: '/images/gridiron_sports.png'
     },
     {
       title: 'Apex Fight Championship',
       type: 'sports',
       subType: 'boxing',
-      description: 'The premier championship fight event of the year.',
-      poster_url: 'https://images.unsplash.com/photo-1517649763962-0c623266010b?auto=format&fit=crop&w=800&q=80'
+      description: 'The premier MMA boxing ring championship fight event of the year.',
+      poster_url: '/images/apex_sports.png'
     }
   ];
 
@@ -314,30 +314,30 @@ async function main() {
         data: { event_id: event.id, venue_id: chosenVenue.id, date: showDate, time: randomTime }
       });
 
-      // Price mapping based on venue & categories
+      // Price mapping in Indian Rupees (₹)
       const pricingData = [];
       if (ev.type === 'movie') {
         pricingData.push(
-          { show_id: show.id, category_id: reclinerCat.id, price: 32.00 },
-          { show_id: show.id, category_id: premiumCat.id, price: 22.00 },
-          { show_id: show.id, category_id: standardCat.id, price: 15.00 }
+          { show_id: show.id, category_id: reclinerCat.id, price: 450.00 },
+          { show_id: show.id, category_id: premiumCat.id, price: 300.00 },
+          { show_id: show.id, category_id: standardCat.id, price: 200.00 }
         );
       } else if (ev.type === 'concert') {
         pricingData.push(
-          { show_id: show.id, category_id: vipPitCat.id, price: 299.00 },
-          { show_id: show.id, category_id: goldenCircleCat.id, price: 175.00 },
-          { show_id: show.id, category_id: lowerTierCat.id, price: 110.00 },
-          { show_id: show.id, category_id: upperDeckCat.id, price: 65.00 }
+          { show_id: show.id, category_id: vipPitCat.id, price: 2500.00 },
+          { show_id: show.id, category_id: goldenCircleCat.id, price: 1800.00 },
+          { show_id: show.id, category_id: lowerTierCat.id, price: 1200.00 },
+          { show_id: show.id, category_id: upperDeckCat.id, price: 650.00 }
         );
       } else if (ev.type === 'comedy') {
         pricingData.push(
-          { show_id: show.id, category_id: generalComedyCat.id, price: 35.00 }
+          { show_id: show.id, category_id: generalComedyCat.id, price: 350.00 }
         );
       } else if (ev.type === 'sports') {
         pricingData.push(
-          { show_id: show.id, category_id: vipPavilionCat.id, price: 150.00 },
-          { show_id: show.id, category_id: lowerTierCat.id, price: 85.00 },
-          { show_id: show.id, category_id: upperDeckCat.id, price: 35.00 }
+          { show_id: show.id, category_id: vipPavilionCat.id, price: 1500.00 },
+          { show_id: show.id, category_id: lowerTierCat.id, price: 850.00 },
+          { show_id: show.id, category_id: upperDeckCat.id, price: 400.00 }
         );
       }
 
@@ -354,7 +354,7 @@ async function main() {
     }
   }
 
-  console.log('Database successfully re-seeded with 20 event-matched high-definition poster images!');
+  console.log('Database successfully seeded with user custom posters, Indian cities, and INR pricing!');
 }
 
 main()

@@ -61,7 +61,7 @@ export default function Events() {
       subtitle: 'Standup & Roasts',
       icon: 'mic',
       color: 'bg-yellow-300 text-on-background border-yellow-600',
-      badge: 'FLAT $35 SEATS'
+      badge: 'FLAT ₹350 SEATS'
     },
     {
       id: 'sports',
@@ -262,17 +262,18 @@ export default function Events() {
                   className="bg-surface border-border-width border-on-background flex flex-col group neo-brutalist-shadow neo-brutalist-hover transition-all relative overflow-hidden cursor-pointer" 
                   onClick={() => setSelectedEvent(event)}
                 >
-                  <div className="relative h-64 border-b-4 border-on-background overflow-hidden">
-                    <div 
-                      className="bg-cover bg-center w-full h-full transition-transform duration-500 scale-100 group-hover:scale-105" 
-                      style={{ backgroundImage: event.poster_url ? `url(${event.poster_url})` : 'none', backgroundColor: event.poster_url ? 'transparent' : '#e2e2e2' }}
-                    >
-                      {!event.poster_url && (
-                        <div className="w-full h-full flex items-center justify-center blueprint-bg">
-                          <span className="font-data-label text-data-label uppercase text-on-surface-variant font-bold">No Poster</span>
-                        </div>
-                      )}
-                    </div>
+                  <div className="relative h-[340px] md:h-[380px] border-b-4 border-on-background overflow-hidden bg-black">
+                    {event.poster_url ? (
+                      <img 
+                        src={event.poster_url} 
+                        alt={event.title}
+                        className="w-full h-full object-cover transition-transform duration-500 scale-100 group-hover:scale-105" 
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center blueprint-bg">
+                        <span className="font-data-label text-data-label uppercase text-on-surface-variant font-bold">No Poster</span>
+                      </div>
+                    )}
                     <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
                       <span className="bg-tertiary-fixed text-on-tertiary-fixed font-data-label text-data-label uppercase px-2 py-1 border-2 border-on-background font-bold">
                         {event.type || 'EVENT'}
