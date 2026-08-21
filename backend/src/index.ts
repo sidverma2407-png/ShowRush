@@ -18,27 +18,39 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 const app = express();
 const httpServer = createServer(app);
 
-// Setup Socket.IO
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:5173'
+];
+
+// Setup Socket.IO with dynamic CORS fallback
 export const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+        callback(null, true);
+      } else {
+        callback(null, true); // Permissive for production deployment
+      }
+    },
     methods: ['GET', 'POST']
   }
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api', adminRoutes); // admin endpoints are defined directly e.g. /venues
-app.use('/api', organiserRoutes); // organiser endpoints e.g. /events
-app.use('/api', customerRoutes); // customer endpoints
+app.use('/api', adminRoutes);
+app.use('/api', organiserRoutes);
+app.use('/api', customerRoutes);
 
 // Basic health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok' });
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
 // Error handling (must be last)
