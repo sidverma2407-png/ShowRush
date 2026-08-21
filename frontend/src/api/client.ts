@@ -1,14 +1,17 @@
-const getApiBase = () => {
-  const envUrl = (import.meta as any).env?.VITE_API_URL;
-  if (envUrl) return envUrl;
+export const getApiBase = () => {
+  let envUrl = (import.meta as any).env?.VITE_API_URL;
+  if (envUrl) {
+    envUrl = envUrl.trim().replace(/\/+$/, '');
+    if (!envUrl.endsWith('/api')) {
+      envUrl = `${envUrl}/api`;
+    }
+    return envUrl;
+  }
   if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    // Relative path fallback for production / reverse proxy
     return '/api';
   }
   return 'http://localhost:3000/api';
 };
-
-const API_BASE = getApiBase();
 
 export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
   const token = localStorage.getItem('token');
@@ -19,7 +22,10 @@ export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
     headers.set('Authorization', `Bearer ${token}`);
   }
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
+  const apiBase = getApiBase();
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+
+  const response = await fetch(`${apiBase}${cleanEndpoint}`, {
     ...options,
     headers
   });
