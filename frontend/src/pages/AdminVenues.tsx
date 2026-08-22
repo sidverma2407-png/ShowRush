@@ -94,100 +94,107 @@ export default function AdminVenues() {
     if (seatsToCreate.length === 0) return alert('No seats defined on the map!');
 
     try {
-      const res = await fetchApi(`/venues/${selectedVenue.id}/seats`, {
+      await fetchApi(`/venues/${selectedVenue.id}/seats`, {
         method: 'POST',
         body: JSON.stringify({ seats: seatsToCreate })
       });
-      alert(`Map saved successfully! Created ${res.data.count} seats.`);
-      setSelectedVenue(null);
+      alert('Venue seat map updated successfully!');
+      loadVenues();
     } catch (err: any) {
-      alert(err.message);
+      alert(err.message || 'Failed to save venue map');
     }
   };
 
   const getCategoryColor = (catId: string) => {
-    if (catId === 'empty') return 'bg-background';
-    // Generate some consistent color based on ID or just use cycle
-    const colors = ['bg-tertiary-fixed', 'bg-inverse-primary', 'bg-secondary-container', 'bg-primary-container'];
-    const idx = categories.findIndex(c => c.id === catId) % colors.length;
-    return colors[idx] || 'bg-on-tertiary';
+    if (catId === 'empty') return 'bg-surface-lowest text-on-surface opacity-30';
+    const cat = categories.find(c => c.id === catId);
+    if (!cat) return 'bg-primary-fixed text-on-background font-bold';
+    const name = cat.name.toLowerCase();
+    if (name.includes('vip') || name.includes('recliner')) return 'bg-amber-300 text-amber-950 font-black';
+    if (name.includes('premium') || name.includes('club')) return 'bg-cyan-300 text-cyan-950 font-black';
+    return 'bg-slate-300 text-slate-900 font-bold';
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="bg-primary-container text-on-background border-4 border-on-background neo-brutalist-shadow px-12 py-8">
-        <p className="font-display-xl text-4xl uppercase tracking-tighter">Loading Builder...</p>
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="bg-primary-container text-on-background border-4 border-on-background shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] px-8 py-6">
+        <p className="font-display-xl text-2xl sm:text-4xl uppercase tracking-tighter">Loading Builder...</p>
       </div>
     </div>
   );
 
   return (
-    <div className="w-full">
-      <section className="bg-on-background py-8 px-margin-mobile md:px-margin-desktop border-b-4 border-on-background">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+    <div className="w-full bg-background min-h-screen pb-12">
+      {/* Header */}
+      <section className="bg-on-background py-8 px-4 md:px-margin-desktop border-b-2 sm:border-b-4 border-on-background">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
           <div>
-             <h1 className="font-display-xl text-display-xl text-primary-fixed uppercase leading-none break-words">
-              VENUE<br />BUILDER
-             </h1>
+            <h1 className="font-display-xl text-3xl sm:text-5xl md:text-6xl text-on-primary uppercase leading-none break-words font-black">
+              VENUE BUILDER
+            </h1>
           </div>
-          <div className="bg-surface text-on-surface border-2 border-on-background px-4 py-2 font-data-label text-data-label uppercase">
-             ADMIN PRIVILEGES ACTIVE
+          <div className="bg-tertiary-fixed text-on-tertiary-fixed border-2 border-on-background px-3 py-1 font-mono text-xs uppercase font-bold">
+            GRID BUILDER CONSOLE
           </div>
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-12 flex flex-col xl:flex-row gap-gutter">
-        <div className="w-full xl:w-1/3 flex flex-col gap-8">
-          
-          <div className="bg-surface border-border-width border-on-background p-6 neo-brutalist-shadow">
-            <h2 className="font-headline-lg-mobile text-xl uppercase mb-6 bg-on-background text-on-primary px-2 py-1 inline-block">New Venue</h2>
-            <form onSubmit={handleCreateVenue} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <label className="font-data-label text-data-label uppercase">Venue Name</label>
+      {/* Main Container */}
+      <section className="max-w-7xl mx-auto px-4 md:px-margin-desktop py-6 sm:py-8 flex flex-col xl:flex-row gap-6">
+        
+        {/* Left Column: Form & List */}
+        <div className="w-full xl:w-1/3 flex flex-col gap-6">
+          {/* Create Venue Form */}
+          <div className="bg-surface border-2 sm:border-4 border-on-background p-4 sm:p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <h3 className="font-headline-lg text-lg uppercase mb-4 border-b-2 border-on-background pb-2 font-black">Add New Venue</h3>
+            <form onSubmit={handleCreateVenue} className="flex flex-col gap-3">
+              <div>
+                <label className="font-data-label text-xs uppercase block mb-1 font-bold">Venue Name</label>
                 <input 
                   type="text" 
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  className="w-full bg-surface-container border-2 border-on-background p-3 font-data-label text-data-label focus:outline-none focus:border-primary-fixed transition-colors"
-                  placeholder="E.G. THE FORUM"
-                  required 
+                  value={name} 
+                  onChange={e => setName(e.target.value)} 
+                  placeholder="E.G. INOX METROPOLIS"
+                  className="w-full bg-surface-lowest border-2 border-on-background p-2.5 font-data-label text-xs font-bold focus:outline-none min-h-[44px]"
+                  required
                 />
               </div>
-              <div className="flex flex-col gap-2">
-                <label className="font-data-label text-data-label uppercase">Address</label>
+              <div>
+                <label className="font-data-label text-xs uppercase block mb-1 font-bold">Address / Location</label>
                 <input 
                   type="text" 
-                  value={address}
-                  onChange={e => setAddress(e.target.value)}
-                  className="w-full bg-surface-container border-2 border-on-background p-3 font-data-label text-data-label focus:outline-none focus:border-primary-fixed transition-colors"
-                  placeholder="E.G. 123 MAIN ST"
-                  required 
+                  value={address} 
+                  onChange={e => setAddress(e.target.value)} 
+                  placeholder="E.G. SECTOR 18, NOIDA"
+                  className="w-full bg-surface-lowest border-2 border-on-background p-2.5 font-data-label text-xs font-bold focus:outline-none min-h-[44px]"
+                  required
                 />
               </div>
-              <button type="submit" className="w-full bg-primary-fixed text-on-background border-2 border-on-background py-3 font-headline-lg-mobile text-sm uppercase mt-4 hover:bg-on-background hover:text-primary-fixed transition-colors">
-                CREATE VENUE
+              <button 
+                type="submit" 
+                className="bg-primary-fixed text-on-primary-fixed border-2 border-on-background p-3 font-headline-lg text-xs uppercase font-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:bg-on-background hover:text-primary-fixed transition-colors mt-2 min-h-[44px]"
+              >
+                Create Venue Entry
               </button>
             </form>
           </div>
 
-          <div className="bg-surface border-border-width border-on-background flex flex-col neo-brutalist-shadow h-[400px]">
-            <div className="bg-surface-variant border-b-4 border-on-background p-4 flex justify-between items-center">
-               <h3 className="font-data-label text-data-label uppercase font-black">Existing Venues</h3>
-               <span className="font-data-label text-data-label bg-on-background text-on-primary px-2">{venues.length}</span>
-            </div>
-            <div className="flex-grow overflow-y-auto p-4 flex flex-col gap-4">
+          {/* Venues List */}
+          <div className="bg-surface border-2 sm:border-4 border-on-background p-4 sm:p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <h3 className="font-headline-lg text-lg uppercase mb-4 border-b-2 border-on-background pb-2 font-black">Existing Venues ({venues.length})</h3>
+            <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto">
                {venues.map(v => (
                  <div 
                    key={v.id} 
                    onClick={() => setSelectedVenue(v)}
-                   className={`border-2 border-on-background p-4 cursor-pointer hover:bg-primary-container transition-colors group ${selectedVenue?.id === v.id ? 'bg-primary-container' : ''}`}
+                   className={`border-2 border-on-background p-3 cursor-pointer hover:bg-primary-container transition-colors group ${selectedVenue?.id === v.id ? 'bg-primary-container' : ''}`}
                  >
-                    <h4 className="font-headline-lg-mobile text-lg uppercase mb-1">{v.name}</h4>
-                    <p className="font-data-label text-xs uppercase text-on-surface-variant group-hover:text-on-background transition-colors">{v.address}</p>
+                    <h4 className="font-headline-lg text-sm sm:text-base uppercase mb-1 font-black">{v.name}</h4>
+                    <p className="font-data-label text-xs uppercase text-on-surface-variant group-hover:text-on-background font-bold">{v.address}</p>
                  </div>
                ))}
                {venues.length === 0 && (
-                 <div className="text-center p-4 font-data-label text-data-label uppercase opacity-50">
+                 <div className="text-center p-4 font-data-label text-xs uppercase opacity-60">
                    No venues exist
                  </div>
                )}
@@ -195,57 +202,61 @@ export default function AdminVenues() {
           </div>
         </div>
 
-        <div className="w-full xl:w-2/3 bg-surface border-border-width border-on-background flex flex-col neo-brutalist-shadow">
-           <div className="bg-surface-variant border-b-4 border-on-background p-4 flex justify-between items-center">
-              <h3 className="font-data-label text-data-label uppercase font-black">Seat Editor {selectedVenue ? `- ${selectedVenue.name}` : ''}</h3>
+        {/* Right Column: Interactive Seat Grid Matrix */}
+        <div className="w-full xl:w-2/3 bg-surface border-2 sm:border-4 border-on-background flex flex-col shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] min-w-0">
+           <div className="bg-surface-variant border-b-2 sm:border-b-4 border-on-background p-3 sm:p-4 flex flex-wrap gap-2 justify-between items-center">
+              <h3 className="font-data-label text-xs sm:text-sm uppercase font-black">Seat Matrix {selectedVenue ? `- ${selectedVenue.name}` : ''}</h3>
               <div className="flex gap-2">
                 <button onClick={() => {
                   setGrid(grid.map(row => row.map(() => ({category_id: 'empty'}))));
-                }} className="bg-surface text-on-surface border-2 border-on-background px-3 py-1 font-data-label text-xs uppercase hover:bg-error hover:text-on-error transition-colors">Clear</button>
-                <button onClick={handleSaveMap} disabled={!selectedVenue} className="bg-on-background text-on-primary border-2 border-on-background px-3 py-1 font-data-label text-xs uppercase disabled:opacity-50">Save Map</button>
+                }} className="bg-surface text-on-surface border-2 border-on-background px-3 py-1 font-data-label text-xs uppercase font-bold hover:bg-error hover:text-on-error transition-colors min-h-[36px]">Clear</button>
+                <button onClick={handleSaveMap} disabled={!selectedVenue} className="bg-on-background text-on-primary border-2 border-on-background px-3 py-1 font-data-label text-xs uppercase font-black disabled:opacity-50 min-h-[36px]">Save Map</button>
               </div>
            </div>
 
-           <div className="flex-grow p-8 flex flex-col relative blueprint-bg min-h-[500px]">
+           <div className="flex-grow p-4 sm:p-6 flex flex-col relative blueprint-bg min-h-[450px]">
               
-              <div className="absolute top-4 left-4 bg-surface border-2 border-on-background p-3 flex flex-col gap-3 z-10">
-                 <span className="font-data-label text-xs uppercase font-bold border-b-2 border-on-background pb-1">Categories</span>
+              {/* Category Toolbar */}
+              <div className="mb-4 sm:mb-0 sm:absolute sm:top-4 sm:left-4 bg-surface border-2 border-on-background p-3 flex flex-wrap sm:flex-col gap-2 z-10 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                 <span className="font-data-label text-xs uppercase font-bold sm:border-b-2 sm:border-on-background sm:pb-1 w-full">Tool:</span>
                  {categories.map(cat => (
                    <button 
                      key={cat.id} 
                      onClick={() => setActiveCategory(cat.id)}
-                     className={`w-full text-left font-data-label text-xs uppercase p-1 border-2 border-on-background hover:-translate-y-1 transition-transform ${activeCategory === cat.id ? 'ring-2 ring-offset-1 ring-on-background' : ''} ${getCategoryColor(cat.id)}`}
-                     title={cat.name}
+                     className={`font-data-label text-[11px] uppercase px-2 py-1 border border-on-background ${activeCategory === cat.id ? 'ring-2 ring-on-background font-black' : ''} ${getCategoryColor(cat.id)}`}
                    >
-                     {cat.name.substring(0, 3)}
+                     {cat.name.substring(0, 4)}
                    </button>
                  ))}
                  <button 
                    onClick={() => setActiveCategory('empty')}
-                   className={`w-full text-left font-data-label text-xs uppercase p-1 border-2 border-on-background bg-background hover:-translate-y-1 transition-transform ${activeCategory === 'empty' ? 'ring-2 ring-offset-1 ring-on-background' : ''}`}
-                   title="Empty Space"
+                   className={`font-data-label text-[11px] uppercase px-2 py-1 border border-on-background bg-background ${activeCategory === 'empty' ? 'ring-2 ring-on-background font-black' : ''}`}
                  >
                    CLR
                  </button>
               </div>
 
-              <div className="absolute top-4 right-4 bg-surface border-2 border-on-background p-3 flex flex-col gap-3 z-10 w-32">
-                 <span className="font-data-label text-xs uppercase font-bold border-b-2 border-on-background pb-1">Dimensions</span>
-                 <div>
-                   <label className="font-data-label text-xs block mb-1">ROWS</label>
-                   <input type="number" value={gridRows} onChange={e => setGridRows(Number(e.target.value))} className="w-full border-2 border-on-background px-2" min={1} max={50} />
+              {/* Dimensions Toolbar */}
+              <div className="mb-4 sm:mb-0 sm:absolute sm:top-4 sm:right-4 bg-surface border-2 border-on-background p-3 flex gap-3 sm:flex-col z-10 w-full sm:w-32 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                 <span className="font-data-label text-xs uppercase font-bold sm:border-b-2 sm:border-on-background sm:pb-1 w-full">Grid Size</span>
+                 <div className="flex items-center gap-1">
+                   <label className="font-data-label text-[10px] font-bold">R:</label>
+                   <input type="number" value={gridRows} onChange={e => setGridRows(Number(e.target.value))} className="w-full border-2 border-on-background px-1.5 py-0.5 text-xs font-mono font-bold" min={1} max={50} />
                  </div>
-                 <div>
-                   <label className="font-data-label text-xs block mb-1">COLUMNS</label>
-                   <input type="number" value={gridCols} onChange={e => setGridCols(Number(e.target.value))} className="w-full border-2 border-on-background px-2" min={1} max={50} />
+                 <div className="flex items-center gap-1">
+                   <label className="font-data-label text-[10px] font-bold">C:</label>
+                   <input type="number" value={gridCols} onChange={e => setGridCols(Number(e.target.value))} className="w-full border-2 border-on-background px-1.5 py-0.5 text-xs font-mono font-bold" min={1} max={50} />
                  </div>
               </div>
 
-              <div className="w-full max-w-2xl mx-auto flex flex-col items-center justify-center flex-grow mt-12 pl-16">
+              {/* Bounded Scrollable Grid Matrix */}
+              <div className="w-full max-w-full mx-auto flex flex-col items-center justify-center flex-grow mt-2 sm:mt-16 overflow-auto border-2 border-dashed border-on-background/30 p-3 bg-surface/50 rounded-lg">
                  {selectedVenue ? (
                    <>
-                     <div className="stage-area w-full max-w-md mb-12 shadow-[8px_8px_0px_0px_rgba(27,27,27,1)]">STAGE</div>
-                     <div className="flex flex-col gap-1 overflow-auto max-h-[50vh] p-4 bg-surface border-4 border-on-background neo-brutalist-shadow">
+                     <div className="w-full max-w-md bg-on-background text-yellow-300 py-1.5 text-center font-mono text-xs font-black uppercase tracking-widest mb-6 border-2 border-on-background shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                       STAGE / SCREEN
+                     </div>
+                     <div className="flex flex-col gap-1 overflow-auto max-h-[60vh] max-w-full p-3 bg-surface border-2 sm:border-4 border-on-background shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                        {grid.map((row, rIdx) => (
                          <div key={rIdx} className="flex gap-1">
                            {row.map((cell, cIdx) => (
@@ -253,9 +264,9 @@ export default function AdminVenues() {
                                key={cIdx}
                                onMouseDown={() => handleCellClick(rIdx, cIdx)}
                                onMouseEnter={(e) => {
-                                 if (e.buttons === 1) handleCellClick(rIdx, cIdx); // drag to paint
+                                 if (e.buttons === 1) handleCellClick(rIdx, cIdx);
                                }}
-                               className={`w-6 h-6 border border-on-background ${getCategoryColor(cell.category_id)}`}
+                               className={`w-6 h-6 sm:w-7 sm:h-7 border border-on-background text-[9px] font-mono font-bold ${getCategoryColor(cell.category_id)} shrink-0`}
                              />
                            ))}
                          </div>
@@ -263,7 +274,7 @@ export default function AdminVenues() {
                      </div>
                    </>
                  ) : (
-                   <div className="text-center font-data-label text-data-label uppercase bg-surface border-2 border-on-background p-4 inline-block">
+                   <div className="text-center font-data-label text-xs uppercase bg-surface border-2 border-on-background p-4 inline-block font-bold">
                       Select a venue from the list to start building its seat map.
                    </div>
                  )}
