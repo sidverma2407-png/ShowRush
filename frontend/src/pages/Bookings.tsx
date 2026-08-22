@@ -14,20 +14,21 @@ export default function Bookings() {
   const downloadTicketPDF = async (booking: any) => {
     setDownloadingId(booking.id);
     try {
-      const ticketElement = document.getElementById(`ticket-${booking.id}`);
-      if (!ticketElement) throw new Error('Ticket element not found in DOM');
+      const ticketElement = document.getElementById(`printable-ticket-${booking.id}`);
+      if (!ticketElement) throw new Error('Printable ticket element not found');
 
       const canvas = await html2canvas(ticketElement, {
-        scale: 2, // High resolution for PDF
+        scale: 2, // Crisp retina scaling
         useCORS: true,
-        backgroundColor: '#f8fafc' // slate-50 as fallback background
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        windowWidth: 1200
       });
       
       const imgData = canvas.toDataURL('image/png');
       
-      // Calculate dimensions in mm (standard for jsPDF)
       const pdf = new jsPDF({
-        orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+        orientation: 'landscape',
         unit: 'px',
         format: [canvas.width, canvas.height]
       });
@@ -274,6 +275,221 @@ export default function Bookings() {
           </div>
         </div>
       )}
+
+      {/* Hidden Printable Ticket Container */}
+      <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+        {bookings.filter(b => b.status === 'confirmed').map(booking => (
+          <div
+            key={`printable-${booking.id}`}
+            id={`printable-ticket-${booking.id}`}
+            style={{
+              width: '900px',
+              backgroundColor: '#ffffff',
+              fontFamily: 'Inter, system-ui, sans-serif',
+              color: '#000000',
+              padding: '24px',
+              boxSizing: 'border-box'
+            }}
+          >
+            <div style={{
+              border: '4px solid #000000',
+              backgroundColor: '#ffffff',
+              boxShadow: '6px 6px 0px #000000'
+            }}>
+              {/* Header Bar */}
+              <div style={{
+                backgroundColor: '#000000',
+                color: '#facc15',
+                padding: '10px 20px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderBottom: '4px solid #000000'
+              }}>
+                <div style={{ fontWeight: '900', fontSize: '18px', letterSpacing: '2px' }}>
+                  ★ SEATZY OFFICIAL PASS ★
+                </div>
+                <div style={{ fontFamily: 'monospace', fontSize: '12px', fontWeight: 'bold', color: '#ffffff' }}>
+                  CONFIRMED BOOKING
+                </div>
+              </div>
+
+              {/* Main Body */}
+              <div style={{ display: 'flex', minHeight: '260px' }}>
+                {/* Left Poster Pane */}
+                <div style={{
+                  width: '200px',
+                  padding: '16px',
+                  backgroundColor: '#f1f5f9',
+                  borderRight: '3px dashed #000000',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {booking.show.event.poster_url ? (
+                    <img
+                      src={booking.show.event.poster_url}
+                      alt="poster"
+                      style={{
+                        width: '140px',
+                        height: '180px',
+                        objectFit: 'cover',
+                        border: '3px solid #000000',
+                        boxShadow: '3px 3px 0px #000000',
+                        marginBottom: '12px'
+                      }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: '140px',
+                      height: '180px',
+                      border: '3px solid #000000',
+                      backgroundColor: '#cbd5e1',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '12px',
+                      fontWeight: 'bold',
+                      marginBottom: '12px'
+                    }}>
+                      SEATZY PASS
+                    </div>
+                  )}
+                  <div style={{
+                    backgroundColor: '#000000',
+                    color: '#ffffff',
+                    fontSize: '11px',
+                    fontFamily: 'monospace',
+                    fontWeight: 'bold',
+                    padding: '4px 8px',
+                    textAlign: 'center',
+                    width: '100%',
+                    boxSizing: 'border-box'
+                  }}>
+                    {new Date(booking.show.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    <br />
+                    @ {booking.show.time}
+                  </div>
+                </div>
+
+                {/* Middle Info Pane */}
+                <div style={{
+                  flex: 1,
+                  padding: '20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between'
+                }}>
+                  <div>
+                    <div style={{
+                      fontSize: '24px',
+                      fontWeight: '900',
+                      textTransform: 'uppercase',
+                      lineHeight: '1.3',
+                      marginBottom: '12px',
+                      color: '#000000'
+                    }}>
+                      {booking.show.event.title}
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '16px' }}>
+                      <div style={{ borderTop: '2px solid #000000', paddingTop: '6px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', display: 'block' }}>BOOKING REF</span>
+                        <span style={{ fontFamily: 'monospace', fontSize: '13px', fontWeight: '900' }}>{booking.booking_reference}</span>
+                      </div>
+
+                      <div style={{ borderTop: '2px solid #000000', paddingTop: '6px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', display: 'block' }}>VENUE</span>
+                        <span style={{ fontSize: '12px', fontWeight: '800' }}>{booking.show.venue?.name || 'Partner Venue'}</span>
+                      </div>
+                    </div>
+
+                    <div style={{ borderTop: '2px solid #000000', paddingTop: '8px', marginTop: '12px' }}>
+                      <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>SEATS ALLOCATED</span>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                        {booking.seats?.map((s: any) => (
+                          <span key={s.id} style={{
+                            backgroundColor: '#fef08a',
+                            border: '1.5px solid #000000',
+                            padding: '3px 8px',
+                            fontSize: '12px',
+                            fontWeight: '900',
+                            fontFamily: 'monospace'
+                          }}>
+                            ROW {s.venue_seat.row_label} - SEAT {s.venue_seat.seat_number}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    borderTop: '2px dashed #cbd5e1',
+                    paddingTop: '10px',
+                    marginTop: '12px'
+                  }}>
+                    <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#475569' }}>
+                      PLEASE PRESENT QR AT VENUE ENTRANCE
+                    </span>
+                    <span style={{ fontSize: '11px', fontFamily: 'monospace', fontWeight: 'bold', backgroundColor: '#e2e8f0', padding: '2px 8px', border: '1px solid #94a3b8' }}>
+                      VERIFIED TICKET
+                    </span>
+                  </div>
+                </div>
+
+                {/* Right Stub Pane */}
+                <div style={{
+                  width: '180px',
+                  padding: '16px',
+                  borderLeft: '3px dashed #000000',
+                  backgroundColor: '#fafafa',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center'
+                }}>
+                  {booking.qr_code_url ? (
+                    <img
+                      src={booking.qr_code_url}
+                      alt="QR Code"
+                      style={{
+                        width: '130px',
+                        height: '130px',
+                        border: '3px solid #000000',
+                        backgroundColor: '#ffffff',
+                        marginBottom: '8px'
+                      }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: '130px',
+                      height: '130px',
+                      border: '3px solid #000000',
+                      backgroundColor: '#ffffff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '11px',
+                      fontWeight: 'bold',
+                      marginBottom: '8px'
+                    }}>
+                      VALID QR
+                    </div>
+                  )}
+                  <span style={{ fontFamily: 'monospace', fontSize: '9px', fontWeight: 'bold', color: '#334155' }}>
+                    ENTRY QR CODE
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
