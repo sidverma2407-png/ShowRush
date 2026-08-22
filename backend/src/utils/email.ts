@@ -1,5 +1,7 @@
 import nodemailer from 'nodemailer';
 import QRCode from 'qrcode';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Disposable / Fake Email domains list to block non-genuine emails
 const DISPOSABLE_DOMAINS = new Set([
@@ -29,35 +31,37 @@ export const validateEmailFormat = (email: string): { valid: boolean; reason?: s
   return { valid: true };
 };
 
-// Create Nodemailer Transporter
-const createTransporter = () => {
-  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+// Create Nodemailer Transporter dynamically at runtime
+const getTransporter = () => {
+  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  const port = Number(process.env.SMTP_PORT) || 587;
+
+  if (user && pass) {
     return nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: Number(process.env.SMTP_PORT) === 465,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-      }
+      host,
+      port,
+      secure: port === 465, // true for 465, false for 587
+      auth: { user, pass },
+      tls: { rejectUnauthorized: false }
     });
   }
 
-  // Fallback to Ethereal / JSON transport for local dev
+  // Fallback to Ethereal / JSON transport for local dev if no credentials
   return nodemailer.createTransport({
     host: 'smtp.ethereal.email',
     port: 587,
     auth: {
-      user: process.env.SMTP_USER || 'ethereal.user@ethereal.email',
-      pass: process.env.SMTP_PASS || 'ethereal_pass'
+      user: 'ethereal.user@ethereal.email',
+      pass: 'ethereal_pass'
     }
   });
 };
 
-const transporter = createTransporter();
-
 // Send 6-Digit Email Verification OTP
 export const sendOtpEmail = async (email: string, otp: string, name: string) => {
+  const transporter = getTransporter();
   const mailOptions = {
     from: process.env.EMAIL_FROM || '"Seatzy Verification" <verify@seatzy.com>',
     to: email,
@@ -86,15 +90,10 @@ export const sendOtpEmail = async (email: string, otp: string, name: string) => 
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    const previewUrl = nodemailer.getTestMessageUrl(info);
-    console.log(`[VERIFICATION OTP SENT] Email: ${email} | Code: ${otp}`);
-    if (previewUrl) {
-      console.log(`[ETHEREAL MAIL PREVIEW]: ${previewUrl}`);
-    }
-    return { success: true, previewUrl };
-  } catch (err) {
-    console.error('Error sending OTP email:', err);
-    console.log(`[VERIFICATION OTP FALLBACK LOG] Email: ${email} | Code: ${otp}`);
+    console.log(`[REAL GMAIL OTP DELIVERED] To: ${email} | Code: ${otp} | MessageId: ${info.messageId}`);
+    return { success: true, messageId: info.messageId };
+  } catch (err: any) {
+    console.error(`[SMTP GMAIL ERROR sending OTP to ${email}]:`, err.message || err);
     return { success: false, otp };
   }
 };
@@ -107,6 +106,7 @@ export const sendBookingEmail = async (
   customerName?: string,
   seatLabels?: string[]
 ) => {
+  const transporter = getTransporter();
   const qrCodeDataUrl = await QRCode.toDataURL(bookingRef, { margin: 1, scale: 6 });
   const eventTitle = showDetails?.event?.title || 'Seatzy Live Event';
   const showDate = showDetails?.date ? new Date(showDetails.date).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : '';
@@ -123,21 +123,18 @@ export const sendBookingEmail = async (
       <div style="font-family: Arial, sans-serif; background-color: #f4f4f5; padding: 30px; text-align: center;">
         <div style="max-width: 550px; margin: 0 auto; background: #ffffff; border: 4px solid #000000; box-shadow: 8px 8px 0px #000000; text-align: left; overflow: hidden;">
           
-          {/* Header Banner */}
           <div style="background-color: #000000; color: #ffffff; padding: 20px; text-align: center;">
             <h1 style="font-size: 26px; text-transform: uppercase; letter-spacing: 2px; margin: 0; color: #fef08a;">SEATZY OFFICIAL TICKET</h1>
             <p style="font-size: 12px; text-transform: uppercase; color: #a1a1aa; margin-top: 5px;">Present this QR code at entry</p>
           </div>
 
           <div style="padding: 25px;">
-            {/* Event Name */}
             <h2 style="font-size: 24px; font-weight: 900; text-transform: uppercase; margin-top: 0; color: #000000;">${eventTitle}</h2>
             
             <div style="background-color: #fef08a; border: 2px solid #000000; padding: 12px; margin-bottom: 20px; font-weight: bold; font-size: 14px;">
               🗓️ ${showDate} @ ${showTime}
             </div>
 
-            {/* Venue & Seats Info */}
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
               <tr>
                 <td style="padding: 8px 0; border-bottom: 1px solid #e4e4e7; font-size: 13px; color: #666; font-weight: bold; text-transform: uppercase;">Ticket Reference</td>
@@ -157,10 +154,9 @@ export const sendBookingEmail = async (
               </tr>
             </table>
 
-            {/* QR Code Embed */}
             <div style="text-align: center; background: #fafafa; border: 3px solid #000000; box-shadow: 4px 4px 0px #000000; padding: 20px; margin: 20px 0;">
               <img src="cid:qrcode" alt="Entry QR Code" style="width: 180px; height: 180px; display: block; margin: 0 auto; border: 2px solid #000;" />
-              <p style="font-size: 11px; text-transform: uppercase; font-weight: bold; color: #000; margin-top: 10px; tracking-widest;">Scan at gate for entry</p>
+              <p style="font-size: 11px; text-transform: uppercase; font-weight: bold; color: #000; margin-top: 10px;">Scan at gate for entry</p>
             </div>
           </div>
 
@@ -183,19 +179,16 @@ export const sendBookingEmail = async (
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log(`[BOOKING TICKET EMAIL SENT] To: ${email} | Ref: ${bookingRef}`);
-    const previewUrl = nodemailer.getTestMessageUrl(info);
-    if (previewUrl) {
-      console.log(`[ETHEREAL TICKET PREVIEW]: ${previewUrl}`);
-    }
+    console.log(`[REAL GMAIL TICKET DELIVERED] To: ${email} | Ref: ${bookingRef} | MessageId: ${info.messageId}`);
     return qrCodeDataUrl;
-  } catch (err) {
-    console.error('Error sending ticket email:', err);
+  } catch (err: any) {
+    console.error(`[SMTP GMAIL ERROR sending ticket to ${email}]:`, err.message || err);
     return qrCodeDataUrl;
   }
 };
 
 export const sendWaitlistOfferEmail = async (email: string, token: string, showDetails: any) => {
+  const transporter = getTransporter();
   const offerLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/waitlist/offer/${token}`;
 
   const mailOptions = {
@@ -218,8 +211,8 @@ export const sendWaitlistOfferEmail = async (email: string, token: string, showD
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log('[WAITLIST OFFER EMAIL SENT]:', nodemailer.getTestMessageUrl(info));
-  } catch (err) {
-    console.error('Error sending waitlist email', err);
+    console.log(`[REAL GMAIL WAITLIST OFFER SENT] To: ${email} | MessageId: ${info.messageId}`);
+  } catch (err: any) {
+    console.error(`[SMTP GMAIL ERROR sending waitlist offer to ${email}]:`, err.message || err);
   }
 };
