@@ -18,7 +18,6 @@ export default function Register() {
   const [otp, setOtp] = useState('');
   const [pendingEmail, setPendingEmail] = useState('');
   const [devOtp, setDevOtp] = useState<string | null>(null);
-  const [devPreview, setDevPreview] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
 
   const login = useAuthStore(state => state.login);
@@ -42,7 +41,6 @@ export default function Register() {
       if (res.data?.requires_verification) {
         setPendingEmail(res.data.email);
         setDevOtp(res.data.dev_otp || null);
-        setDevPreview(res.data.dev_email_preview || null);
         setStep('otp');
         showSuccess(`A 6-digit verification code has been sent to ${res.data.email}.\n\nPlease check your inbox to activate your account.`, {
           title: 'EMAIL CODE SENT'
@@ -94,7 +92,6 @@ export default function Register() {
         body: JSON.stringify({ email: pendingEmail })
       });
       if (res.data?.dev_otp) setDevOtp(res.data.dev_otp);
-      if (res.data?.dev_email_preview) setDevPreview(res.data.dev_email_preview);
       showSuccess(`A new 6-digit verification code has been sent to ${pendingEmail}.`, { title: 'CODE RESENT' });
     } catch (err: any) {
       showError(err.message || 'Failed to resend code');
