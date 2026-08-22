@@ -91,10 +91,10 @@ export const sendOtpEmail = async (email: string, otp: string, name: string) => 
   try {
     const info = await transporter.sendMail(mailOptions);
     console.log(`[REAL GMAIL OTP DELIVERED] To: ${email} | Code: ${otp} | MessageId: ${info.messageId}`);
-    return { success: true, messageId: info.messageId };
+    return { success: true, messageId: info.messageId, previewUrl: nodemailer.getTestMessageUrl(info) || undefined };
   } catch (err: any) {
     console.error(`[SMTP GMAIL ERROR sending OTP to ${email}]:`, err.message || err);
-    return { success: false, otp };
+    return { success: false, otp, previewUrl: undefined };
   }
 };
 
