@@ -257,6 +257,20 @@ export default function Bookings() {
                   ))}
                 </div>
               </div>
+
+              {selectedBooking.booking_addons?.length > 0 && (
+                <div className="border-t-2 border-on-background/20 pt-2">
+                  <span className="text-on-surface-variant font-bold block mb-1.5 uppercase">FOOD & DRINKS ADD-ONS:</span>
+                  <div className="space-y-1.5">
+                    {selectedBooking.booking_addons.map((ba: any) => (
+                      <div key={ba.id} className="flex justify-between items-center bg-yellow-200 border-2 border-black px-3 py-1.5 text-xs">
+                        <span className="font-black">{ba.addon_item?.name || 'Food Item'} (x{ba.quantity})</span>
+                        <span className="font-mono font-black text-emerald-800">₹{Number(ba.unit_price_at_booking) * ba.quantity}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {selectedBooking.qr_code_url && selectedBooking.status === 'confirmed' && (

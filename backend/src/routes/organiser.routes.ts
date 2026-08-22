@@ -12,9 +12,14 @@ import {
   createVenue,
   getSeatCategories
 } from '../controllers/organiser.controller';
+import {
+  createAddonItem,
+  updateAddonItem,
+  deleteAddonItem
+} from '../controllers/adminAddons.controller';
 
 const router = Router();
-const orgAuth = [authenticate, requireRole(['organiser'])];
+const orgAuth = [authenticate, requireRole(['organiser', 'admin'])];
 
 // Events
 router.get('/organiser/events', ...orgAuth, getMyEvents);
@@ -35,5 +40,10 @@ router.post('/organiser/venues', ...orgAuth, createVenue);
 
 // Seat Categories (shared lookup)
 router.get('/seat-categories', authenticate, getSeatCategories);
+
+// Food & Drinks Add-ons management
+router.post('/addons', ...orgAuth, createAddonItem);
+router.patch('/addons/:id', ...orgAuth, updateAddonItem);
+router.delete('/addons/:id', ...orgAuth, deleteAddonItem);
 
 export default router;

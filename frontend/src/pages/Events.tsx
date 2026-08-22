@@ -12,6 +12,9 @@ export default function Events() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialType = searchParams.get('type') || '';
   const [typeFilter, setTypeFilter] = useState(initialType);
+  const [languageFilter, setLanguageFilter] = useState('All');
+  const [formatFilter, setFormatFilter] = useState('All');
+  const [genreFilter, setGenreFilter] = useState('All');
 
   const [selectedCity, setSelectedCity] = useState<string>(() => {
     return localStorage.getItem('seatzy_selected_city') || 'All Cities';
@@ -89,7 +92,7 @@ export default function Events() {
               EXPLORE LIVE EVENTS
             </h1>
             <p className="font-body-md text-xs sm:text-sm text-surface-variant max-w-2xl font-bold uppercase">
-              Select any event below to view showtimes (2 to 4 live show slots available per event) and pick your exact seats.
+              Select any event below to view showtimes, trailers, viewer reviews and pick your seats.
             </p>
           </div>
 
@@ -124,6 +127,75 @@ export default function Events() {
               </button>
             );
           })}
+        </div>
+
+        {/* BookMyShow Style Filters: Language, Format, Genre */}
+        <div className="bg-yellow-100 border-3 border-on-background p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-wrap gap-4 items-center">
+          <span className="font-mono font-black text-xs uppercase bg-black text-white px-3 py-1 border border-black">
+            Movie Filters:
+          </span>
+
+          {/* Language Dropdown */}
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-bold uppercase">Language:</span>
+            <select
+              value={languageFilter}
+              onChange={(e) => setLanguageFilter(e.target.value)}
+              className="bg-white border-2 border-black font-mono font-bold text-xs uppercase px-2.5 py-1.5 focus:outline-none cursor-pointer"
+            >
+              <option value="All">All Languages</option>
+              <option value="Hindi">Hindi</option>
+              <option value="English">English</option>
+              <option value="Tamil">Tamil</option>
+              <option value="Telugu">Telugu</option>
+            </select>
+          </div>
+
+          {/* Format Dropdown */}
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-bold uppercase">Format:</span>
+            <select
+              value={formatFilter}
+              onChange={(e) => setFormatFilter(e.target.value)}
+              className="bg-white border-2 border-black font-mono font-bold text-xs uppercase px-2.5 py-1.5 focus:outline-none cursor-pointer"
+            >
+              <option value="All">All Formats</option>
+              <option value="2D">2D</option>
+              <option value="3D">3D</option>
+              <option value="IMAX 3D">IMAX 3D</option>
+              <option value="4DX">4DX</option>
+            </select>
+          </div>
+
+          {/* Genre Dropdown */}
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-bold uppercase">Genre:</span>
+            <select
+              value={genreFilter}
+              onChange={(e) => setGenreFilter(e.target.value)}
+              className="bg-white border-2 border-black font-mono font-bold text-xs uppercase px-2.5 py-1.5 focus:outline-none cursor-pointer"
+            >
+              <option value="All">All Genres</option>
+              <option value="Action">Action</option>
+              <option value="Comedy">Comedy</option>
+              <option value="Sci-Fi">Sci-Fi</option>
+              <option value="Drama">Drama</option>
+              <option value="Romance">Romance</option>
+            </select>
+          </div>
+
+          {(languageFilter !== 'All' || formatFilter !== 'All' || genreFilter !== 'All') && (
+            <button
+              onClick={() => {
+                setLanguageFilter('All');
+                setFormatFilter('All');
+                setGenreFilter('All');
+              }}
+              className="font-mono text-xs font-black text-red-600 underline uppercase hover:text-black ml-auto cursor-pointer"
+            >
+              Reset Movie Filters
+            </button>
+          )}
         </div>
 
         {/* Search & Date Filter Inputs */}
@@ -161,17 +233,20 @@ export default function Events() {
               )}
             </div>
 
-            {(typeFilter || searchQuery || dateFilter) && (
+            {(typeFilter || searchQuery || dateFilter || languageFilter !== 'All' || formatFilter !== 'All' || genreFilter !== 'All') && (
               <button
                 onClick={() => {
                   setTypeFilter('');
                   setSearchQuery('');
                   setDateFilter('');
+                  setLanguageFilter('All');
+                  setFormatFilter('All');
+                  setGenreFilter('All');
                   setSearchParams({});
                 }}
                 className="bg-error text-on-error border-2 border-on-background px-4 py-3 font-headline-lg text-xs uppercase font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-on-background hover:text-error transition-colors min-h-[46px] whitespace-nowrap cursor-pointer"
               >
-                CLEAR FILTERS
+                CLEAR ALL
               </button>
             )}
           </div>
@@ -201,7 +276,23 @@ export default function Events() {
             matchDate = e.shows?.some((s: any) => new Date(s.date).toISOString().split('T')[0] === dateFilter);
           }
 
-          return matchCity && matchSearch && matchType && matchDate;
+          // BookMyShow Filters
+          let matchLang = true;
+          if (languageFilter !== 'All') {
+            matchLang = e.language ? e.language.toLowerCase().includes(languageFilter.toLowerCase()) : false;
+          }
+
+          let matchFmt = true;
+          if (formatFilter !== 'All') {
+            matchFmt = e.format ? e.format.toLowerCase().includes(formatFilter.toLowerCase()) : false;
+          }
+
+          let matchGnr = true;
+          if (genreFilter !== 'All') {
+            matchGnr = e.genre ? e.genre.toLowerCase().includes(genreFilter.toLowerCase()) : false;
+          }
+
+          return matchCity && matchSearch && matchType && matchDate && matchLang && matchFmt && matchGnr;
         });
 
         if (filteredEvents.length === 0) {
@@ -211,13 +302,16 @@ export default function Events() {
                 <span className="material-symbols-outlined text-6xl text-on-surface-variant font-black">event_busy</span>
                 <h3 className="font-headline-lg text-2xl uppercase font-black text-on-background">No Events Match Your Filter</h3>
                 <p className="font-body-md text-sm text-on-surface-variant font-bold max-w-md">
-                  No shows found matching "{searchQuery || typeFilter || 'selected date'}" in {selectedCity}. Try resetting filters or switching your city location.
+                  No shows found matching your selected search criteria in {selectedCity}. Try resetting filters.
                 </p>
                 <button
                   onClick={() => {
                     setTypeFilter('');
                     setSearchQuery('');
                     setDateFilter('');
+                    setLanguageFilter('All');
+                    setFormatFilter('All');
+                    setGenreFilter('All');
                     setSearchParams({});
                   }}
                   className="mt-2 bg-primary-fixed text-on-background border-2 border-on-background px-6 py-3 font-headline-lg text-sm uppercase font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-on-background hover:text-primary-fixed transition-colors min-h-[44px] cursor-pointer"
@@ -238,7 +332,7 @@ export default function Events() {
               return (
                 <article 
                   key={event.id} 
-                  onClick={() => setSelectedEvent(event)}
+                  onClick={() => navigate(`/events/${event.id}`)}
                   className="bg-surface border-4 border-on-background flex flex-col group shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] active:translate-x-[0px] active:translate-y-[0px] transition-all relative overflow-hidden cursor-pointer" 
                 >
                   {/* Poster Aspect Container */}
@@ -260,13 +354,19 @@ export default function Events() {
                       <span className="bg-primary-fixed text-on-background font-mono text-xs uppercase px-2.5 py-1 border-2 border-on-background font-black shadow-sm">
                         {event.type}
                       </span>
-                      {venueObj?.city && (
-                        <span className="bg-surface text-on-background font-mono text-xs uppercase px-2.5 py-1 border-2 border-on-background font-black flex items-center gap-1 shadow-sm">
-                          <span className="material-symbols-outlined text-xs">location_on</span>
-                          {venueObj.city}
+                      {event.certification && (
+                        <span className="bg-red-500 text-white font-mono text-xs uppercase px-2 py-1 border-2 border-on-background font-black shadow-sm">
+                          {event.certification}
                         </span>
                       )}
                     </div>
+
+                    {/* Rating Badge */}
+                    {event.average_rating && (
+                      <div className="absolute top-3 right-3 bg-yellow-400 text-black font-mono text-xs font-black px-2.5 py-1 border-2 border-on-background shadow-sm flex items-center gap-1">
+                        ★ {event.average_rating}
+                      </div>
+                    )}
 
                     {/* Shows Available Badge on Poster */}
                     <div className="absolute bottom-3 right-3 bg-tertiary-fixed text-on-tertiary-fixed font-mono text-xs font-black px-2.5 py-1 border-2 border-on-background shadow-sm uppercase flex items-center gap-1">
@@ -281,6 +381,14 @@ export default function Events() {
                       <h2 className="font-headline-lg text-lg sm:text-xl text-on-background uppercase font-black line-clamp-1 mb-2 group-hover:text-primary transition-colors">
                         {event.title}
                       </h2>
+                      
+                      {/* Language & Format Tags */}
+                      <div className="flex flex-wrap gap-1.5 mb-2 font-mono text-[10px] font-bold uppercase">
+                        {event.language && <span className="bg-slate-100 border border-black px-1.5 py-0.5">{event.language}</span>}
+                        {event.format && <span className="bg-blue-100 border border-black px-1.5 py-0.5">{event.format}</span>}
+                        {event.genre && <span className="bg-emerald-100 border border-black px-1.5 py-0.5">{event.genre}</span>}
+                      </div>
+
                       <p className="font-body-md text-xs text-on-surface-variant line-clamp-2 font-bold leading-relaxed mb-4">
                         {event.description}
                       </p>
@@ -294,8 +402,14 @@ export default function Events() {
                         </span>
                       </div>
 
-                      <button className="bg-on-background text-on-primary font-headline-lg text-xs uppercase font-black border-2 border-on-background px-4 py-2.5 group-hover:bg-primary-fixed group-hover:text-on-background transition-colors min-h-[42px] flex items-center gap-1">
-                        <span>SELECT</span>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/events/${event.id}`);
+                        }}
+                        className="bg-yellow-400 text-black font-headline-lg text-xs uppercase font-black border-2 border-on-background px-4 py-2.5 group-hover:bg-black group-hover:text-yellow-400 transition-colors min-h-[42px] flex items-center gap-1 shadow-neo-sm"
+                      >
+                        <span>BOOK SHOWS</span>
                         <span className="material-symbols-outlined text-sm font-black">arrow_forward</span>
                       </button>
                     </div>

@@ -18,6 +18,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { NeoModal } from './components/NeoModal';
 
+import EventDetail from './pages/EventDetail';
+
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: string[] }) {
   const { user } = useAuthStore();
   
@@ -49,6 +51,7 @@ function App() {
                   <Route path="/" element={<Navigate to="/explore" />} />
                   <Route path="/explore" element={<Explore />} />
                   <Route path="/events" element={<Events />} />
+                  <Route path="/events/:id" element={<EventDetail />} />
                   <Route path="/bookings" element={
                     <ProtectedRoute allowedRoles={['customer']}><Bookings /></ProtectedRoute>
                   } />

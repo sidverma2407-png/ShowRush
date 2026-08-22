@@ -22,7 +22,7 @@ export const getMyEvents = async (req: AuthRequest, res: Response) => {
 };
 
 export const createEvent = async (req: AuthRequest, res: Response) => {
-  const { title, type, description, poster_url } = req.body;
+  const { title, type, description, poster_url, language, format, genre, certification, cast, trailer_url } = req.body;
   if (!title || !type || !description) {
     throw new BadRequestError('Title, type, and description required');
   }
@@ -33,6 +33,12 @@ export const createEvent = async (req: AuthRequest, res: Response) => {
       type: type as EventType,
       description,
       poster_url,
+      language: language || null,
+      format: format || null,
+      genre: genre || null,
+      certification: certification || null,
+      cast: cast || null,
+      trailer_url: trailer_url || null,
       organiser_id: req.user!.id
     }
   });
@@ -42,7 +48,7 @@ export const createEvent = async (req: AuthRequest, res: Response) => {
 
 export const updateEvent = async (req: AuthRequest, res: Response) => {
   const id = req.params.id as string;
-  const { title, type, description, poster_url } = req.body;
+  const { title, type, description, poster_url, language, format, genre, certification, cast, trailer_url } = req.body;
 
   const event = await prisma.event.findUnique({ where: { id } });
   if (!event || event.organiser_id !== req.user!.id) {
@@ -51,7 +57,18 @@ export const updateEvent = async (req: AuthRequest, res: Response) => {
 
   const updated = await prisma.event.update({
     where: { id },
-    data: { title, type: type as EventType, description, poster_url }
+    data: {
+      title,
+      type: type as EventType,
+      description,
+      poster_url,
+      language: language !== undefined ? language : event.language,
+      format: format !== undefined ? format : event.format,
+      genre: genre !== undefined ? genre : event.genre,
+      certification: certification !== undefined ? certification : event.certification,
+      cast: cast !== undefined ? cast : event.cast,
+      trailer_url: trailer_url !== undefined ? trailer_url : event.trailer_url
+    }
   });
 
   res.json({ status: 'success', data: updated });

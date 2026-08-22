@@ -61,6 +61,7 @@ model User {
   seat_holds       SeatStatus[]
   bookings         Booking[]
   waitlist_entries WaitlistEntry[]
+  reviews          Review[]
 
   @@map("users")
 }
@@ -70,11 +71,12 @@ model Venue {
   name       String
   address    String
   city       String   @default("New York")
+  chain      String   @default("Independent")
   created_by String   @db.Uuid
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  creator    User     @relation(fields: [created_by], references: [id])
+  creator    User        @relation(fields: [created_by], references: [id])
   seats      VenueSeat[]
   shows      Show[]
 
@@ -114,17 +116,24 @@ model VenueSeat {
 }
 
 model Event {
-  id           String    @id @default(uuid()) @db.Uuid
-  organiser_id String    @db.Uuid
-  title        String
-  type         EventType
-  description  String
-  poster_url   String?
-  created_at   DateTime  @default(now())
-  updated_at   DateTime  @updatedAt
+  id            String    @id @default(uuid()) @db.Uuid
+  organiser_id  String    @db.Uuid
+  title         String
+  type          EventType
+  description   String
+  poster_url    String?
+  language      String?   // e.g. "Hindi", "English", "Tamil", "Telugu"
+  format        String?   // e.g. "2D", "3D", "IMAX 3D", "4DX"
+  genre         String?   // e.g. "Action, Sci-Fi", "Drama, Romance"
+  certification String?   // e.g. "U", "U/A", "A"
+  cast          String?   // Comma-separated cast names
+  trailer_url   String?   // YouTube video URL or ID
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
 
-  organiser    User      @relation(fields: [organiser_id], references: [id])
-  shows        Show[]
+  organiser     User      @relation(fields: [organiser_id], references: [id])
+  shows         Show[]
+  reviews       Review[]
 
   @@map("events")
 }
@@ -135,6 +144,8 @@ model Show {
   venue_id   String     @db.Uuid
   date       DateTime   @db.Date
   time       String     // e.g. "19:00"
+  format     String?    // e.g. "2D", "3D", "IMAX 3D"
+  language   String?    // e.g. "Hindi", "English"
   status     ShowStatus @default(scheduled)
   created_at DateTime   @default(now())
   updated_at DateTime   @updatedAt
@@ -147,6 +158,51 @@ model Show {
   waitlist_entries WaitlistEntry[]
 
   @@map("shows")
+}
+
+model Review {
+  id          String   @id @default(uuid()) @db.Uuid
+  event_id    String   @db.Uuid
+  customer_id String   @db.Uuid
+  rating      Int      // 1 to 5 stars
+  review_text String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  event    Event @relation(fields: [event_id], references: [id])
+  customer User  @relation(fields: [customer_id], references: [id])
+
+  @@unique([event_id, customer_id])
+  @@map("reviews")
+}
+
+model AddonItem {
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String   // e.g. "Large Caramel Popcorn", "Pepsi 500ml", "Cheese Nachos Combo"
+  category   String   // "food" | "drink" | "combo"
+  price      Decimal  @db.Decimal(10, 2)
+  image_url  String?
+  available  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  booking_addons BookingAddon[]
+
+  @@map("addon_items")
+}
+
+model BookingAddon {
+  id                    String   @id @default(uuid()) @db.Uuid
+  booking_id            String   @db.Uuid
+  addon_item_id         String   @db.Uuid
+  quantity              Int
+  unit_price_at_booking Decimal  @db.Decimal(10, 2)
+  created_at            DateTime @default(now())
+
+  booking    Booking   @relation(fields: [booking_id], references: [id])
+  addon_item AddonItem @relation(fields: [addon_item_id], references: [id])
+
+  @@map("booking_addons")
 }
 
 model ShowCategoryPricing {
@@ -197,10 +253,11 @@ model Booking {
   created_at        DateTime      @default(now())
   updated_at        DateTime      @updatedAt
 
-  customer          User          @relation(fields: [customer_id], references: [id])
-  show              Show          @relation(fields: [show_id], references: [id])
-  seats             BookingSeat[]
-  seat_statuses     SeatStatus[]
+  customer       User           @relation(fields: [customer_id], references: [id])
+  show           Show           @relation(fields: [show_id], references: [id])
+  seats          BookingSeat[]
+  seat_statuses  SeatStatus[]
+  booking_addons BookingAddon[]
 
   @@map("bookings")
 }

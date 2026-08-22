@@ -4,6 +4,7 @@ import { io } from 'socket.io-client';
 import { fetchApi } from '../api/client';
 import { useAuthStore } from '../store/auth';
 import { useModalStore } from '../store/modal';
+import { AddonSelectionModal } from '../components/AddonSelectionModal';
 
 export default function SeatMap() {
   const { showId } = useParams();
@@ -20,6 +21,7 @@ export default function SeatMap() {
   // Customer details for checkout
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
+  const [isAddonModalOpen, setIsAddonModalOpen] = useState(false);
 
   const user = useAuthStore(state => state.user);
   const navigate = useNavigate();
@@ -131,11 +133,17 @@ export default function SeatMap() {
     }
   };
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     const myHolds = seats.filter(s => s.status === 'held' && s.held_by === user?.id);
     if (myHolds.length === 0) return showAlert('No seats held. Please select and hold seats before checkout.', { title: 'HOLD SEATS FIRST', type: 'warning' });
     if (!customerName || !customerPhone) return showAlert('Please enter your full name and phone number to complete booking.', { title: 'DETAILS REQUIRED', type: 'warning' });
     
+    setIsAddonModalOpen(true);
+  };
+
+  const executeFinalBooking = async (selectedAddons: { addon_item_id: string; quantity: number }[]) => {
+    setIsAddonModalOpen(false);
+    const myHolds = seats.filter(s => s.status === 'held' && s.held_by === user?.id);
     setCheckingOut(true);
     try {
       const res = await fetchApi(`/bookings`, {
@@ -144,7 +152,8 @@ export default function SeatMap() {
           show_id: showId, 
           seat_status_ids: myHolds.map(s => s.id),
           customer_name: customerName,
-          customer_phone: customerPhone
+          customer_phone: customerPhone,
+          addons: selectedAddons
         })
       });
       showSuccess(`Booking Confirmed!\n\nReference Code: ${res.data.booking_reference}\n\nYour QR Code ticket has been sent to your email.`, {
@@ -1120,6 +1129,14 @@ export default function SeatMap() {
           )}
         </div>
       </div>
+
+      <AddonSelectionModal
+        isOpen={isAddonModalOpen}
+        onClose={() => setIsAddonModalOpen(false)}
+        seatTotal={subtotal}
+        seatCount={seats.filter(s => s.status === 'held' && s.held_by === user?.id).length}
+        onConfirm={executeFinalBooking}
+      />
     </div>
   );
 }

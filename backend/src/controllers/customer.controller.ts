@@ -6,10 +6,190 @@ import { io } from '../index';
 import { sendBookingEmail, sendWaitlistOfferEmail } from '../utils/email';
 
 export const getEvents = async (req: Request, res: Response) => {
+  const { language, format, genre, city } = req.query;
+
+  const where: any = {};
+  if (language && language !== 'All') {
+    where.language = { contains: String(language), mode: 'insensitive' };
+  }
+  if (format && format !== 'All') {
+    where.format = { contains: String(format), mode: 'insensitive' };
+  }
+  if (genre && genre !== 'All') {
+    where.genre = { contains: String(genre), mode: 'insensitive' };
+  }
+
   const events = await prisma.event.findMany({
-    include: { shows: { include: { venue: true } } }
+    where,
+    include: {
+      shows: {
+        include: { venue: true }
+      },
+      reviews: {
+        select: { rating: true }
+      }
+    },
+    orderBy: { created_at: 'desc' }
   });
-  res.json({ status: 'success', data: events });
+
+  // Calculate aggregate star rating for each event
+  const processed = events.map(evt => {
+    const totalReviews = evt.reviews.length;
+    const avgRating = totalReviews > 0
+      ? (evt.reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1)
+      : null;
+    const { reviews, ...rest } = evt;
+    return { ...rest, average_rating: avgRating ? Number(avgRating) : null, review_count: totalReviews };
+  });
+
+  res.json({ status: 'success', data: processed });
+};
+
+export const getEventDetails = async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const authHeader = req.headers.authorization;
+  let currentUserId: string | null = null;
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    try {
+      const jwt = require('jsonwebtoken');
+      const token = authHeader.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+      currentUserId = decoded.id;
+    } catch (e) {
+      // invalid token, treat as guest
+    }
+  }
+
+  const event = await prisma.event.findUnique({
+    where: { id },
+    include: {
+      shows: {
+        include: {
+          venue: true,
+          pricing: { include: { category: true } }
+        },
+        orderBy: [{ date: 'asc' }, { time: 'asc' }]
+      },
+      reviews: {
+        include: {
+          customer: { select: { id: true, name: true } }
+        },
+        orderBy: { created_at: 'desc' }
+      }
+    }
+  });
+
+  if (!event) throw new NotFoundError('Event not found');
+
+  // Compute aggregate rating
+  const totalReviews = event.reviews.length;
+  const avgRating = totalReviews > 0
+    ? (event.reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1)
+    : null;
+
+  // Check if current logged in customer has a confirmed booking for this event
+  let userHasBooking = false;
+  if (currentUserId) {
+    const bookingCount = await prisma.booking.count({
+      where: {
+        customer_id: currentUserId,
+        show: { event_id: id },
+        status: 'confirmed'
+      }
+    });
+    userHasBooking = bookingCount > 0;
+  }
+
+  res.json({
+    status: 'success',
+    data: {
+      ...event,
+      average_rating: avgRating ? Number(avgRating) : null,
+      review_count: totalReviews,
+      user_has_booking: userHasBooking
+    }
+  });
+};
+
+export const getEventReviews = async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const reviews = await prisma.review.findMany({
+    where: { event_id: id },
+    include: { customer: { select: { id: true, name: true } } },
+    orderBy: { created_at: 'desc' }
+  });
+  res.json({ status: 'success', data: reviews });
+};
+
+export const createEventReview = async (req: AuthRequest, res: Response) => {
+  const id = req.params.id as string;
+  const { rating, review_text } = req.body;
+
+  if (!rating || rating < 1 || rating > 5) {
+    throw new BadRequestError('Rating must be an integer between 1 and 5');
+  }
+  if (!review_text || !review_text.trim()) {
+    throw new BadRequestError('Review text is required');
+  }
+
+  const review = await prisma.review.upsert({
+    where: {
+      event_id_customer_id: {
+        event_id: id,
+        customer_id: req.user!.id
+      }
+    },
+    update: {
+      rating: Number(rating),
+      review_text: review_text.trim(),
+      updated_at: new Date()
+    },
+    create: {
+      event_id: id,
+      customer_id: req.user!.id,
+      rating: Number(rating),
+      review_text: review_text.trim()
+    },
+    include: {
+      customer: { select: { id: true, name: true } }
+    }
+  });
+
+  // Calculate new aggregate average rating
+  const allReviews = await prisma.review.findMany({
+    where: { event_id: id }
+  });
+
+  const totalReviews = allReviews.length;
+  const avgRating = totalReviews > 0
+    ? Number((allReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1))
+    : null;
+
+  // Real-time rating & review update broadcast via Socket.IO
+  io.emit('review_updated', {
+    event_id: id,
+    average_rating: avgRating,
+    review_count: totalReviews,
+    new_review: review
+  });
+
+  res.status(201).json({
+    status: 'success',
+    data: {
+      review,
+      average_rating: avgRating,
+      review_count: totalReviews
+    }
+  });
+};
+
+export const getAddonItems = async (req: Request, res: Response) => {
+  const addons = await prisma.addonItem.findMany({
+    where: { available: true },
+    orderBy: { category: 'asc' }
+  });
+  res.json({ status: 'success', data: addons });
 };
 
 export const getSeatMap = async (req: Request, res: Response) => {
@@ -67,7 +247,7 @@ export const holdSeats = async (req: AuthRequest, res: Response) => {
 };
 
 export const confirmBooking = async (req: AuthRequest, res: Response) => {
-  const { show_id, seat_status_ids, customer_name, customer_phone } = req.body;
+  const { show_id, seat_status_ids, customer_name, customer_phone, addons } = req.body;
   if (!show_id || !Array.isArray(seat_status_ids)) throw new BadRequestError('show_id and seat_status_ids required');
 
   const booking = await prisma.$transaction(async (tx) => {
@@ -109,7 +289,7 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
     const priceMap = new Map();
     showPrices.forEach(sp => priceMap.set(sp.category_id, Number(sp.price)));
 
-    let totalPrice = 0;
+    let seatTotalPrice = 0;
 
     // Fetch the venue_seats to know the category
     const seatIds = seats.map(s => `'${s.venue_seat_id}'`).filter(Boolean).join(',');
@@ -125,9 +305,30 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
 
     for (const seat of seats) {
       const catId = categoryMap.get(seat.venue_seat_id);
-      totalPrice += priceMap.get(catId) || 0;
+      seatTotalPrice += priceMap.get(catId) || 0;
     }
 
+    // Process optional food & drinks add-ons
+    let addonTotalPrice = 0;
+    const validatedAddons: { addon_item_id: string; quantity: number; unit_price: number }[] = [];
+    if (Array.isArray(addons) && addons.length > 0) {
+      for (const item of addons) {
+        if (item.addon_item_id && item.quantity > 0) {
+          const addonDb = await tx.addonItem.findUnique({ where: { id: item.addon_item_id } });
+          if (addonDb && addonDb.available) {
+            const itemPrice = Number(addonDb.price);
+            addonTotalPrice += itemPrice * item.quantity;
+            validatedAddons.push({
+              addon_item_id: addonDb.id,
+              quantity: Number(item.quantity),
+              unit_price: itemPrice
+            });
+          }
+        }
+      }
+    }
+
+    const finalTotalPrice = seatTotalPrice + addonTotalPrice;
     const bookingRef = `QR-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
     let newBooking: any;
     try {
@@ -140,7 +341,7 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
           customer_phone,
           show_id, 
           booking_reference: bookingRef, 
-          total_price: totalPrice 
+          total_price: finalTotalPrice 
         }
       });
     } catch (e) {
@@ -150,7 +351,7 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
           customer_id: req.user!.id, 
           show_id, 
           booking_reference: bookingRef, 
-          total_price: totalPrice 
+          total_price: finalTotalPrice 
         }
       });
     }
@@ -164,6 +365,19 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
         data: { status: 'booked', held_by: null, hold_expires_at: null, booking_id: newBooking.id }
       });
     }
+
+    // Insert itemized food & drinks add-ons snapshot
+    for (const addOn of validatedAddons) {
+      await tx.bookingAddon.create({
+        data: {
+          booking_id: newBooking.id,
+          addon_item_id: addOn.addon_item_id,
+          quantity: addOn.quantity,
+          unit_price_at_booking: addOn.unit_price
+        }
+      });
+    }
+
     return newBooking;
   });
 
@@ -234,7 +448,12 @@ export const releaseHold = async (req: AuthRequest, res: Response) => {
 export const getMyBookings = async (req: AuthRequest, res: Response) => {
   const bookings = await prisma.booking.findMany({
     where: { customer_id: req.user!.id },
-    include: { show: { include: { event: true } }, seats: { include: { venue_seat: true } } }
+    include: {
+      show: { include: { event: true, venue: true } },
+      seats: { include: { venue_seat: { include: { category: true } } } },
+      booking_addons: { include: { addon_item: true } }
+    },
+    orderBy: { created_at: 'desc' }
   });
   res.json({ status: 'success', data: bookings });
 };
