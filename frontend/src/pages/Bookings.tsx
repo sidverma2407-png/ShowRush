@@ -180,43 +180,54 @@ export default function Bookings() {
                 </p>
               </div>
 
-              <div className="bg-surface-variant border-2 border-on-background p-4 flex flex-col gap-4">
+              <div className="bg-surface-variant border-2 border-on-background p-4 flex flex-col gap-3">
                 <div className="flex justify-between border-b-2 border-on-background pb-2">
-                  <span className="font-data-label text-xs uppercase text-on-surface-variant">Order Ref</span>
+                  <span className="font-data-label text-xs uppercase text-on-surface-variant">Ticket ID / Ref</span>
                   <span className="font-body-md font-bold">{selectedBooking.booking_reference}</span>
                 </div>
                 <div className="flex justify-between border-b-2 border-on-background pb-2">
                   <span className="font-data-label text-xs uppercase text-on-surface-variant">Status</span>
-                  <span className={`font-data-label text-xs uppercase font-bold px-2 ${selectedBooking.status === 'cancelled' ? 'bg-error text-on-error' : 'bg-success text-on-success'}`}>
+                  <span className={`font-data-label text-xs uppercase font-bold px-2 py-0.5 border border-on-background ${selectedBooking.status === 'cancelled' ? 'bg-error text-on-error' : 'bg-success text-on-success'}`}>
                     {selectedBooking.status}
                   </span>
                 </div>
                 <div className="flex justify-between border-b-2 border-on-background pb-2">
-                  <span className="font-data-label text-xs uppercase text-on-surface-variant">Seats</span>
-                  <div className="flex gap-1">
+                  <span className="font-data-label text-xs uppercase text-on-surface-variant">Attendee Name</span>
+                  <span className="font-body-md font-bold">{selectedBooking.customer_name || 'Seatzy User'}</span>
+                </div>
+                {selectedBooking.customer_phone && (
+                  <div className="flex justify-between border-b-2 border-on-background pb-2">
+                    <span className="font-data-label text-xs uppercase text-on-surface-variant">Phone Number</span>
+                    <span className="font-body-md font-bold">{selectedBooking.customer_phone}</span>
+                  </div>
+                )}
+                <div className="flex justify-between border-b-2 border-on-background pb-2">
+                  <span className="font-data-label text-xs uppercase text-on-surface-variant">Total Paid</span>
+                  <span className="font-body-md font-bold text-success">₹{Number(selectedBooking.total_price).toLocaleString('en-IN')}</span>
+                </div>
+                <div className="flex justify-between border-b-2 border-on-background pb-2">
+                  <span className="font-data-label text-xs uppercase text-on-surface-variant">Venue & City</span>
+                  <span className="font-body-md font-bold text-right">
+                    {selectedBooking.show.venue?.name}<br/>
+                    <span className="text-xs text-on-surface-variant font-normal">{selectedBooking.show.venue?.address}, {selectedBooking.show.venue?.city}</span>
+                  </span>
+                </div>
+                <div className="flex justify-between border-b-2 border-on-background pb-2">
+                  <span className="font-data-label text-xs uppercase text-on-surface-variant">Seat Breakdown</span>
+                  <div className="flex flex-col items-end gap-1">
                     {selectedBooking.seats.map((s: any) => (
-                      <span key={s.id} className="font-data-label text-xs bg-primary-fixed border border-on-background px-1 font-bold">
-                        {s.venue_seat.row_label}{s.venue_seat.seat_number}
+                      <span key={s.id} className="font-data-label text-xs bg-primary-fixed border border-on-background px-1.5 py-0.5 font-bold">
+                        {s.venue_seat.row_label}{s.venue_seat.seat_number} {s.venue_seat.category?.name ? `(${s.venue_seat.category.name})` : ''}
                       </span>
                     ))}
                   </div>
                 </div>
-                <div className="flex justify-between border-b-2 border-on-background pb-2">
-                  <span className="font-data-label text-xs uppercase text-on-surface-variant">Total Paid</span>
-                  <span className="font-body-md font-bold">₹{selectedBooking.total_price}</span>
-                </div>
-                {selectedBooking.customer_name && (
-                  <div className="flex justify-between border-b-2 border-on-background pb-2">
-                    <span className="font-data-label text-xs uppercase text-on-surface-variant">Booked Under</span>
-                    <span className="font-body-md font-bold">{selectedBooking.customer_name}</span>
-                  </div>
-                )}
               </div>
 
               {selectedBooking.status === 'confirmed' && selectedBooking.qr_code_url && (
-                <div className="flex flex-col items-center justify-center pt-4">
-                  <img src={selectedBooking.qr_code_url} alt="QR Code" className="w-48 aspect-square border-4 border-on-background bg-white mb-2" />
-                  <span className="font-data-label text-xs uppercase text-on-surface-variant tracking-widest">Scan at venue</span>
+                <div className="flex flex-col items-center justify-center pt-2">
+                  <img src={selectedBooking.qr_code_url} alt="QR Code" className="w-48 aspect-square border-4 border-on-background bg-white mb-2 p-1" />
+                  <span className="font-data-label text-xs uppercase text-on-surface-variant tracking-widest font-bold">Scan at gate for entry</span>
                 </div>
               )}
             </div>

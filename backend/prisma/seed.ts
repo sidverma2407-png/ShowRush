@@ -12,7 +12,7 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log('Clearing old data and seeding database with specialized multi-venue layouts & Indian cities...');
+  console.log('Clearing old data and seeding database with realistic August 23, 2026+ events & iconic venues...');
 
   // Clean wipe tables for fresh layout seeding
   await prisma.$executeRawUnsafe(`TRUNCATE TABLE "bookings", "booking_seats", "waitlist_entries", "seat_status", "show_category_pricing", "shows", "events", "venue_seats", "seat_categories", "venues" CASCADE;`);
@@ -22,14 +22,14 @@ async function main() {
 
   const admin = await prisma.user.upsert({
     where: { email: 'admin@seatzy.com' },
-    update: {},
-    create: { name: 'Admin User', email: 'admin@seatzy.com', password_hash, role: 'admin' }
+    update: { is_verified: true },
+    create: { name: 'Admin User', email: 'admin@seatzy.com', password_hash, role: 'admin', is_verified: true }
   });
 
   const organiser = await prisma.user.upsert({
     where: { email: 'organiser@seatzy.com' },
-    update: {},
-    create: { name: 'Organiser User', email: 'organiser@seatzy.com', password_hash, role: 'organiser' }
+    update: { is_verified: true },
+    create: { name: 'Organiser User', email: 'organiser@seatzy.com', password_hash, role: 'organiser', is_verified: true }
   });
 
   // Helper to ensure seat category exists
@@ -52,7 +52,7 @@ async function main() {
   const vipPavilionCat = await getCategory('VIP Pavilion');
   const generalComedyCat = await getCategory('General Admission');
 
-  // --- VENUE 1: Grand Cinema Multiplex (Delhi NCR) ---
+  // --- VENUE 1: Seatzy Grand Cinema (Select CITYWALK, Saket, Delhi NCR) ---
   const cinemaVenue = await prisma.venue.create({
     data: { name: 'Seatzy Grand Cinema', address: 'Select CITYWALK, Saket', city: 'Delhi NCR', created_by: admin.id }
   });
@@ -76,7 +76,7 @@ async function main() {
   }
   await prisma.venueSeat.createMany({ data: cinemaSeats });
 
-  // --- VENUE 2: Jio World Arena (Mumbai) ---
+  // --- VENUE 2: Jio World Arena (Bandra Kurla Complex, Mumbai) ---
   const stadiumVenue = await prisma.venue.create({
     data: { name: 'Jio World Arena', address: 'Bandra Kurla Complex', city: 'Mumbai', created_by: admin.id }
   });
@@ -96,9 +96,9 @@ async function main() {
   });
   await prisma.venueSeat.createMany({ data: stadiumSeats });
 
-  // --- VENUE 3: Seatzy Comedy Club (Bengaluru) ---
+  // --- VENUE 3: The Habitat Comedy Club (Koramangala, Bengaluru) ---
   const comedyVenue = await prisma.venue.create({
-    data: { name: 'Seatzy Comedy Club', address: 'Koramangala 5th Block', city: 'Bengaluru', created_by: admin.id }
+    data: { name: 'The Habitat Comedy Lounge', address: 'Koramangala 5th Block', city: 'Bengaluru', created_by: admin.id }
   });
 
   const comedySeats = [];
@@ -110,7 +110,7 @@ async function main() {
   }
   await prisma.venueSeat.createMany({ data: comedySeats });
 
-  // --- VENUE 4: Noida International Stadium (Noida) ---
+  // --- VENUE 4: Noida International Cricket Stadium (Noida) ---
   const cricketVenue = await prisma.venue.create({
     data: { name: 'Noida International Cricket Stadium', address: 'Sector 21A', city: 'Noida', created_by: admin.id }
   });
@@ -127,9 +127,9 @@ async function main() {
   });
   await prisma.venueSeat.createMany({ data: cricketSeats });
 
-  // --- VENUE 5: Balewadi Football Arena (Pune) ---
+  // --- VENUE 5: Balewadi Sports Complex (Pune) ---
   const footballVenue = await prisma.venue.create({
-    data: { name: 'Balewadi Football Arena', address: 'Shree Shiv Chhatrapati Sports Complex', city: 'Pune', created_by: admin.id }
+    data: { name: 'Balewadi Sports Complex', address: 'Shree Shiv Chhatrapati Sports Complex', city: 'Pune', created_by: admin.id }
   });
 
   const footballSeats = [];
@@ -144,141 +144,144 @@ async function main() {
   });
   await prisma.venueSeat.createMany({ data: footballSeats });
 
-  // --- 20 EVENTS WITH USER CUSTOM GENERATED POSTERS ---
+  // --- REAL-LIFE REALISTIC EVENTS LISTING ---
   const eventData = [
+    // CONCERTS
+    {
+      title: 'Coldplay: Music Of The Spheres World Tour',
+      type: 'concert',
+      description: 'The iconic global rock band returns for a breathtaking live experience featuring light-up wristbands, pyrotechnics, and legendary anthems.',
+      poster_url: '/images/electric_concert.png'
+    },
+    {
+      title: 'A.R. Rahman: Symphony of Hope Live',
+      type: 'concert',
+      description: 'Oscar & Grammy winning maestro A.R. Rahman performs live with a full 60-piece orchestra playing timeless musical compositions.',
+      poster_url: '/images/golden_concert.png'
+    },
+    {
+      title: 'Sunburn Arena EDM Night',
+      type: 'concert',
+      description: 'Asia’s premier EDM festival featuring world-class DJs, massive laser displays, and 360-degree bass-heavy stadium acoustics.',
+      poster_url: '/images/bass_drop_concert.png'
+    },
+    {
+      title: 'Underground Indie Rock Revolution',
+      type: 'concert',
+      description: 'An intimate indie rock night featuring raw electric guitars and top upcoming alternative rock talents.',
+      poster_url: '/images/underground_concert.png'
+    },
+    {
+      title: 'Midnight Jazz & Saxophone Lounge',
+      type: 'concert',
+      description: 'Smooth and sophisticated jazz saxophone solos under a clear moonlit open-air terrace.',
+      poster_url: '/images/jazz_concert.png'
+    },
+
     // MOVIES
     {
-      title: 'Neon Chronicles',
+      title: 'Avatar: The Seed Bearer (IMAX 3D)',
       type: 'movie',
-      description: 'A cyberpunk neo-noir sci-fi film set in a dystopian future where human memories are traded as currency.',
+      description: 'James Cameron returns to Pandora in a mesmerizing IMAX 3D adventure exploring uncharted ocean depths and volcanic biomes.',
       poster_url: '/images/neon_movie.png'
     },
     {
-      title: 'The Last Voyage',
+      title: 'Neon Chronicles 2099',
       type: 'movie',
-      description: 'A sci-fi epic following a lone starship searching for a new habitable world in uncharted galaxy.',
+      description: 'A cyberpunk thriller following a rogue android detective racing against time across a neon-lit dystopian metropolis.',
       poster_url: '/images/lost_voyage_movie.png'
     },
     {
-      title: 'Midnight Paradox',
+      title: 'Oppenheimer: 70mm Special Re-Release',
       type: 'movie',
-      description: 'A gripping mystery thriller that twists the fabric of time and human consciousness.',
+      description: 'Christopher Nolan’s epic historical masterpiece returning to the big screen in full original 70mm film print.',
       poster_url: '/images/midnight_movie.png'
     },
     {
       title: 'Echoes of Eternity',
       type: 'movie',
-      description: 'A sweeping fantasy epic detailing the fall of an ancient magical empire and rising hero.',
+      description: 'A fantasy film detailing the rise of legendary dragons and ancient spellcasters fighting for the golden crown.',
       poster_url: '/images/echoes_movie.png'
     },
     {
-      title: 'Velocity Shift',
+      title: 'Velocity Shift: Formula Night Race',
       type: 'movie',
-      description: 'High octane street racing action across neon-lit city highways and illegal night tracks.',
+      description: 'High-octane racing thriller taking audiences inside the cockpit of 200mph night street circuits.',
       poster_url: '/images/velocity_movie.png'
-    },
-
-    // CONCERTS
-    {
-      title: 'Electric Symphony',
-      type: 'concert',
-      description: 'A massive EDM festival featuring cutting-edge laser shows, heavy drops, and 360-degree arena sound.',
-      poster_url: '/images/electric_concert.png'
-    },
-    {
-      title: 'Echoes of the Underground',
-      type: 'concert',
-      description: 'An intimate indie rock gig showcasing electric guitars and raw upcoming indie talent.',
-      poster_url: '/images/underground_concert.png'
-    },
-    {
-      title: 'Jazz Under the Stars',
-      type: 'concert',
-      description: 'Smooth and elegant saxophone jazz performance under a clear moonlit open sky.',
-      poster_url: '/images/jazz_concert.png'
-    },
-    {
-      title: 'Bass Drop Riot',
-      type: 'concert',
-      description: 'Heavy dubstep and bass music festival that will shake the stadium floor.',
-      poster_url: '/images/bass_drop_concert.png'
-    },
-    {
-      title: 'The Golden Era Tour',
-      type: 'concert',
-      description: 'A grand tribute concert celebrating the greatest classic rock anthems of all time.',
-      poster_url: '/images/golden_concert.png'
     },
 
     // COMEDY
     {
-      title: 'Laugh Riot: Unfiltered',
+      title: 'Zakir Khan: Live & Tathastu Standup',
       type: 'comedy',
-      description: 'No holds barred raw standup comedy from top national touring comedians.',
+      description: 'India’s favorite Sakht Launda brings his hilarious observational comedy, relatable storytelling, and heartfelt punchlines.',
       poster_url: '/images/laugh_comedy.png'
     },
     {
-      title: 'The Daily Roast',
+      title: 'Anubhav Singh Bassi: Bas Kar Bassi',
       type: 'comedy',
-      description: 'A brutal and hilarious roast battle featuring razor-sharp punchlines.',
+      description: 'Razor-sharp college & hostel nostalgia comedy from one of the sharpest storytellers in the comedy circuit.',
       poster_url: '/images/roast_comedy.png'
     },
     {
-      title: 'Chuckles & Cheers',
+      title: 'Improv Comedy Battle Royale',
       type: 'comedy',
-      description: 'A family-friendly improv comedy show filled with spontaneous laughs.',
+      description: 'Spontaneous, unscripted, and wildly hilarious crowd-interactive improvisational comedy show.',
       poster_url: '/images/chuckles_comedy.png'
     },
     {
-      title: 'Stand-Up Showdown',
+      title: 'The Great Indian Roast Special',
       type: 'comedy',
-      description: 'Top comedians face off in a ring to win the ultimate title of comedy champion.',
+      description: 'Top comedians face off with quick-witted roasts, dark humor, and brutal punchlines.',
       poster_url: '/images/standup_comedy.png'
     },
     {
-      title: 'Midnight Giggles',
+      title: 'Midnight Giggles & Unfiltered Satire',
       type: 'comedy',
-      description: 'A late-night comedy special featuring dark humor, satire, and unscripted crowd work.',
+      description: 'Late night adult standup comedy special packed with political satire, dark jokes, and raw crowd work.',
       poster_url: '/images/midnight_comedy.png'
     },
 
     // SPORTS
     {
-      title: 'T20 Premier Cricket League Derby',
+      title: 'India vs Australia T20 International Series',
       type: 'sports',
       subType: 'cricket',
-      description: 'High stakes T20 Cricket derby packed with boundary sixes and electric stadium energy.',
+      description: 'The ultimate cricket showdown! High-voltage T20 action packed with towering sixes and packed stadium roaring fans.',
       poster_url: '/images/t20_sports.png'
     },
     {
-      title: 'Champions Trophy Football Final',
+      title: 'ISL Cup Final: Mumbai City vs Mohun Bagan',
       type: 'sports',
       subType: 'football',
-      description: 'The ultimate football championship match under intense stadium floodlights.',
+      description: 'The pinnacle of Indian football! Two rival heavyweights battle for 90 minutes under stadium floodlights.',
       poster_url: '/images/champions_sports.png'
     },
     {
-      title: 'World Cricket Super Clash',
+      title: 'World Cricket Super Clash 2026',
       type: 'sports',
       subType: 'cricket',
-      description: 'International cricket powerhouses clash live on the central pitch.',
+      description: 'International cricket heavyweights collide live on the central turf pitch in an electric atmosphere.',
       poster_url: '/images/world_sports.png'
     },
     {
-      title: 'Gridiron Football Championship',
-      type: 'sports',
-      subType: 'football',
-      description: 'Two massive rival football clubs battle for the trophy on the pitch.',
-      poster_url: '/images/gridiron_sports.png'
-    },
-    {
-      title: 'Apex Fight Championship',
+      title: 'Apex Championship Fighting League (MMA)',
       type: 'sports',
       subType: 'boxing',
-      description: 'The premier MMA boxing ring championship fight event of the year.',
+      description: 'Fierce mixed martial arts title bout featuring top championship fighters inside the Octagon ring.',
       poster_url: '/images/apex_sports.png'
+    },
+    {
+      title: 'National Gridiron Super Bowl 2026',
+      type: 'sports',
+      subType: 'football',
+      description: 'The annual gridiron football championship with halftime show performances and thrilling touchdowns.',
+      poster_url: '/images/gridiron_sports.png'
     }
   ];
+
+  // Starting anchor date: August 23, 2026
+  const baseDate = new Date(2026, 7, 23); // Aug 23, 2026
 
   for (let i = 0; i < eventData.length; i++) {
     const ev = eventData[i];
@@ -303,12 +306,14 @@ async function main() {
     // Fetch venue seats
     const vSeats = await prisma.venueSeat.findMany({ where: { venue_id: chosenVenue.id } });
 
-    // Create 3 random shows per event
-    for (let s = 1; s <= 3; s++) {
-      const showDate = new Date();
-      showDate.setDate(showDate.getDate() + Math.floor(Math.random() * 60) + 1);
-      const hours = ['18:00', '19:30', '20:00', '21:00', '22:00'];
-      const randomTime = hours[Math.floor(Math.random() * hours.length)];
+    // Generate 3 realistic shows (Tonight Aug 23, Tomorrow Aug 24, and Upcoming Aug 28/29)
+    const showOffsets = [0, 1, 5 + (i % 4)]; // 0 = Aug 23 (Today), 1 = Aug 24, 5+ = Aug 28-31
+    const times = ['18:30', '19:45', '20:30'];
+
+    for (let s = 0; s < 3; s++) {
+      const showDate = new Date(baseDate);
+      showDate.setDate(baseDate.getDate() + showOffsets[s]);
+      const randomTime = times[s];
 
       const show = await prisma.show.create({
         data: { event_id: event.id, venue_id: chosenVenue.id, date: showDate, time: randomTime }
@@ -324,20 +329,20 @@ async function main() {
         );
       } else if (ev.type === 'concert') {
         pricingData.push(
-          { show_id: show.id, category_id: vipPitCat.id, price: 2500.00 },
-          { show_id: show.id, category_id: goldenCircleCat.id, price: 1800.00 },
-          { show_id: show.id, category_id: lowerTierCat.id, price: 1200.00 },
-          { show_id: show.id, category_id: upperDeckCat.id, price: 650.00 }
+          { show_id: show.id, category_id: vipPitCat.id, price: 3500.00 },
+          { show_id: show.id, category_id: goldenCircleCat.id, price: 2200.00 },
+          { show_id: show.id, category_id: lowerTierCat.id, price: 1400.00 },
+          { show_id: show.id, category_id: upperDeckCat.id, price: 800.00 }
         );
       } else if (ev.type === 'comedy') {
         pricingData.push(
-          { show_id: show.id, category_id: generalComedyCat.id, price: 350.00 }
+          { show_id: show.id, category_id: generalComedyCat.id, price: 499.00 }
         );
       } else if (ev.type === 'sports') {
         pricingData.push(
-          { show_id: show.id, category_id: vipPavilionCat.id, price: 1500.00 },
-          { show_id: show.id, category_id: lowerTierCat.id, price: 850.00 },
-          { show_id: show.id, category_id: upperDeckCat.id, price: 400.00 }
+          { show_id: show.id, category_id: vipPavilionCat.id, price: 2500.00 },
+          { show_id: show.id, category_id: lowerTierCat.id, price: 1200.00 },
+          { show_id: show.id, category_id: upperDeckCat.id, price: 500.00 }
         );
       }
 
@@ -354,7 +359,7 @@ async function main() {
     }
   }
 
-  console.log('Database successfully seeded with user custom posters, Indian cities, and INR pricing!');
+  console.log('Database successfully re-seeded with realistic August 23, 2026+ events, iconic venues, and full INR pricing!');
 }
 
 main()

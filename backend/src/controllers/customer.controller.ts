@@ -150,11 +150,28 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
   const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
   const bookingWithSeats = await prisma.booking.findUnique({
     where: { id: booking.id },
-    include: { seats: { include: { venue_seat: true } } }
+    include: { 
+      seats: { 
+        include: { 
+          venue_seat: { 
+            include: { category: true } 
+          } 
+        } 
+      } 
+    }
   });
-  const seatLabels = bookingWithSeats?.seats.map(s => `${s.venue_seat.row_label}${s.venue_seat.seat_number}`) || [];
+  const seatLabels = bookingWithSeats?.seats.map(s => `${s.venue_seat.row_label}${s.venue_seat.seat_number} (${s.venue_seat.category.name})`) || [];
 
-  const qrUrl = await sendBookingEmail(user!.email, booking.booking_reference, showDetails, customer_name || user?.name, seatLabels);
+  const qrUrl = await sendBookingEmail(
+    user!.email, 
+    booking.booking_reference, 
+    showDetails, 
+    customer_name || user?.name, 
+    seatLabels,
+    Number(booking.total_price),
+    customer_phone || 'N/A'
+  );
+
   if (qrUrl) {
     await prisma.booking.update({
       where: { id: booking.id },

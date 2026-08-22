@@ -104,64 +104,131 @@ export const sendBookingEmail = async (
   bookingRef: string,
   showDetails: any,
   customerName?: string,
-  seatLabels?: string[]
+  seatLabels?: string[],
+  totalPrice?: number,
+  customerPhone?: string
 ) => {
   const transporter = getTransporter();
-  const qrCodeDataUrl = await QRCode.toDataURL(bookingRef, { margin: 1, scale: 6 });
+  
+  // Create a unique secure payload inside the QR Code
+  const qrPayload = JSON.stringify({
+    ref: bookingRef,
+    event: showDetails?.event?.title || 'Seatzy Event',
+    attendee: customerName || 'Seatzy Guest',
+    phone: customerPhone || 'N/A',
+    seats: seatLabels || [],
+    amount: totalPrice ? `₹${totalPrice}` : 'Paid',
+    timestamp: new Date().toISOString()
+  });
+
+  const qrCodeDataUrl = await QRCode.toDataURL(qrPayload, { margin: 1, scale: 6 });
+
   const eventTitle = showDetails?.event?.title || 'Seatzy Live Event';
+  const eventType = showDetails?.event?.type || 'event';
   const showDate = showDetails?.date ? new Date(showDetails.date).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : '';
   const showTime = showDetails?.time || '';
   const venueName = showDetails?.venue?.name || 'Main Arena';
-  const venueAddress = showDetails?.venue?.address ? `${showDetails.venue.address}, ${showDetails.venue.city}` : '';
-  const seatsText = seatLabels && seatLabels.length > 0 ? seatLabels.join(', ') : 'Reserved Seating';
+  const venueAddress = showDetails?.venue?.address ? `${showDetails.venue.address}, ${showDetails.venue.city}` : 'Venue Location';
+  const seatsText = seatLabels && seatLabels.length > 0 ? seatLabels.join('<br/>') : 'Reserved Seating';
+  const formattedPrice = totalPrice ? `₹${totalPrice.toLocaleString('en-IN')}` : 'Confirmed';
+  const attendeeName = customerName || 'Seatzy Guest';
+  const attendeePhone = customerPhone || 'N/A';
+
+  // Event specific tailored warm wish
+  let eventWish = "We hope you have an incredible time at the event!";
+  if (eventType === 'movie') {
+    eventWish = "🍿 Grab your popcorn, sit back, and enjoy the cinematic experience on the big screen!";
+  } else if (eventType === 'concert') {
+    eventWish = "🎸 Get ready for an unmissable night of electrifying live music and pure euphoria!";
+  } else if (eventType === 'comedy') {
+    eventWish = "😂 Prepare for non-stop laughter, hilarious stand-up punchlines, and great vibes!";
+  } else if (eventType === 'sports') {
+    eventWish = "⚽ Wear your team colors, cheer loud, and feel the live stadium adrenaline!";
+  }
 
   const mailOptions = {
     from: process.env.EMAIL_FROM || '"Seatzy Tickets" <tickets@seatzy.com>',
     to: email,
-    subject: `🎟️ Your Confirmed Ticket: ${eventTitle} (${bookingRef})`,
+    subject: `🎟️ Ticket Confirmed: ${eventTitle} (${bookingRef})`,
     html: `
-      <div style="font-family: Arial, sans-serif; background-color: #f4f4f5; padding: 30px; text-align: center;">
-        <div style="max-width: 550px; margin: 0 auto; background: #ffffff; border: 4px solid #000000; box-shadow: 8px 8px 0px #000000; text-align: left; overflow: hidden;">
+      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f5; padding: 30px; text-align: center;">
+        <div style="max-width: 580px; margin: 0 auto; background: #ffffff; border: 4px solid #000000; box-shadow: 8px 8px 0px #000000; text-align: left; overflow: hidden;">
           
-          <div style="background-color: #000000; color: #ffffff; padding: 20px; text-align: center;">
-            <h1 style="font-size: 26px; text-transform: uppercase; letter-spacing: 2px; margin: 0; color: #fef08a;">SEATZY OFFICIAL TICKET</h1>
-            <p style="font-size: 12px; text-transform: uppercase; color: #a1a1aa; margin-top: 5px;">Present this QR code at entry</p>
+          {/* Top Banner */}
+          <div style="background-color: #000000; color: #ffffff; padding: 25px 20px; text-align: center;">
+            <h1 style="font-size: 28px; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; margin: 0; color: #fef08a;">SEATZY OFFICIAL TICKET</h1>
+            <p style="font-size: 11px; text-transform: uppercase; color: #a1a1aa; margin-top: 6px; letter-spacing: 1px;">Present this digital ticket at entry gate</p>
           </div>
 
-          <div style="padding: 25px;">
-            <h2 style="font-size: 24px; font-weight: 900; text-transform: uppercase; margin-top: 0; color: #000000;">${eventTitle}</h2>
-            
-            <div style="background-color: #fef08a; border: 2px solid #000000; padding: 12px; margin-bottom: 20px; font-weight: bold; font-size: 14px;">
-              🗓️ ${showDate} @ ${showTime}
+          <div style="padding: 30px;">
+            {/* Thank You Greeting */}
+            <div style="background-color: #fef08a; border: 3px solid #000000; box-shadow: 4px 4px 0px #000000; padding: 18px; margin-bottom: 25px;">
+              <h3 style="font-size: 18px; font-weight: 900; margin: 0 0 8px 0; color: #000000; text-transform: uppercase;">
+                Thank you ${attendeeName} for your booking! 🎉
+              </h3>
+              <p style="font-size: 14px; margin: 0; color: #18181b; font-weight: bold; leading-relaxed;">
+                ${eventWish}
+              </p>
             </div>
 
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr>
-                <td style="padding: 8px 0; border-bottom: 1px solid #e4e4e7; font-size: 13px; color: #666; font-weight: bold; text-transform: uppercase;">Ticket Reference</td>
-                <td style="padding: 8px 0; border-bottom: 1px solid #e4e4e7; font-size: 14px; color: #000; font-weight: bold; text-align: right;">${bookingRef}</td>
+            {/* Event Title */}
+            <h2 style="font-size: 24px; font-weight: 900; text-transform: uppercase; margin-top: 0; margin-bottom: 15px; color: #000000; letter-spacing: -0.5px;">
+              ${eventTitle}
+            </h2>
+
+            {/* Event Time Pill */}
+            <div style="background-color: #e0f2fe; border: 2px solid #000000; padding: 10px 14px; margin-bottom: 25px; font-weight: 900; font-size: 15px; color: #0369a1; text-transform: uppercase; display: inline-block;">
+              🗓️ ${showDate} &nbsp;|&nbsp; ⏰ ${showTime}
+            </div>
+
+            {/* Comprehensive Ticket Details Table */}
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+              <tr style="border-bottom: 2px solid #000000;">
+                <td style="padding: 10px 0; font-size: 12px; color: #52525b; font-weight: 900; text-transform: uppercase;">Unique Ticket ID</td>
+                <td style="padding: 10px 0; font-size: 15px; color: #000000; font-weight: 900; text-align: right; letter-spacing: 1px;">${bookingRef}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e4e4e7;">
+                <td style="padding: 10px 0; font-size: 12px; color: #52525b; font-weight: 900; text-transform: uppercase;">Attendee Name</td>
+                <td style="padding: 10px 0; font-size: 14px; color: #000000; font-weight: bold; text-align: right;">${attendeeName}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e4e4e7;">
+                <td style="padding: 10px 0; font-size: 12px; color: #52525b; font-weight: 900; text-transform: uppercase;">Phone Number</td>
+                <td style="padding: 10px 0; font-size: 14px; color: #000000; font-weight: bold; text-align: right;">${attendeePhone}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e4e4e7;">
+                <td style="padding: 10px 0; font-size: 12px; color: #52525b; font-weight: 900; text-transform: uppercase;">Total Amount Paid</td>
+                <td style="padding: 10px 0; font-size: 16px; color: #15803d; font-weight: 900; text-align: right;">${formattedPrice}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e4e4e7;">
+                <td style="padding: 10px 0; font-size: 12px; color: #52525b; font-weight: 900; text-transform: uppercase; vertical-align: top;">Seat Breakdown</td>
+                <td style="padding: 10px 0; font-size: 13px; color: #000000; font-weight: bold; text-align: right; line-height: 1.5;">${seatsText}</td>
               </tr>
               <tr>
-                <td style="padding: 8px 0; border-bottom: 1px solid #e4e4e7; font-size: 13px; color: #666; font-weight: bold; text-transform: uppercase;">Attendee</td>
-                <td style="padding: 8px 0; border-bottom: 1px solid #e4e4e7; font-size: 14px; color: #000; font-weight: bold; text-align: right;">${customerName || 'Seatzy Guest'}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; border-bottom: 1px solid #e4e4e7; font-size: 13px; color: #666; font-weight: bold; text-transform: uppercase;">Seats Assigned</td>
-                <td style="padding: 8px 0; border-bottom: 1px solid #e4e4e7; font-size: 14px; color: #000; font-weight: bold; text-align: right;">${seatsText}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-size: 13px; color: #666; font-weight: bold; text-transform: uppercase;">Venue Location</td>
-                <td style="padding: 8px 0; font-size: 13px; color: #000; font-weight: bold; text-align: right;">${venueName}<br/><span style="font-weight: normal; color: #666;">${venueAddress}</span></td>
+                <td style="padding: 10px 0; font-size: 12px; color: #52525b; font-weight: 900; text-transform: uppercase; vertical-align: top;">Venue & City</td>
+                <td style="padding: 10px 0; font-size: 13px; color: #000000; font-weight: bold; text-align: right; line-height: 1.4;">
+                  ${venueName}<br/>
+                  <span style="font-weight: normal; color: #52525b;">${venueAddress}</span>
+                </td>
               </tr>
             </table>
 
-            <div style="text-align: center; background: #fafafa; border: 3px solid #000000; box-shadow: 4px 4px 0px #000000; padding: 20px; margin: 20px 0;">
-              <img src="cid:qrcode" alt="Entry QR Code" style="width: 180px; height: 180px; display: block; margin: 0 auto; border: 2px solid #000;" />
-              <p style="font-size: 11px; text-transform: uppercase; font-weight: bold; color: #000; margin-top: 10px;">Scan at gate for entry</p>
+            {/* Unique QR Code Card */}
+            <div style="text-align: center; background-color: #fafafa; border: 4px solid #000000; box-shadow: 6px 6px 0px #000000; padding: 25px; margin: 25px 0;">
+              <img src="cid:qrcode" alt="Unique Verification QR Code" style="width: 200px; height: 200px; display: block; margin: 0 auto; border: 3px solid #000000; background: #ffffff; padding: 5px;" />
+              <p style="font-size: 11px; text-transform: uppercase; font-weight: 900; color: #000000; margin-top: 15px; letter-spacing: 2px;">
+                SECURITY SCAN AT GATE
+              </p>
+              <p style="font-size: 10px; color: #71717a; margin-top: 4px;">
+                Ref: ${bookingRef}
+              </p>
             </div>
           </div>
 
-          <div style="background-color: #f4f4f5; border-top: 2px solid #000000; padding: 15px; text-align: center;">
-            <p style="font-size: 11px; color: #71717a; margin: 0; text-transform: uppercase;">Thank you for booking with Seatzy</p>
+          {/* Footer */}
+          <div style="background-color: #18181b; color: #a1a1aa; border-top: 4px solid #000000; padding: 18px; text-align: center;">
+            <p style="font-size: 11px; margin: 0; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">
+              SEATZY LIVE TICKETING PLATFORM
+            </p>
           </div>
 
         </div>
