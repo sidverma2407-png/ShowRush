@@ -48,6 +48,11 @@ app.use('/api', adminRoutes);
 app.use('/api', organiserRoutes);
 app.use('/api', customerRoutes);
 
+// Root endpoint for Render health check
+app.get('/', (_req, res) => {
+  res.json({ message: 'Seatzy Live Events API Server is Running!', status: 'ok', time: new Date().toISOString() });
+});
+
 // Basic health check
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });

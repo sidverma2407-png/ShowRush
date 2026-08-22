@@ -8,7 +8,7 @@ export const getApiBase = () => {
     return envUrl;
   }
   if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    return '/api';
+    return 'https://seatzy-oqbv.onrender.com/api';
   }
   return 'http://localhost:3000/api';
 };
