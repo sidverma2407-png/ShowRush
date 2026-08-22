@@ -39,7 +39,7 @@ export default function OrganiserDashboard() {
     seats_per_row: 16,
   });
 
-  const INDIAN_CITIES = ['Delhi', 'Noida', 'Mumbai', 'Pune', 'Bengaluru', 'Chennai', 'Vellore', 'Hyderabad', 'Kolkata'];
+  const INDIAN_CITIES = ['Delhi', 'Noida', 'Mumbai', 'Pune', 'Bengaluru', 'Chennai', 'Vellore', 'Hyderabad'];
 
   const fetchData = async () => {
     setLoading(true);

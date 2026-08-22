@@ -14,7 +14,6 @@ export const CITIES = [
   { name: 'Vellore', icon: 'school', tag: 'TAMIL NADU' },
   { name: 'Noida', icon: 'domain', tag: 'UTTAR PRADESH' },
   { name: 'Chennai', icon: 'theater_comedy', tag: 'TAMIL NADU' },
-  { name: 'Kolkata', icon: 'stadium', tag: 'WEST BENGAL' },
   { name: 'Hyderabad', icon: 'sports_cricket', tag: 'TELANGANA' }
 ];
 
