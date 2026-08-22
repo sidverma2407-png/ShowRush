@@ -31,6 +31,10 @@ export const validateEmailFormat = (email: string): { valid: boolean; reason?: s
   return { valid: true };
 };
 
+export const isSmtpConfigured = () => {
+  return Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
+};
+
 // Create Nodemailer Transporter dynamically at runtime
 const getTransporter = () => {
   const host = process.env.SMTP_HOST || 'smtp.gmail.com';
@@ -55,20 +59,21 @@ const getTransporter = () => {
     });
   }
 
-  // Fallback to Ethereal / JSON transport for local dev if no credentials
-  return nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    auth: {
-      user: 'ethereal.user@ethereal.email',
-      pass: 'ethereal_pass'
-    }
-  });
+  return null;
 };
 
 // Send 6-Digit Email Verification OTP
 export const sendOtpEmail = async (email: string, otp: string, name: string) => {
+  if (!isSmtpConfigured()) {
+    console.log(`[SMTP SKIPPED] No SMTP credentials configured. OTP code for ${email} is ${otp}`);
+    return { success: false, otp, reason: 'SMTP not configured' };
+  }
+
   const transporter = getTransporter();
+  if (!transporter) {
+    return { success: false, otp, reason: 'Transporter creation failed' };
+  }
+
   const mailOptions = {
     from: process.env.EMAIL_FROM || '"Seatzy Verification" <verify@seatzy.com>',
     to: email,
@@ -96,12 +101,21 @@ export const sendOtpEmail = async (email: string, otp: string, name: string) => 
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
+    // 3.5s timeout promise so the API response NEVER gets stuck on "Authenticating..."
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('SMTP timeout (3.5s limit reached)')), 3500)
+    );
+
+    const info: any = await Promise.race([
+      transporter.sendMail(mailOptions),
+      timeoutPromise
+    ]);
+
     console.log(`[REAL GMAIL OTP DELIVERED] To: ${email} | Code: ${otp} | MessageId: ${info.messageId}`);
-    return { success: true, messageId: info.messageId, previewUrl: nodemailer.getTestMessageUrl(info) || undefined };
+    return { success: true, messageId: info.messageId, previewUrl: undefined };
   } catch (err: any) {
-    console.error(`[SMTP GMAIL ERROR sending OTP to ${email}]:`, err.message || err);
-    return { success: false, otp, previewUrl: undefined };
+    console.error(`[SMTP ERROR sending OTP to ${email}]:`, err.message || err);
+    return { success: false, otp, reason: err.message };
   }
 };
 
@@ -245,6 +259,10 @@ export const sendBookingEmail = async (
   };
 
   try {
+    if (!transporter) {
+      console.log(`[SMTP SKIPPED] No SMTP credentials. Ticket generated for ${email} Ref: ${bookingRef}`);
+      return qrCodeDataUrl;
+    }
     const info = await transporter.sendMail(mailOptions);
     console.log(`[REAL GMAIL TICKET DELIVERED] To: ${email} | Ref: ${bookingRef} | MessageId: ${info.messageId}`);
     return qrCodeDataUrl;
@@ -256,6 +274,11 @@ export const sendBookingEmail = async (
 
 export const sendWaitlistOfferEmail = async (email: string, token: string, showDetails: any) => {
   const transporter = getTransporter();
+  if (!transporter) {
+    console.log(`[SMTP SKIPPED] No SMTP credentials. Waitlist link for ${email}`);
+    return;
+  }
+
   const offerLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/waitlist/offer/${token}`;
 
   const mailOptions = {

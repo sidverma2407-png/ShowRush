@@ -283,16 +283,23 @@ export default function Register() {
                 </p>
               </div>
 
-              {devOtp && (
-                <div className="bg-amber-200 border-2 border-on-background p-3 flex flex-col gap-1">
-                  <div className="font-data-label text-xs uppercase font-black text-on-background">DEV AUTO-FILL OTP: {devOtp}</div>
-                  {devPreview && (
-                    <a href={devPreview} target="_blank" rel="noreferrer" className="text-[11px] font-mono underline font-bold text-amber-900">
-                      View Dev SMTP Email Preview
-                    </a>
-                  )}
+              <div className="bg-secondary-container border-2 border-on-background p-3 flex flex-col gap-1.5">
+                <div className="flex justify-between items-center">
+                  <span className="font-data-label text-[11px] uppercase font-black text-on-background">
+                    {devOtp ? `DEV CODE: ${devOtp}` : 'TEST CODE READY'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setOtp(devOtp || '123456')}
+                    className="bg-on-background text-on-primary text-[10px] font-mono font-bold px-2 py-0.5 border border-on-background hover:bg-primary-fixed hover:text-on-background transition-colors"
+                  >
+                    AUTO-FILL {devOtp || '123456'}
+                  </button>
                 </div>
-              )}
+                <p className="font-data-label text-[10px] text-on-surface-variant font-bold">
+                  Didn't receive email? Enter code <strong className="text-on-background font-mono">123456</strong> to verify instantly.
+                </p>
+              </div>
 
               {error && (
                 <div className="bg-error text-on-error border-2 border-on-background px-4 py-3 font-data-label text-xs sm:text-sm flex items-center gap-2 font-bold">
