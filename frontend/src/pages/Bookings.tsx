@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { fetchApi } from '../api/client';
+import { useModalStore } from '../store/modal';
 
 export default function Bookings() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
+  const { showConfirm, showSuccess, showError } = useModalStore();
 
   const fetchBookings = () => {
     fetchApi('/bookings')
@@ -20,16 +22,20 @@ export default function Bookings() {
     fetchBookings();
   }, []);
 
-  const handleCancel = async (id: string) => {
-    if (window.confirm('Are you sure you want to cancel this booking?')) {
-      try {
-        await fetchApi(`/bookings/${id}`, { method: 'DELETE' });
-        alert('Booking cancelled successfully.');
-        fetchBookings();
-      } catch (err: any) {
-        alert(err.message);
-      }
-    }
+  const handleCancel = (id: string) => {
+    showConfirm(
+      'Are you sure you want to cancel this booking?\n\nYour seats will be released and offered to the waitlist.',
+      async () => {
+        try {
+          await fetchApi(`/bookings/${id}`, { method: 'DELETE' });
+          showSuccess('Booking cancelled successfully.', { title: 'BOOKING CANCELLED' });
+          fetchBookings();
+        } catch (err: any) {
+          showError(err.message || 'Failed to cancel booking');
+        }
+      },
+      { title: 'CANCEL BOOKING', confirmText: 'YES, CANCEL TICKET', type: 'warning' }
+    );
   };
 
   if (loading) return (

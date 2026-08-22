@@ -16,6 +16,7 @@ import OrganiserDashboard from './pages/OrganiserDashboard';
 // Components
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import { NeoModal } from './components/NeoModal';
 
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: string[] }) {
   const { user } = useAuthStore();
@@ -30,6 +31,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen flex flex-col font-body-md blueprint-bg">
+        <NeoModal />
         <Routes>
           {/* Auth pages — full viewport, no padding, no global nav/footer */}
           <Route path="/login" element={<Login />} />

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { fetchApi } from '../api/client';
 import { useAuthStore } from '../store/auth';
+import { useModalStore } from '../store/modal';
 
 export default function SeatMap() {
   const { showId } = useParams();
@@ -22,6 +23,7 @@ export default function SeatMap() {
 
   const user = useAuthStore(state => state.user);
   const navigate = useNavigate();
+  const { showError, showSuccess, showAlert } = useModalStore();
 
   useEffect(() => {
     fetchApi(`/shows/${showId}/seats`)
@@ -96,7 +98,7 @@ export default function SeatMap() {
         return up ? { ...s, ...up, venue_seat: up.venue_seat || s.venue_seat } : s;
       }));
     } catch (err: any) {
-      alert(err.message);
+      showError(err.message || 'Failed to hold seat');
       fetchApi(`/shows/${showId}/seats`).then(res => setSeats(res.data.seats || []));
       setSelectedSeats([]);
     } finally {
@@ -112,7 +114,7 @@ export default function SeatMap() {
         setSeats(prev => prev.map(s => s.id === hold.id ? { ...s, ...res.data, venue_seat: res.data.venue_seat || s.venue_seat } : s));
       } catch (err: any) {
         console.error(err);
-        alert(err.message || 'Failed to release hold');
+        showError(err.message || 'Failed to release hold');
       }
     }
     setSelectedSeats([]);
@@ -125,14 +127,14 @@ export default function SeatMap() {
       setSelectedSeats(prev => prev.filter(s => s.id !== holdId));
     } catch (err: any) {
       console.error(err);
-      alert(err.message || 'Failed to release hold');
+      showError(err.message || 'Failed to release hold');
     }
   };
 
   const handleCheckout = async () => {
     const myHolds = seats.filter(s => s.status === 'held' && s.held_by === user?.id);
-    if (myHolds.length === 0) return alert('No seats held');
-    if (!customerName || !customerPhone) return alert('Please enter your name and phone number');
+    if (myHolds.length === 0) return showAlert('No seats held. Please select and hold seats before checkout.', { title: 'HOLD SEATS FIRST', type: 'warning' });
+    if (!customerName || !customerPhone) return showAlert('Please enter your full name and phone number to complete booking.', { title: 'DETAILS REQUIRED', type: 'warning' });
     
     setCheckingOut(true);
     try {
@@ -145,10 +147,13 @@ export default function SeatMap() {
           customer_phone: customerPhone
         })
       });
-      alert(`Booking Confirmed! Reference: ${res.data.booking_reference}. Email with QR sent.`);
-      navigate('/bookings');
+      showSuccess(`Booking Confirmed!\n\nReference Code: ${res.data.booking_reference}\n\nYour QR Code ticket has been sent to your email.`, {
+        title: 'TICKET BOOKED!',
+        buttonText: 'VIEW MY TICKETS',
+        onClose: () => navigate('/bookings')
+      });
     } catch (err: any) {
-      alert(err.message);
+      showError(err.message || 'Checkout failed');
     } finally {
       setCheckingOut(false);
     }
@@ -160,9 +165,9 @@ export default function SeatMap() {
         method: 'POST',
         body: JSON.stringify({ category_id: seat.venue_seat.category_id })
       });
-      alert('Joined waitlist for this category!');
+      showSuccess('You have successfully joined the waitlist for this seat category!\n\nIf a ticket becomes available, you will receive an exclusive email link.', { title: 'WAITLIST JOINED' });
     } catch (err: any) {
-      alert(err.message);
+      showError(err.message || 'Failed to join waitlist');
     }
   };
 
