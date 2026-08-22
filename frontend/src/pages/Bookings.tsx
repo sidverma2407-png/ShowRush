@@ -156,6 +156,76 @@ export default function Bookings() {
           </article>
         ))}
       </section>
+
+      {/* Ticket Details Modal */}
+      {selectedBooking && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-background/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-surface border-4 border-on-background shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-w-lg w-full p-6 relative flex flex-col gap-4">
+            <button
+              onClick={() => setSelectedBooking(null)}
+              className="absolute top-4 right-4 bg-error text-on-error border-2 border-on-background w-8 h-8 flex items-center justify-center font-black text-sm hover:scale-105 transition-transform"
+            >
+              ✕
+            </button>
+
+            <div className="border-b-4 border-on-background pb-3">
+              <span className="bg-primary-fixed text-on-background font-mono text-[10px] font-black px-2 py-0.5 border border-on-background uppercase">
+                TICKET BREAKDOWN
+              </span>
+              <h2 className="font-headline-lg text-2xl uppercase font-black mt-2 leading-tight">
+                {selectedBooking.show.event.title}
+              </h2>
+              <p className="font-data-label text-xs uppercase text-on-surface-variant mt-1 font-bold">
+                {new Date(selectedBooking.show.date).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} @ {selectedBooking.show.time}
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 font-mono text-xs">
+              <div className="flex justify-between border-b-2 border-on-background/20 pb-2">
+                <span className="text-on-surface-variant font-bold">BOOKING REF:</span>
+                <span className="font-black text-on-background break-all">{selectedBooking.booking_reference}</span>
+              </div>
+
+              <div className="flex justify-between border-b-2 border-on-background/20 pb-2">
+                <span className="text-on-surface-variant font-bold">VENUE:</span>
+                <span className="font-black text-on-background">{selectedBooking.show.venue?.name || 'Partner Venue'} ({selectedBooking.show.venue?.city || 'Delhi'})</span>
+              </div>
+
+              <div className="flex justify-between border-b-2 border-on-background/20 pb-2">
+                <span className="text-on-surface-variant font-bold">STATUS:</span>
+                <span className={`font-black uppercase px-2 py-0.5 border border-on-background ${selectedBooking.status === 'confirmed' ? 'bg-emerald-300 text-emerald-950' : 'bg-red-300 text-red-950'}`}>
+                  {selectedBooking.status}
+                </span>
+              </div>
+
+              <div>
+                <span className="text-on-surface-variant font-bold block mb-1">RESERVED SEATS ({selectedBooking.seats?.length || 0}):</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedBooking.seats?.map((s: any) => (
+                    <span key={s.id} className="bg-primary-fixed border border-on-background px-2 py-1 font-black text-xs">
+                      Row {s.venue_seat.row_label} - Seat {s.venue_seat.seat_number}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {selectedBooking.qr_code_url && selectedBooking.status === 'confirmed' && (
+              <div className="flex flex-col items-center gap-2 border-t-4 border-on-background pt-4 mt-2">
+                <img src={selectedBooking.qr_code_url} alt="QR Code" className="w-36 h-36 border-4 border-on-background bg-white" />
+                <span className="font-mono text-[10px] uppercase font-bold text-on-surface-variant">PRESENT THIS QR CODE AT GATE ENTRY</span>
+              </div>
+            )}
+
+            <button
+              onClick={() => setSelectedBooking(null)}
+              className="w-full bg-on-background text-on-primary border-2 border-on-background py-3 font-headline-lg text-sm uppercase font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-primary-fixed hover:text-on-background transition-colors mt-2"
+            >
+              CLOSE DETAILS
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
