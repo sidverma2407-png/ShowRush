@@ -171,8 +171,8 @@ export default function Events() {
                   className="bg-surface border-border-width border-on-background flex flex-col group neo-brutalist-shadow neo-brutalist-hover transition-all relative overflow-hidden cursor-pointer" 
                   onClick={() => setSelectedEvent(event)}
                 >
-                  {/* Poster Container - object-contain bg-black to display full poster without cropping */}
-                  <div className="relative w-full aspect-[3/4] border-b-4 border-on-background overflow-hidden bg-black flex items-center justify-center">
+                  {/* Poster Container - 1:1 aspect-square display */}
+                  <div className="relative w-full aspect-square border-b-4 border-on-background overflow-hidden bg-black flex items-center justify-center">
                     {event.poster_url ? (
                       <img 
                         src={event.poster_url} 
