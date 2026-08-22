@@ -154,14 +154,12 @@ export const sendBookingEmail = async (
       <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f5; padding: 30px; text-align: center;">
         <div style="max-width: 580px; margin: 0 auto; background: #ffffff; border: 4px solid #000000; box-shadow: 8px 8px 0px #000000; text-align: left; overflow: hidden;">
           
-          {/* Top Banner */}
           <div style="background-color: #000000; color: #ffffff; padding: 25px 20px; text-align: center;">
             <h1 style="font-size: 28px; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; margin: 0; color: #fef08a;">SEATZY OFFICIAL TICKET</h1>
             <p style="font-size: 11px; text-transform: uppercase; color: #a1a1aa; margin-top: 6px; letter-spacing: 1px;">Present this digital ticket at entry gate</p>
           </div>
 
           <div style="padding: 30px;">
-            {/* Thank You Greeting */}
             <div style="background-color: #fef08a; border: 3px solid #000000; box-shadow: 4px 4px 0px #000000; padding: 18px; margin-bottom: 25px;">
               <h3 style="font-size: 18px; font-weight: 900; margin: 0 0 8px 0; color: #000000; text-transform: uppercase;">
                 Thank you ${attendeeName} for your booking! 🎉
@@ -171,17 +169,14 @@ export const sendBookingEmail = async (
               </p>
             </div>
 
-            {/* Event Title */}
             <h2 style="font-size: 24px; font-weight: 900; text-transform: uppercase; margin-top: 0; margin-bottom: 15px; color: #000000; letter-spacing: -0.5px;">
               ${eventTitle}
             </h2>
 
-            {/* Event Time Pill */}
             <div style="background-color: #e0f2fe; border: 2px solid #000000; padding: 10px 14px; margin-bottom: 25px; font-weight: 900; font-size: 15px; color: #0369a1; text-transform: uppercase; display: inline-block;">
               🗓️ ${showDate} &nbsp;|&nbsp; ⏰ ${showTime}
             </div>
 
-            {/* Comprehensive Ticket Details Table */}
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
               <tr style="border-bottom: 2px solid #000000;">
                 <td style="padding: 10px 0; font-size: 12px; color: #52525b; font-weight: 900; text-transform: uppercase;">Unique Ticket ID</td>
@@ -212,7 +207,6 @@ export const sendBookingEmail = async (
               </tr>
             </table>
 
-            {/* Unique QR Code Card */}
             <div style="text-align: center; background-color: #fafafa; border: 4px solid #000000; box-shadow: 6px 6px 0px #000000; padding: 25px; margin: 25px 0;">
               <img src="cid:qrcode" alt="Unique Verification QR Code" style="width: 200px; height: 200px; display: block; margin: 0 auto; border: 3px solid #000000; background: #ffffff; padding: 5px;" />
               <p style="font-size: 11px; text-transform: uppercase; font-weight: 900; color: #000000; margin-top: 15px; letter-spacing: 2px;">
@@ -224,7 +218,6 @@ export const sendBookingEmail = async (
             </div>
           </div>
 
-          {/* Footer */}
           <div style="background-color: #18181b; color: #a1a1aa; border-top: 4px solid #000000; padding: 18px; text-align: center;">
             <p style="font-size: 11px; margin: 0; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">
               SEATZY LIVE TICKETING PLATFORM
