@@ -142,12 +142,19 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
     return newBooking;
   });
 
-  const showDetails = await prisma.show.findUnique({ where: { id: show_id }, include: { event: true } });
+  const showDetails = await prisma.show.findUnique({ 
+    where: { id: show_id }, 
+    include: { event: true, venue: true } 
+  });
   
-  // For safety, assume req.user!.email isn't passed from middleware, we need to fetch it
   const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
-  
-  const qrUrl = await sendBookingEmail(user!.email, booking.booking_reference, showDetails);
+  const bookingWithSeats = await prisma.booking.findUnique({
+    where: { id: booking.id },
+    include: { seats: { include: { venue_seat: true } } }
+  });
+  const seatLabels = bookingWithSeats?.seats.map(s => `${s.venue_seat.row_label}${s.venue_seat.seat_number}`) || [];
+
+  const qrUrl = await sendBookingEmail(user!.email, booking.booking_reference, showDetails, customer_name || user?.name, seatLabels);
   if (qrUrl) {
     await prisma.booking.update({
       where: { id: booking.id },

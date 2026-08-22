@@ -45,13 +45,16 @@ enum WaitlistStatus {
 }
 
 model User {
-  id            String  @id @default(uuid()) @db.Uuid
-  name          String
-  email         String  @unique
-  password_hash String
-  role          Role
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  id               String    @id @default(uuid()) @db.Uuid
+  name             String
+  email            String    @unique
+  password_hash    String
+  role             Role
+  is_verified      Boolean   @default(false)
+  verification_otp String?
+  otp_expires_at   DateTime?
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
 
   venues_created   Venue[]
   events_organized Event[]
