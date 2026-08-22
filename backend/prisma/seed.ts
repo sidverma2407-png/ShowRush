@@ -12,7 +12,7 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log('Clearing old data and seeding database with realistic August 23, 2026+ events & iconic venues...');
+  console.log('Clearing old data and seeding database with real-world Indian events after Aug 24, 2026...');
 
   // Clean wipe tables for fresh layout seeding
   await prisma.$executeRawUnsafe(`TRUNCATE TABLE "bookings", "booking_seats", "waitlist_entries", "seat_status", "show_category_pricing", "shows", "events", "venue_seats", "seat_categories", "venues" CASCADE;`);
@@ -41,325 +41,355 @@ async function main() {
     return cat;
   }
 
-  // Create Seat Categories
-  const vipPitCat = await getCategory('VIP Pit');
+  // Seat Categories
+  const vipPitCat = await getCategory('VIP Lounge');
   const goldenCircleCat = await getCategory('Golden Circle');
-  const lowerTierCat = await getCategory('Lower Tier');
-  const upperDeckCat = await getCategory('Upper Deck');
-  const reclinerCat = await getCategory('Executive Recliner');
-  const premiumCat = await getCategory('Premium Club');
+  const lowerTierCat = await getCategory('Lower Stand');
+  const upperDeckCat = await getCategory('Upper Pavilion');
+  const reclinerCat = await getCategory('IMAX Recliner');
+  const premiumCat = await getCategory('Executive');
   const standardCat = await getCategory('Standard');
-  const vipPavilionCat = await getCategory('VIP Pavilion');
-  const generalComedyCat = await getCategory('General Admission');
+  const generalCat = await getCategory('General Admission');
 
-  // --- VENUE 1: Seatzy Grand Cinema (Select CITYWALK, Saket, Delhi NCR) ---
-  const cinemaVenue = await prisma.venue.create({
-    data: { name: 'Seatzy Grand Cinema', address: 'Select CITYWALK, Saket', city: 'Delhi NCR', created_by: admin.id }
+  // --- REAL VENUES ---
+  // 1. PVR Director's Cut (Delhi NCR)
+  const pvrDelhi = await prisma.venue.create({
+    data: { name: "PVR Director's Cut, Ambience Mall", address: 'Vasant Kunj', city: 'Delhi NCR', created_by: admin.id }
   });
 
-  const cinemaSeats = [];
-  const cinemaRows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-  for (let r = 0; r < cinemaRows.length; r++) {
-    const rowLabel = cinemaRows[r];
-    let categoryId = standardCat.id;
-    if (r >= 2 && r <= 5) categoryId = premiumCat.id;
-    if (r >= 6) categoryId = reclinerCat.id;
-
-    for (let i = 1; i <= 14; i++) {
-      cinemaSeats.push({
-        venue_id: cinemaVenue.id,
-        row_label: rowLabel,
-        seat_number: i,
-        category_id: categoryId
-      });
-    }
-  }
-  await prisma.venueSeat.createMany({ data: cinemaSeats });
-
-  // --- VENUE 2: Jio World Arena (Bandra Kurla Complex, Mumbai) ---
-  const stadiumVenue = await prisma.venue.create({
-    data: { name: 'Jio World Arena', address: 'Bandra Kurla Complex', city: 'Mumbai', created_by: admin.id }
+  // 2. Jio World Garden (Mumbai)
+  const jioMumbai = await prisma.venue.create({
+    data: { name: 'Jio World Garden, BKC', address: 'Bandra Kurla Complex', city: 'Mumbai', created_by: admin.id }
   });
 
-  const stadiumSeats = [];
-  ['A', 'B'].forEach(row => {
-    for (let i = 1; i <= 12; i++) stadiumSeats.push({ venue_id: stadiumVenue.id, row_label: row, seat_number: i, category_id: vipPitCat.id });
-  });
-  ['C', 'D', 'E'].forEach(row => {
-    for (let i = 1; i <= 14; i++) stadiumSeats.push({ venue_id: stadiumVenue.id, row_label: row, seat_number: i, category_id: goldenCircleCat.id });
-  });
-  ['F', 'G', 'H'].forEach(row => {
-    for (let i = 1; i <= 16; i++) stadiumSeats.push({ venue_id: stadiumVenue.id, row_label: row, seat_number: i, category_id: lowerTierCat.id });
-  });
-  ['I', 'J', 'K'].forEach(row => {
-    for (let i = 1; i <= 16; i++) stadiumSeats.push({ venue_id: stadiumVenue.id, row_label: row, seat_number: i, category_id: upperDeckCat.id });
-  });
-  await prisma.venueSeat.createMany({ data: stadiumSeats });
-
-  // --- VENUE 3: The Habitat Comedy Club (Koramangala, Bengaluru) ---
-  const comedyVenue = await prisma.venue.create({
-    data: { name: 'The Habitat Comedy Lounge', address: 'Koramangala 5th Block', city: 'Bengaluru', created_by: admin.id }
+  // 3. Wankhede Stadium (Mumbai)
+  const wankhedeMumbai = await prisma.venue.create({
+    data: { name: 'Wankhede Cricket Stadium', address: 'Churchgate', city: 'Mumbai', created_by: admin.id }
   });
 
-  const comedySeats = [];
-  const comedyRows = ['A', 'B', 'C', 'D', 'E', 'F'];
-  for (let r = 0; r < comedyRows.length; r++) {
-    for (let i = 1; i <= 12; i++) {
-      comedySeats.push({ venue_id: comedyVenue.id, row_label: comedyRows[r], seat_number: i, category_id: generalComedyCat.id });
-    }
-  }
-  await prisma.venueSeat.createMany({ data: comedySeats });
-
-  // --- VENUE 4: Noida International Cricket Stadium (Noida) ---
-  const cricketVenue = await prisma.venue.create({
+  // 4. Noida International Cricket Stadium (Noida)
+  const noidaStadium = await prisma.venue.create({
     data: { name: 'Noida International Cricket Stadium', address: 'Sector 21A', city: 'Noida', created_by: admin.id }
   });
 
-  const cricketSeats = [];
-  ['A', 'B'].forEach(row => {
-    for (let i = 1; i <= 12; i++) cricketSeats.push({ venue_id: cricketVenue.id, row_label: row, seat_number: i, category_id: vipPavilionCat.id });
-  });
-  ['C', 'D', 'E'].forEach(row => {
-    for (let i = 1; i <= 14; i++) cricketSeats.push({ venue_id: cricketVenue.id, row_label: row, seat_number: i, category_id: lowerTierCat.id });
-  });
-  ['F', 'G', 'H'].forEach(row => {
-    for (let i = 1; i <= 16; i++) cricketSeats.push({ venue_id: cricketVenue.id, row_label: row, seat_number: i, category_id: upperDeckCat.id });
-  });
-  await prisma.venueSeat.createMany({ data: cricketSeats });
-
-  // --- VENUE 5: Balewadi Sports Complex (Pune) ---
-  const footballVenue = await prisma.venue.create({
-    data: { name: 'Balewadi Sports Complex', address: 'Shree Shiv Chhatrapati Sports Complex', city: 'Pune', created_by: admin.id }
+  // 5. The Habitat Comedy Lounge (Bengaluru)
+  const habitatBlr = await prisma.venue.create({
+    data: { name: 'The Habitat Comedy Lounge', address: 'Koramangala 5th Block', city: 'Bengaluru', created_by: admin.id }
   });
 
-  const footballSeats = [];
-  ['A', 'B'].forEach(row => {
-    for (let i = 1; i <= 12; i++) footballSeats.push({ venue_id: footballVenue.id, row_label: row, seat_number: i, category_id: vipPavilionCat.id });
+  // 6. M. Chinnaswamy Stadium (Bengaluru)
+  const chinnaswamyBlr = await prisma.venue.create({
+    data: { name: 'M. Chinnaswamy Stadium', address: 'MG Road', city: 'Bengaluru', created_by: admin.id }
   });
-  ['C', 'D', 'E'].forEach(row => {
-    for (let i = 1; i <= 14; i++) footballSeats.push({ venue_id: footballVenue.id, row_label: row, seat_number: i, category_id: lowerTierCat.id });
-  });
-  ['F', 'G', 'H'].forEach(row => {
-    for (let i = 1; i <= 16; i++) footballSeats.push({ venue_id: footballVenue.id, row_label: row, seat_number: i, category_id: upperDeckCat.id });
-  });
-  await prisma.venueSeat.createMany({ data: footballSeats });
 
-  // --- REAL-LIFE REALISTIC EVENTS LISTING ---
-  const eventData = [
-    // CONCERTS
+  // 7. Balewadi Sports Complex (Pune)
+  const balewadiPune = await prisma.venue.create({
+    data: { name: 'Shree Shiv Chhatrapati Sports Complex', address: 'Balewadi', city: 'Pune', created_by: admin.id }
+  });
+
+  // 8. Gachibowli Arena (Hyderabad)
+  const gachibowliHyd = await prisma.venue.create({
+    data: { name: 'Gachibowli Indoor Arena', address: 'Gachibowli', city: 'Hyderabad', created_by: admin.id }
+  });
+
+  // Create seat layouts for venues
+  const createLayout = async (venueId: string, rows: string[], cols: number, catId: string) => {
+    const seats = [];
+    for (const row of rows) {
+      for (let c = 1; c <= cols; c++) {
+        seats.push({ venue_id: venueId, row_label: row, seat_number: c, category_id: catId });
+      }
+    }
+    await prisma.venueSeat.createMany({ data: seats });
+  };
+
+  await createLayout(pvrDelhi.id, ['A', 'B', 'C', 'D', 'E'], 12, reclinerCat.id);
+  await createLayout(jioMumbai.id, ['A', 'B', 'C', 'D', 'E', 'F'], 16, goldenCircleCat.id);
+  await createLayout(wankhedeMumbai.id, ['A', 'B', 'C', 'D', 'E', 'F', 'G'], 16, lowerTierCat.id);
+  await createLayout(noidaStadium.id, ['A', 'B', 'C', 'D', 'E', 'F'], 16, lowerTierCat.id);
+  await createLayout(habitatBlr.id, ['A', 'B', 'C', 'D'], 10, generalCat.id);
+  await createLayout(chinnaswamyBlr.id, ['A', 'B', 'C', 'D', 'E', 'F'], 16, lowerTierCat.id);
+  await createLayout(balewadiPune.id, ['A', 'B', 'C', 'D', 'E'], 14, upperDeckCat.id);
+  await createLayout(gachibowliHyd.id, ['A', 'B', 'C', 'D', 'E'], 14, vipPitCat.id);
+
+  // --- 20 REAL WORLD EVENTS AFTER AUGUST 24, 2026 ---
+  const eventList = [
+    // 🎵 CONCERTS
     {
       title: 'Coldplay: Music Of The Spheres World Tour',
       type: 'concert',
-      description: 'The iconic global rock band returns for a breathtaking live experience featuring light-up wristbands, pyrotechnics, and legendary anthems.',
-      poster_url: '/event_pics/electric_concert.png'
+      description: 'The global stadium phenomenon featuring LED wristbands, pyrotechnics, and iconic anthems live in Mumbai.',
+      poster_url: '/event_pics/coldplay_tour.png',
+      venue: jioMumbai,
+      dateOffset: 2, // Aug 25
+      time: '19:30',
+      price: 3500.00,
+      cat: goldenCircleCat.id
     },
     {
       title: 'A.R. Rahman: Symphony of Hope Live',
       type: 'concert',
-      description: 'Oscar & Grammy winning maestro A.R. Rahman performs live with a full 60-piece orchestra playing timeless musical compositions.',
-      poster_url: '/event_pics/golden_concert.png'
+      description: 'Oscar & Grammy maestro A.R. Rahman performs live with a full 60-piece symphony orchestra.',
+      poster_url: '/event_pics/ar_rahman.png',
+      venue: jioMumbai,
+      dateOffset: 4, // Aug 27
+      time: '19:00',
+      price: 2800.00,
+      cat: vipPitCat.id
     },
     {
-      title: 'Sunburn Arena EDM Night',
+      title: 'Sunburn EDM Arena Festival',
       type: 'concert',
-      description: 'Asia’s premier EDM festival featuring world-class DJs, massive laser displays, and 360-degree bass-heavy stadium acoustics.',
-      poster_url: '/event_pics/bass_drop_concert.png'
+      description: 'Asia’s largest electronic dance music arena featuring top international DJs and massive laser light shows.',
+      poster_url: '/event_pics/sunburn_arena.png',
+      venue: gachibowliHyd,
+      dateOffset: 6, // Aug 29
+      time: '18:00',
+      price: 2000.00,
+      cat: goldenCircleCat.id
     },
     {
-      title: 'Underground Indie Rock Revolution',
+      title: 'Karan Aujla: It Was All A Dream Tour',
       type: 'concert',
-      description: 'An intimate indie rock night featuring raw electric guitars and top upcoming alternative rock talents.',
-      poster_url: '/event_pics/underground_concert.png'
+      description: 'Punjabi music sensation Karan Aujla live in concert performing his chart-topping hits with live band.',
+      poster_url: '/event_pics/karan_aujla.png',
+      venue: noidaStadium,
+      dateOffset: 8, // Aug 31
+      time: '20:00',
+      price: 2500.00,
+      cat: lowerTierCat.id
     },
     {
-      title: 'Midnight Jazz & Saxophone Lounge',
+      title: 'Diljit Dosanjh: Dil-Luminati India Tour',
       type: 'concert',
-      description: 'Smooth and sophisticated jazz saxophone solos under a clear moonlit open-air terrace.',
-      poster_url: '/event_pics/jazz_concert.png'
+      description: 'Global superstar Diljit Dosanjh brings his explosive Dil-Luminati stadium spectacle live to Bengaluru.',
+      poster_url: '/event_pics/diljit_diluminati.png',
+      venue: chinnaswamyBlr,
+      dateOffset: 10, // Sep 2
+      time: '19:30',
+      price: 3200.00,
+      cat: goldenCircleCat.id
     },
 
-    // MOVIES
+    // 🎬 MOVIES
     {
-      title: 'Avatar: The Seed Bearer (IMAX 3D)',
+      title: 'Stree 2: Sarkate Ka Aatank (IMAX)',
       type: 'movie',
-      description: 'James Cameron returns to Pandora in a mesmerizing IMAX 3D adventure exploring uncharted ocean depths and volcanic biomes.',
-      poster_url: '/event_pics/neon_movie.png'
+      description: 'The legendary horror-comedy blockbuster returns as Chanderi faces the terrifying headless myth Sarkata.',
+      poster_url: '/event_pics/stree_2.png',
+      venue: pvrDelhi,
+      dateOffset: 2, // Aug 25
+      time: '18:30',
+      price: 450.00,
+      cat: reclinerCat.id
     },
     {
-      title: 'Neon Chronicles 2099',
+      title: 'Kalki 2898 AD (IMAX 3D)',
       type: 'movie',
-      description: 'A cyberpunk thriller following a rogue android detective racing against time across a neon-lit dystopian metropolis.',
-      poster_url: '/event_pics/lost_voyage_movie.png'
+      description: 'Prabhas and Amitabh Bachchan star in Nag Ashwin’s epic futuristic mythological sci-fi spectacle.',
+      poster_url: '/event_pics/kalki_2898.png',
+      venue: pvrDelhi,
+      dateOffset: 3, // Aug 26
+      time: '21:00',
+      price: 500.00,
+      cat: reclinerCat.id
     },
     {
-      title: 'Oppenheimer: 70mm Special Re-Release',
+      title: 'Deadpool & Wolverine (IMAX 3D)',
       type: 'movie',
-      description: 'Christopher Nolan’s epic historical masterpiece returning to the big screen in full original 70mm film print.',
-      poster_url: '/event_pics/midnight_movie.png'
+      description: 'Marvel Studios ultimate team-up as the Merc with a Mouth joins forces with Wolverine in full 3D.',
+      poster_url: '/event_pics/deadpool_wolverine.png',
+      venue: pvrDelhi,
+      dateOffset: 5, // Aug 28
+      time: '19:45',
+      price: 480.00,
+      cat: reclinerCat.id
     },
     {
-      title: 'Echoes of Eternity',
+      title: 'Pushpa 2: The Rule (Dolby Atmos)',
       type: 'movie',
-      description: 'A fantasy film detailing the rise of legendary dragons and ancient spellcasters fighting for the golden crown.',
-      poster_url: '/event_pics/echoes_movie.png'
+      description: 'Allu Arjun returns as Pushpa Raj in the grand action finale dominating the red sandalwood empire.',
+      poster_url: '/event_pics/pushpa_2.png',
+      venue: pvrDelhi,
+      dateOffset: 7, // Aug 30
+      time: '20:30',
+      price: 450.00,
+      cat: reclinerCat.id
     },
     {
-      title: 'Velocity Shift: Formula Night Race',
+      title: 'Gladiator II (IMAX 70mm)',
       type: 'movie',
-      description: 'High-octane racing thriller taking audiences inside the cockpit of 200mph night street circuits.',
-      poster_url: '/event_pics/velocity_movie.png'
+      description: 'Ridley Scott returns to the Colosseum in an epic sequel depicting power, revenge, and Roman glory.',
+      poster_url: '/event_pics/gladiator_2.png',
+      venue: pvrDelhi,
+      dateOffset: 9, // Sep 1
+      time: '17:30',
+      price: 550.00,
+      cat: reclinerCat.id
     },
 
-    // COMEDY
+    // 😂 COMEDY
     {
-      title: 'Zakir Khan: Live & Tathastu Standup',
+      title: 'Zakir Khan: Tathastu & Unfiltered Live',
       type: 'comedy',
-      description: 'India’s favorite Sakht Launda brings his hilarious observational comedy, relatable storytelling, and heartfelt punchlines.',
-      poster_url: '/event_pics/laugh_comedy.png'
+      description: 'India’s Sakht Launda Zakir Khan brings his brand new hour of relatable storytelling and razor-sharp punchlines.',
+      poster_url: '/event_pics/zakir_khan.png',
+      venue: habitatBlr,
+      dateOffset: 2, // Aug 25
+      time: '20:00',
+      price: 799.00,
+      cat: generalCat.id
     },
     {
       title: 'Anubhav Singh Bassi: Bas Kar Bassi',
       type: 'comedy',
-      description: 'Razor-sharp college & hostel nostalgia comedy from one of the sharpest storytellers in the comedy circuit.',
-      poster_url: '/event_pics/roast_comedy.png'
+      description: 'Bassi shares hilarious hostel memories, college nostalgia, and real-life misadventures live in Bengaluru.',
+      poster_url: '/event_pics/bassi_comedy.png',
+      venue: habitatBlr,
+      dateOffset: 4, // Aug 27
+      time: '19:30',
+      price: 699.00,
+      cat: generalCat.id
     },
     {
-      title: 'Improv Comedy Battle Royale',
+      title: 'Samay Raina: Unfiltered Standup Tour',
       type: 'comedy',
-      description: 'Spontaneous, unscripted, and wildly hilarious crowd-interactive improvisational comedy show.',
-      poster_url: '/event_pics/chuckles_comedy.png'
+      description: 'The king of dark humor and crowd work Samay Raina performs his raw, unscripted live comedy show.',
+      poster_url: '/event_pics/samay_raina.png',
+      venue: habitatBlr,
+      dateOffset: 6, // Aug 29
+      time: '21:00',
+      price: 899.00,
+      cat: generalCat.id
     },
     {
-      title: 'The Great Indian Roast Special',
+      title: 'Harsh Gujral: Jo Bolta Hai Wohi Hota Hai',
       type: 'comedy',
-      description: 'Top comedians face off with quick-witted roasts, dark humor, and brutal punchlines.',
-      poster_url: '/event_pics/standup_comedy.png'
+      description: 'Harsh Gujral brings his quick-witted North Indian observational comedy and interactive crowd roasting.',
+      poster_url: '/event_pics/harsh_gujral.png',
+      venue: habitatBlr,
+      dateOffset: 8, // Aug 31
+      time: '18:30',
+      price: 599.00,
+      cat: generalCat.id
     },
     {
-      title: 'Midnight Giggles & Unfiltered Satire',
+      title: 'Biswa Kalyan Rath: Live Standup Special',
       type: 'comedy',
-      description: 'Late night adult standup comedy special packed with political satire, dark jokes, and raw crowd work.',
-      poster_url: '/event_pics/midnight_comedy.png'
+      description: 'Biswa Mast Aadmi delivers hilarious analytical breakdowns of everyday Indian life and human behavior.',
+      poster_url: '/event_pics/biswa_kalyan.png',
+      venue: habitatBlr,
+      dateOffset: 10, // Sep 2
+      time: '20:30',
+      price: 749.00,
+      cat: generalCat.id
     },
 
-    // SPORTS
+    // ⚽ SPORTS
     {
-      title: 'India vs Australia T20 International Series',
+      title: 'India vs England T20 International Series',
       type: 'sports',
-      subType: 'cricket',
-      description: 'The ultimate cricket showdown! High-voltage T20 action packed with towering sixes and packed stadium roaring fans.',
-      poster_url: '/event_pics/t20_sports.png'
+      description: 'High-voltage T20 international cricket clash under stadium lights at Wankhede Stadium, Mumbai.',
+      poster_url: '/event_pics/india_eng_t20.png',
+      venue: wankhedeMumbai,
+      dateOffset: 3, // Aug 26
+      time: '19:00',
+      price: 1800.00,
+      cat: lowerTierCat.id
     },
     {
-      title: 'ISL Cup Final: Mumbai City vs Mohun Bagan',
+      title: 'IPL Night: Mumbai Indians vs Chennai Super Kings',
       type: 'sports',
-      subType: 'football',
-      description: 'The pinnacle of Indian football! Two rival heavyweights battle for 90 minutes under stadium floodlights.',
-      poster_url: '/event_pics/champions_sports.png'
+      description: 'The blockbuster El Clásico of Indian cricket! Rohit Sharma vs MS Dhoni in a roaring stadium thriller.',
+      poster_url: '/event_pics/mi_vs_csk.png',
+      venue: wankhedeMumbai,
+      dateOffset: 5, // Aug 28
+      time: '19:30',
+      price: 2500.00,
+      cat: lowerTierCat.id
     },
     {
-      title: 'World Cricket Super Clash 2026',
+      title: 'ISL Final: Mohun Bagan vs Mumbai City FC',
       type: 'sports',
-      subType: 'cricket',
-      description: 'International cricket heavyweights collide live on the central turf pitch in an electric atmosphere.',
-      poster_url: '/event_pics/world_sports.png'
+      description: 'The pinnacle of Indian football! Two powerhouse football clubs battle for 90 minutes for the ISL Trophy.',
+      poster_url: '/event_pics/isl_final.png',
+      venue: balewadiPune,
+      dateOffset: 7, // Aug 30
+      time: '19:30',
+      price: 999.00,
+      cat: upperDeckCat.id
     },
     {
-      title: 'Apex Championship Fighting League (MMA)',
+      title: 'Pro Kabaddi League Championship Final',
       type: 'sports',
-      subType: 'boxing',
-      description: 'Fierce mixed martial arts title bout featuring top championship fighters inside the Octagon ring.',
-      poster_url: '/event_pics/apex_sports.png'
+      description: 'High-intensity raids, tackles, and non-stop kabaddi adrenaline live inside the Gachibowli Arena.',
+      poster_url: '/event_pics/pkl_championship.png',
+      venue: gachibowliHyd,
+      dateOffset: 9, // Sep 1
+      time: '20:00',
+      price: 750.00,
+      cat: vipPitCat.id
     },
     {
-      title: 'National Gridiron Super Bowl 2026',
+      title: 'Formula 1 Indian Night Grand Prix 2026',
       type: 'sports',
-      subType: 'football',
-      description: 'The annual gridiron football championship with halftime show performances and thrilling touchdowns.',
-      poster_url: '/event_pics/gridiron_sports.png'
+      description: 'The ultimate motorsport spectacle! 200mph night circuit racing under towering stadium illuminations.',
+      poster_url: '/event_pics/f1_night_gp.png',
+      venue: noidaStadium,
+      dateOffset: 11, // Sep 3
+      time: '20:00',
+      price: 4500.00,
+      cat: lowerTierCat.id
     }
   ];
 
-  // Starting anchor date: August 23, 2026
+  // Base date anchored strictly after Aug 24, 2026 (Aug 23 base + offsets)
   const baseDate = new Date(2026, 7, 23); // Aug 23, 2026
 
-  for (let i = 0; i < eventData.length; i++) {
-    const ev = eventData[i];
+  for (const item of eventList) {
     const event = await prisma.event.create({
       data: {
         organiser_id: organiser.id,
-        title: ev.title,
-        type: ev.type as any,
-        description: ev.description,
-        poster_url: ev.poster_url
+        title: item.title,
+        type: item.type as any,
+        description: item.description,
+        poster_url: item.poster_url
       }
     });
 
-    // Select venue based on event type & subType
-    let chosenVenue = comedyVenue;
-    if (ev.type === 'movie') chosenVenue = cinemaVenue;
-    else if (ev.type === 'concert') chosenVenue = stadiumVenue;
-    else if (ev.type === 'comedy') chosenVenue = comedyVenue;
-    else if (ev.type === 'sports' && ev.subType === 'cricket') chosenVenue = cricketVenue;
-    else if (ev.type === 'sports') chosenVenue = footballVenue;
+    const venueSeats = await prisma.venueSeat.findMany({ where: { venue_id: item.venue.id } });
 
-    // Fetch venue seats
-    const vSeats = await prisma.venueSeat.findMany({ where: { venue_id: chosenVenue.id } });
+    // Show date strictly after Aug 24, 2026
+    const showDate = new Date(baseDate);
+    showDate.setDate(baseDate.getDate() + item.dateOffset);
 
-    // Generate 3 realistic shows (Tonight Aug 23, Tomorrow Aug 24, and Upcoming Aug 28/29)
-    const showOffsets = [0, 1, 5 + (i % 4)]; // 0 = Aug 23 (Today), 1 = Aug 24, 5+ = Aug 28-31
-    const times = ['18:30', '19:45', '20:30'];
-
-    for (let s = 0; s < 3; s++) {
-      const showDate = new Date(baseDate);
-      showDate.setDate(baseDate.getDate() + showOffsets[s]);
-      const randomTime = times[s];
-
-      const show = await prisma.show.create({
-        data: { event_id: event.id, venue_id: chosenVenue.id, date: showDate, time: randomTime }
-      });
-
-      // Price mapping in Indian Rupees (₹)
-      const pricingData = [];
-      if (ev.type === 'movie') {
-        pricingData.push(
-          { show_id: show.id, category_id: reclinerCat.id, price: 450.00 },
-          { show_id: show.id, category_id: premiumCat.id, price: 300.00 },
-          { show_id: show.id, category_id: standardCat.id, price: 200.00 }
-        );
-      } else if (ev.type === 'concert') {
-        pricingData.push(
-          { show_id: show.id, category_id: vipPitCat.id, price: 3500.00 },
-          { show_id: show.id, category_id: goldenCircleCat.id, price: 2200.00 },
-          { show_id: show.id, category_id: lowerTierCat.id, price: 1400.00 },
-          { show_id: show.id, category_id: upperDeckCat.id, price: 800.00 }
-        );
-      } else if (ev.type === 'comedy') {
-        pricingData.push(
-          { show_id: show.id, category_id: generalComedyCat.id, price: 499.00 }
-        );
-      } else if (ev.type === 'sports') {
-        pricingData.push(
-          { show_id: show.id, category_id: vipPavilionCat.id, price: 2500.00 },
-          { show_id: show.id, category_id: lowerTierCat.id, price: 1200.00 },
-          { show_id: show.id, category_id: upperDeckCat.id, price: 500.00 }
-        );
+    const show = await prisma.show.create({
+      data: {
+        event_id: event.id,
+        venue_id: item.venue.id,
+        date: showDate,
+        time: item.time
       }
+    });
 
-      await prisma.showCategoryPricing.createMany({ data: pricingData });
+    await prisma.showCategoryPricing.create({
+      data: {
+        show_id: show.id,
+        category_id: item.cat,
+        price: item.price
+      }
+    });
 
-      // Create seat statuses for show
-      await prisma.seatStatus.createMany({
-        data: vSeats.map(seat => ({
-          show_id: show.id,
-          venue_seat_id: seat.id,
-          status: 'available'
-        }))
-      });
-    }
+    await prisma.seatStatus.createMany({
+      data: venueSeats.map(seat => ({
+        show_id: show.id,
+        venue_seat_id: seat.id,
+        status: 'available'
+      }))
+    });
   }
 
-  console.log('Database successfully re-seeded with realistic August 23, 2026+ events, iconic venues, and full INR pricing!');
+  console.log('Database successfully re-seeded with 20 real-world Indian events strictly after August 24, 2026!');
 }
 
 main()
