@@ -28,7 +28,7 @@ export default function Register() {
   const handleRegisterSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!agreed) {
-      setError('You must agree to the Terms.');
+      setError('You must agree to the Terms & Conditions to proceed.');
       return;
     }
     setError('');
@@ -102,128 +102,151 @@ export default function Register() {
   };
 
   return (
-    <div className="w-full min-h-[calc(100vh-80px)] flex flex-col md:flex-row bg-surface">
-      {/* Left Side: Image/Branding */}
-      <div className="w-full md:w-1/2 p-6 sm:p-10 md:p-12 border-b-4 md:border-b-0 md:border-r-4 border-on-background relative overflow-hidden bg-primary-fixed flex flex-col justify-between min-h-[220px] md:min-h-full">
-        <div className="absolute inset-0 blueprint-bg opacity-50 mix-blend-multiply"></div>
-        <div className="relative z-10 flex flex-col justify-between h-full">
+    <main className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row border-4 border-on-background shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-surface my-6 md:my-12 min-h-0 md:min-h-[620px] overflow-hidden">
+      {/* Left Side: Branding / Intro */}
+      <div className="w-full md:w-5/12 p-6 sm:p-10 border-b-4 md:border-b-0 md:border-r-4 border-on-background relative overflow-hidden bg-primary-fixed flex flex-col justify-between">
+        <div className="relative z-10 flex flex-col justify-between h-full gap-6">
           <div>
-            <h1 className="font-display-xl text-3xl sm:text-5xl md:text-6xl text-on-background uppercase leading-none font-black" style={{ textShadow: '2px 2px 0px #fff' }}>
-              SEATZY<br className="hidden md:inline" /> JOIN THE RIOT
+            <div className="inline-flex items-center gap-2 bg-on-background text-primary-fixed font-mono text-xs font-black px-3 py-1 border-2 border-on-background uppercase tracking-wider w-fit mb-4">
+              NEW ACCOUNT REGISTRATION
+            </div>
+            <h1 className="font-display-xl text-4xl sm:text-5xl md:text-6xl text-on-background uppercase leading-none font-black italic">
+              JOIN THE<br />LIVE RIOT
             </h1>
-          </div>
-          <div className="w-full border-2 sm:border-4 border-on-background bg-on-background p-3 sm:p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rotate-[-1deg] md:rotate-[-2deg] mt-4">
-            <p className="font-data-label text-[10px] sm:text-xs text-primary-fixed uppercase tracking-widest text-center font-black">
-              TICKET_ID: REG-001 // ACCESS GRANTED
+            <p className="font-body-md text-sm text-on-background/80 font-bold mt-3">
+              Create your free account to book live concerts, blockbusters, comedy clubs, and stadium matches with live seat locks.
             </p>
+          </div>
+
+          <div className="w-full border-4 border-on-background bg-on-background p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rotate-[-1deg] mt-4">
+            <div className="flex items-center justify-between text-primary-fixed font-mono text-xs font-black uppercase">
+              <span>TICKET_ID: REG-001</span>
+              <span className="bg-primary-fixed text-on-background px-1.5 py-0.5 font-black text-[10px]">ACCESS UNLOCKED</span>
+            </div>
           </div>
         </div>
         
         {/* Brutalist Abstract Background Shapes */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 mix-blend-luminosity opacity-30">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 mix-blend-luminosity opacity-25">
           <div className="absolute -top-[20%] -left-[20%] w-[80%] aspect-square rounded-full border-[20px] md:border-[40px] border-on-background" />
           <div className="absolute top-[40%] -right-[10%] w-[60%] h-[120%] bg-on-background transform rotate-12" />
         </div>
       </div>
 
       {/* Right Side: Form */}
-      <div className="w-full md:w-1/2 flex flex-col bg-surface py-6 px-4 sm:px-8 md:px-12 blueprint-bg relative">
-        <div className="w-full max-w-lg mx-auto flex flex-col gap-6">
+      <div className="w-full md:w-7/12 flex flex-col bg-surface p-6 sm:p-10 md:p-12 blueprint-bg justify-center">
+        <div className="w-full max-w-md mx-auto flex flex-col gap-6">
           
           {step === 'register' ? (
             <>
               <div>
-                <h2 className="font-headline-lg text-2xl sm:text-3xl md:text-4xl uppercase font-black tracking-tighter">Register Entity</h2>
-                <p className="font-body-md text-xs sm:text-sm text-on-surface-variant mt-1 font-bold uppercase">Claim your access</p>
+                <h2 className="font-headline-lg text-2xl sm:text-3xl uppercase font-black tracking-tight">Create Account</h2>
+                <p className="font-body-md text-xs sm:text-sm text-on-surface-variant font-bold mt-1">Join Seatzy to discover and book live shows.</p>
               </div>
 
               {error && (
-                <div className="bg-error text-on-error border-2 border-on-background px-4 py-3 font-data-label text-xs sm:text-sm flex items-center gap-2 font-bold">
-                  <span className="material-symbols-outlined text-sm">warning</span>
+                <div className="bg-error text-on-error border-2 border-on-background px-4 py-3 font-data-label text-xs sm:text-sm flex items-start gap-2.5 font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                  <span className="material-symbols-outlined text-base mt-0.5 shrink-0">error</span>
                   <span>{error}</span>
                 </div>
               )}
 
               <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-4">
-                {/* Role Toggle */}
-                <div className="w-full flex border-2 border-on-background bg-surface-variant p-1">
-                  <label className="flex-1 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="role"
-                      value="customer"
-                      checked={role === 'customer'}
-                      onChange={() => setRole('customer')}
-                      className="peer sr-only"
-                    />
-                    <div className="w-full py-2.5 sm:py-3 text-center font-data-label text-xs sm:text-sm uppercase font-black transition-all peer-checked:bg-primary-fixed peer-checked:text-on-background peer-checked:border-2 peer-checked:border-on-background text-on-surface-variant min-h-[44px] flex items-center justify-center">
-                      Customer
-                    </div>
-                  </label>
-                  <label className="flex-1 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="role"
-                      value="organiser"
-                      checked={role === 'organiser'}
-                      onChange={() => setRole('organiser')}
-                      className="peer sr-only"
-                    />
-                    <div className="w-full py-2.5 sm:py-3 text-center font-data-label text-xs sm:text-sm uppercase font-black transition-all peer-checked:bg-primary-fixed peer-checked:text-on-background peer-checked:border-2 peer-checked:border-on-background text-on-surface-variant min-h-[44px] flex items-center justify-center">
-                      Organiser
-                    </div>
-                  </label>
+                {/* Role Selection */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="font-data-label text-xs uppercase font-black text-on-background">Account Type</label>
+                  <div className="w-full flex border-2 border-on-background bg-surface-variant p-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                    <label className="flex-1 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="role"
+                        value="customer"
+                        checked={role === 'customer'}
+                        onChange={() => setRole('customer')}
+                        className="peer sr-only"
+                      />
+                      <div className="w-full py-2.5 text-center font-data-label text-xs uppercase font-black transition-all peer-checked:bg-primary-fixed peer-checked:text-on-background peer-checked:border-2 peer-checked:border-on-background text-on-surface-variant flex items-center justify-center gap-1.5 min-h-[42px]">
+                        <span className="material-symbols-outlined text-sm">confirmation_number</span>
+                        Customer
+                      </div>
+                    </label>
+                    <label className="flex-1 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="role"
+                        value="organiser"
+                        checked={role === 'organiser'}
+                        onChange={() => setRole('organiser')}
+                        className="peer sr-only"
+                      />
+                      <div className="w-full py-2.5 text-center font-data-label text-xs uppercase font-black transition-all peer-checked:bg-primary-fixed peer-checked:text-on-background peer-checked:border-2 peer-checked:border-on-background text-on-surface-variant flex items-center justify-center gap-1.5 min-h-[42px]">
+                        <span className="material-symbols-outlined text-sm">campaign</span>
+                        Organiser
+                      </div>
+                    </label>
+                  </div>
                 </div>
 
                 {/* Inputs */}
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="name" className="font-data-label text-xs sm:text-sm uppercase font-bold">Full Name</label>
+                  <label htmlFor="name" className="font-data-label text-xs uppercase font-black flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm text-primary">person</span>
+                    Full Name
+                  </label>
                   <input
                     id="name"
                     type="text"
                     value={name}
                     onChange={e => setName(e.target.value)}
-                    placeholder="JOHN_DOE"
-                    className="w-full border-2 border-on-background p-3.5 bg-on-tertiary text-on-surface font-data-label text-xs sm:text-sm focus:outline-none focus:ring-0 focus:border-on-background transition-all placeholder:text-surface-dim font-bold min-h-[44px]"
+                    placeholder="John Doe"
+                    className="w-full border-2 border-on-background p-3 bg-surface-lowest text-on-background font-data-label text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-bold min-h-[44px]"
                     required
                   />
                 </div>
+
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="email" className="font-data-label text-xs sm:text-sm uppercase font-bold">Email Address</label>
+                  <label htmlFor="email" className="font-data-label text-xs uppercase font-black flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm text-primary">mail</span>
+                    Email Address
+                  </label>
                   <input
                     id="email"
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
-                    placeholder="USER@DOMAIN.COM"
-                    className="w-full border-2 border-on-background p-3.5 bg-on-tertiary text-on-surface font-data-label text-xs sm:text-sm focus:outline-none focus:ring-0 focus:border-on-background transition-all placeholder:text-surface-dim font-bold min-h-[44px]"
+                    placeholder="name@example.com"
+                    className="w-full border-2 border-on-background p-3 bg-surface-lowest text-on-background font-data-label text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-bold min-h-[44px]"
                     required
                   />
                 </div>
+
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="password" className="font-data-label text-xs sm:text-sm uppercase font-bold">Access Code (Password)</label>
+                  <label htmlFor="password" className="font-data-label text-xs uppercase font-black flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm text-primary">lock</span>
+                    Password
+                  </label>
                   <input
                     id="password"
                     type="password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full border-2 border-on-background p-3.5 bg-on-tertiary text-on-surface font-data-label text-xs sm:text-sm focus:outline-none focus:ring-0 focus:border-on-background transition-all placeholder:text-surface-dim font-bold min-h-[44px]"
+                    className="w-full border-2 border-on-background p-3 bg-surface-lowest text-on-background font-data-label text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-bold min-h-[44px]"
                     required
                   />
                 </div>
 
                 {/* Checkbox */}
-                <div className="flex items-center gap-3 mt-2">
+                <div className="flex items-center gap-3 mt-1">
                   <input
                     id="agreed"
                     type="checkbox"
                     checked={agreed}
                     onChange={e => setAgreed(e.target.checked)}
-                    className="w-6 h-6 border-2 border-on-background accent-primary-fixed focus:ring-0 cursor-pointer min-w-[24px]"
+                    className="w-5 h-5 border-2 border-on-background accent-primary-fixed focus:ring-0 cursor-pointer shrink-0"
                   />
-                  <label htmlFor="agreed" className="font-data-label text-xs uppercase cursor-pointer select-none font-bold">
-                    I AGREE TO THE <a href="#" className="underline font-black">TERMS AND CONDITIONS</a>
+                  <label htmlFor="agreed" className="font-data-label text-xs uppercase cursor-pointer select-none font-bold text-on-background/80">
+                    I AGREE TO THE <a href="#" className="underline font-black text-on-background">TERMS AND CONDITIONS</a>
                   </label>
                 </div>
 
@@ -231,31 +254,32 @@ export default function Register() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-primary-fixed text-on-primary-fixed border-2 border-on-background p-3.5 font-headline-lg text-sm sm:text-base uppercase font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:bg-on-background hover:text-primary-fixed mt-2 min-h-[44px]"
+                  className="w-full bg-primary-fixed text-on-primary-fixed border-2 border-on-background p-3.5 font-headline-lg text-sm sm:text-base uppercase font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-[0px] active:translate-y-[0px] transition-all mt-2 min-h-[46px] cursor-pointer flex items-center justify-center gap-2"
                 >
-                  {loading ? 'Creating...' : 'Create Account'}
+                  <span>{loading ? 'Creating Account...' : 'Register Account'}</span>
+                  <span className="material-symbols-outlined font-bold text-base">arrow_forward</span>
                 </button>
               </form>
 
-              <div className="border-t-2 border-on-background pt-4 text-center">
+              <div className="border-t-2 border-on-background/20 pt-4 text-center">
                 <p className="font-data-label text-xs sm:text-sm text-on-surface-variant uppercase font-bold">
-                  ALREADY REGISTERED?{' '}
-                  <Link to="/login" className="text-on-background font-black underline hover:bg-primary-container transition-colors px-1">
-                    LOGIN HERE
+                  Already registered?{' '}
+                  <Link to="/login" className="text-on-background font-black underline hover:bg-primary-container transition-colors px-1 py-0.5">
+                    Login Here
                   </Link>
                 </p>
               </div>
             </>
           ) : (
             /* STEP 2: OTP Verification UI */
-            <div className="flex flex-col gap-6 bg-surface p-4 sm:p-6 border-2 sm:border-4 border-on-background shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <div className="flex flex-col gap-5 bg-surface p-5 sm:p-6 border-4 border-on-background shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
               <div>
-                <div className="flex items-center gap-2 text-primary mb-2">
-                  <span className="material-symbols-outlined text-2xl sm:text-3xl font-black">mark_email_read</span>
-                  <span className="font-headline-lg text-lg sm:text-xl uppercase font-black">Verify Email Code</span>
+                <div className="flex items-center gap-2 text-primary mb-1">
+                  <span className="material-symbols-outlined text-2xl font-black">mark_email_read</span>
+                  <span className="font-headline-lg text-lg sm:text-xl uppercase font-black text-on-background">Verify Email Code</span>
                 </div>
                 <p className="font-body-md text-xs sm:text-sm text-on-surface-variant font-bold">
-                  Enter the 6-digit code sent to <span className="bg-primary-container px-1 text-on-background font-black">{pendingEmail}</span>.
+                  Enter the 6-digit code sent to <span className="bg-primary-container text-on-background px-1.5 py-0.5 font-black">{pendingEmail}</span>.
                 </p>
               </div>
 
@@ -284,7 +308,7 @@ export default function Register() {
                   value={otp}
                   onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
                   placeholder="123456"
-                  className="w-full border-2 border-on-background p-3 bg-on-tertiary text-on-surface font-display-xl text-2xl sm:text-3xl text-center tracking-[6px] sm:tracking-[8px] focus:outline-none min-h-[44px]"
+                  className="w-full border-2 border-on-background p-3 bg-surface-lowest text-on-background font-display-xl text-3xl text-center tracking-[8px] focus:outline-none focus:border-primary min-h-[48px] font-bold"
                   required
                   autoFocus
                 />
@@ -292,20 +316,22 @@ export default function Register() {
                 <button
                   type="submit"
                   disabled={verifying || otp.length !== 6}
-                  className="w-full bg-primary-fixed text-on-primary-fixed border-2 border-on-background p-3 font-headline-lg text-sm sm:text-base uppercase font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all min-h-[44px]"
+                  className="w-full bg-primary-fixed text-on-primary-fixed border-2 border-on-background p-3.5 font-headline-lg text-sm sm:text-base uppercase font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-on-background hover:text-primary-fixed transition-all min-h-[46px] cursor-pointer"
                 >
-                  {verifying ? 'Verifying...' : 'VERIFY & ENTER SEATZY'}
+                  {verifying ? 'Verifying Code...' : 'VERIFY & ENTER SEATZY'}
                 </button>
               </form>
 
-              <div className="flex justify-between items-center border-t-2 border-on-background pt-3 font-data-label text-xs">
+              <div className="flex justify-between items-center border-t-2 border-on-background/20 pt-3 font-data-label text-xs">
                 <button
+                  type="button"
                   onClick={() => setStep('register')}
                   className="uppercase font-bold underline hover:text-primary min-h-[44px] flex items-center"
                 >
                   Change Email
                 </button>
                 <button
+                  type="button"
                   onClick={handleResendCode}
                   className="uppercase font-bold text-primary underline hover:text-on-background min-h-[44px] flex items-center"
                 >
@@ -317,6 +343,6 @@ export default function Register() {
 
         </div>
       </div>
-    </div>
+    </main>
   );
 }

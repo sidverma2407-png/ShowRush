@@ -32,7 +32,10 @@ export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || 'API request failed');
+    const err: any = new Error(errorData.message || 'API request failed');
+    err.data = errorData;
+    err.status = response.status;
+    throw err;
   }
 
   return response.json();

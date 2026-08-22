@@ -9,7 +9,7 @@ export default function Events() {
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('');
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const initialType = searchParams.get('type') || '';
   const [typeFilter, setTypeFilter] = useState(initialType);
 
@@ -22,7 +22,7 @@ export default function Events() {
 
   useEffect(() => {
     const paramType = searchParams.get('type');
-    if (paramType) {
+    if (paramType !== null) {
       setTypeFilter(paramType);
     }
   }, [searchParams]);
@@ -40,77 +40,145 @@ export default function Events() {
     return () => window.removeEventListener('seatzy_city_changed' as any, handleCityChange);
   }, []);
 
+  const handleCategorySelect = (category: string) => {
+    setTypeFilter(category);
+    if (category) {
+      setSearchParams({ type: category });
+    } else {
+      setSearchParams({});
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center bg-background p-4">
-        <div className="bg-primary-container text-on-background neo-brutalist-shadow px-6 sm:px-12 py-6 sm:py-8 border-2 sm:border-4 border-on-background text-center">
-          <p className="font-display-xl text-xl sm:text-2xl md:text-headline-lg uppercase tracking-tighter">Loading Events...</p>
+      <div className="min-h-[65vh] flex items-center justify-center bg-background p-4">
+        <div className="bg-primary-container text-on-background shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 sm:p-12 border-4 border-on-background text-center flex flex-col items-center gap-4">
+          <span className="material-symbols-outlined text-5xl font-black animate-spin">progress_activity</span>
+          <p className="font-display-xl text-2xl uppercase tracking-tight font-black">FETCHING LIVE EVENTS...</p>
         </div>
       </div>
     );
   }
 
+  const categoryChips = [
+    { id: '', label: 'ALL SHOWS', icon: 'grid_view' },
+    { id: 'movie', label: 'MOVIES', icon: 'movie' },
+    { id: 'concert', label: 'CONCERTS', icon: 'graphic_eq' },
+    { id: 'comedy', label: 'COMEDY', icon: 'mic' },
+    { id: 'sports', label: 'SPORTS', icon: 'stadium' },
+  ];
+
   return (
-    <div className="w-full bg-background selection:bg-primary-fixed selection:text-on-primary-fixed">
-      {/* Hero Section */}
-      <section className="w-full bg-on-background py-8 sm:py-12 md:py-16 px-4 md:px-margin-desktop border-b-2 sm:border-b-4 border-on-background relative overflow-hidden">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6 relative z-10">
+    <div className="w-full bg-background selection:bg-primary-fixed selection:text-on-primary-fixed pb-20">
+      
+      {/* 🚀 Header Hero Section */}
+      <section className="w-full bg-on-background text-on-primary py-12 md:py-16 px-4 md:px-margin-desktop border-b-4 border-on-background relative overflow-hidden">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6 relative z-10">
           <div>
-            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3 flex-wrap">
-              <span className="font-mono text-[10px] sm:text-xs uppercase font-bold bg-primary-fixed text-on-primary-fixed px-2.5 py-1 border border-sm:border-2 border-on-background flex items-center gap-1">
-                <span className="material-symbols-outlined text-sm">location_on</span>
+            <div className="flex items-center gap-3 mb-3 flex-wrap">
+              <span className="font-mono text-xs uppercase font-black bg-primary-fixed text-on-background px-3 py-1 border-2 border-primary-fixed flex items-center gap-1.5 shadow-sm">
+                <span className="material-symbols-outlined text-sm font-black">location_on</span>
                 {selectedCity === 'All Cities' ? 'ALL LOCATIONS' : selectedCity.toUpperCase()}
               </span>
-              <span className="font-mono text-[10px] sm:text-xs uppercase font-bold bg-tertiary-fixed text-on-tertiary-fixed px-2.5 py-1 border border-sm:border-2 border-on-background">
-                LIVE BOOKING ENGINE
+              <span className="font-mono text-xs uppercase font-black bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 border-2 border-tertiary-fixed">
+                LIVE SEAT LOCKING ENGINE
               </span>
             </div>
-            <h1 className="font-display-xl text-3xl sm:text-5xl md:text-6xl text-on-primary uppercase leading-none break-words tracking-tight font-black">
-              LIVE EVENTS
+
+            <h1 className="font-display-xl text-4xl sm:text-6xl md:text-7xl font-black text-primary-container uppercase tracking-tight leading-none mb-3 italic">
+              EXPLORE LIVE EVENTS
             </h1>
+            <p className="font-body-md text-xs sm:text-sm text-surface-variant max-w-2xl font-bold uppercase">
+              Select any event below to view showtimes (2 to 4 live show slots available per event) and pick your exact seats.
+            </p>
           </div>
-          <div className="bg-primary-container text-on-background border-2 sm:border-4 border-on-background px-4 sm:px-5 py-2 sm:py-3 flex items-center justify-center font-display-xl text-base sm:text-lg md:text-2xl leading-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transform md:rotate-3 self-start md:self-auto font-black">
-            {events.length} EVENTS AVAILABLE
+
+          <div className="bg-primary-fixed text-on-background border-4 border-on-background px-6 py-3 font-display-xl text-xl sm:text-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transform md:-rotate-2 self-start md:self-auto font-black shrink-0">
+            {events.length} EVENTS LOADED
           </div>
         </div>
-        {/* Abstract architectural lines in background */}
-        <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #fff 0, #fff 2px, transparent 2px, transparent 20px)' }}></div>
+
+        {/* Abstract Background Accent */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-primary-container/10 rounded-full blur-3xl pointer-events-none"></div>
       </section>
 
-      {/* Search / Filter Bar & Active City Marker */}
-      <section ref={eventsGridRef} className="max-w-7xl mx-auto px-4 md:px-margin-desktop py-6 sm:py-8 flex flex-col md:flex-row gap-3 sm:gap-4 items-stretch md:items-center">
-        <div className="flex-grow min-w-0 flex relative">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-xl sm:text-2xl text-on-surface-variant z-10" style={{ fontVariationSettings: "'FILL' 1" }}>search</span>
-          <input 
-            className="w-full bg-surface border-2 sm:border-border-width border-on-background pl-11 sm:pl-14 pr-4 py-3 font-data-label text-xs sm:text-sm placeholder:text-on-surface-variant focus:outline-none focus:ring-0 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] md:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-bold min-h-[44px]" 
-            placeholder={`SEARCH VENUES, ARTISTS IN ${selectedCity.toUpperCase()}...`} 
-            type="text" 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+      {/* 🧭 Filter Bar & Category Chips */}
+      <section ref={eventsGridRef} className="max-w-7xl mx-auto px-4 md:px-margin-desktop py-8 flex flex-col gap-6">
+        
+        {/* Category Quick Selector Chips */}
+        <div className="flex items-center gap-2.5 overflow-x-auto pb-2 scrollbar-none">
+          {categoryChips.map((chip) => {
+            const isActive = typeFilter.toLowerCase() === chip.id.toLowerCase();
+            return (
+              <button
+                key={chip.id}
+                onClick={() => handleCategorySelect(chip.id)}
+                className={`px-4 py-2.5 border-2 border-on-background font-headline-lg text-xs sm:text-sm uppercase font-black whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+                  isActive
+                    ? 'bg-primary-fixed text-on-background shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] translate-y-[-2px]'
+                    : 'bg-surface text-on-background hover:bg-surface-variant shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                }`}
+              >
+                <span className="material-symbols-outlined text-base font-black">{chip.icon}</span>
+                <span>{chip.label}</span>
+              </button>
+            );
+          })}
         </div>
-        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-          <input 
-            type="date"
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-            className="bg-surface text-on-surface border-2 sm:border-border-width border-on-background px-3 py-3 font-data-label text-xs sm:text-sm uppercase whitespace-nowrap shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] focus:outline-none transition-all font-bold min-h-[44px] w-full sm:w-auto"
-          />
-          <select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            className="bg-tertiary-fixed text-on-tertiary-fixed border-2 sm:border-border-width border-on-background px-4 py-3 font-data-label text-xs sm:text-sm uppercase whitespace-nowrap shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] focus:outline-none transition-all cursor-pointer font-bold min-h-[44px] w-full sm:w-auto"
-          >
-            <option value="">ALL TYPES</option>
-            <option value="movie">MOVIE</option>
-            <option value="concert">CONCERT</option>
-            <option value="comedy">COMEDY</option>
-            <option value="sports">SPORTS</option>
-          </select>
+
+        {/* Search & Date Filter Inputs */}
+        <div className="flex flex-col md:flex-row gap-4 items-stretch">
+          <div className="flex-grow min-w-0 flex relative">
+            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-xl text-on-surface-variant z-10 font-black">search</span>
+            <input 
+              className="w-full bg-surface border-2 border-on-background pl-12 pr-10 py-3 font-data-label text-sm placeholder:text-on-surface-variant focus:outline-none focus:border-primary shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-bold min-h-[46px]" 
+              placeholder={`Search artist, event title or venue in ${selectedCity.toUpperCase()}...`} 
+              type="text" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-background font-bold text-sm"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          <div className="flex gap-3 items-center">
+            <div className="flex items-center gap-2 bg-surface border-2 border-on-background px-3 py-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] min-h-[46px]">
+              <span className="material-symbols-outlined text-sm font-black text-primary">calendar_month</span>
+              <input 
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="bg-transparent text-on-surface font-data-label text-xs sm:text-sm uppercase font-bold focus:outline-none cursor-pointer"
+              />
+              {dateFilter && (
+                <button onClick={() => setDateFilter('')} className="text-xs font-black hover:text-error ml-1">✕</button>
+              )}
+            </div>
+
+            {(typeFilter || searchQuery || dateFilter) && (
+              <button
+                onClick={() => {
+                  setTypeFilter('');
+                  setSearchQuery('');
+                  setDateFilter('');
+                  setSearchParams({});
+                }}
+                className="bg-error text-on-error border-2 border-on-background px-4 py-3 font-headline-lg text-xs uppercase font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-on-background hover:text-error transition-colors min-h-[46px] whitespace-nowrap cursor-pointer"
+              >
+                CLEAR FILTERS
+              </button>
+            )}
+          </div>
         </div>
       </section>
 
-      {/* Event Grid */}
+      {/* 🎪 Events List / Grid */}
       {(() => {
         const filteredEvents = events.filter(e => {
           // City filter
@@ -127,7 +195,7 @@ export default function Events() {
           // Event format type
           const matchType = typeFilter ? e.type.toLowerCase() === typeFilter.toLowerCase() : true;
           
-          // Date
+          // Date filter
           let matchDate = true;
           if (dateFilter) {
             matchDate = e.shows?.some((s: any) => new Date(s.date).toISOString().split('T')[0] === dateFilter);
@@ -138,21 +206,21 @@ export default function Events() {
 
         if (filteredEvents.length === 0) {
           return (
-            <section className="max-w-7xl mx-auto px-4 md:px-margin-desktop py-8 sm:py-12">
-              <div className="bg-surface-variant border-2 sm:border-4 border-on-background p-6 sm:p-12 flex flex-col items-center gap-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] blueprint-bg text-center">
-                <div className="font-headline-lg text-lg sm:text-2xl uppercase font-black bg-on-background text-on-primary px-3 sm:px-4 py-2 transform -rotate-1 border-2 sm:border-4 border-on-background">
-                  No Events Found in {selectedCity}
-                </div>
-                <p className="font-data-label text-xs sm:text-sm uppercase font-bold max-w-md">
-                  Try switching cities or selecting "ALL CITIES" from the top navigation bar.
+            <section className="max-w-7xl mx-auto px-4 md:px-margin-desktop py-12">
+              <div className="bg-surface border-4 border-on-background p-8 sm:p-12 flex flex-col items-center gap-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-center max-w-2xl mx-auto">
+                <span className="material-symbols-outlined text-6xl text-on-surface-variant font-black">event_busy</span>
+                <h3 className="font-headline-lg text-2xl uppercase font-black text-on-background">No Events Match Your Filter</h3>
+                <p className="font-body-md text-sm text-on-surface-variant font-bold max-w-md">
+                  No shows found matching "{searchQuery || typeFilter || 'selected date'}" in {selectedCity}. Try resetting filters or switching your city location.
                 </p>
                 <button
                   onClick={() => {
                     setTypeFilter('');
                     setSearchQuery('');
                     setDateFilter('');
+                    setSearchParams({});
                   }}
-                  className="mt-2 bg-primary-fixed text-on-primary-fixed border-2 sm:border-4 border-on-background px-6 py-3 font-headline-lg uppercase font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] min-h-[44px]"
+                  className="mt-2 bg-primary-fixed text-on-background border-2 border-on-background px-6 py-3 font-headline-lg text-sm uppercase font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-on-background hover:text-primary-fixed transition-colors min-h-[44px] cursor-pointer"
                 >
                   Reset All Filters
                 </button>
@@ -162,17 +230,19 @@ export default function Events() {
         }
 
         return (
-          <section className="max-w-7xl mx-auto px-4 md:px-margin-desktop py-4 sm:py-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-16">
+          <section className="max-w-7xl mx-auto px-4 md:px-margin-desktop py-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-16">
             {filteredEvents.map((event) => {
               const venueObj = event.shows?.[0]?.venue;
+              const showCount = event.shows?.length || 0;
+
               return (
                 <article 
                   key={event.id} 
-                  className="bg-surface border-2 sm:border-border-width border-on-background flex flex-col group shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all relative overflow-hidden cursor-pointer" 
                   onClick={() => setSelectedEvent(event)}
+                  className="bg-surface border-4 border-on-background flex flex-col group shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] active:translate-x-[0px] active:translate-y-[0px] transition-all relative overflow-hidden cursor-pointer" 
                 >
-                  {/* Poster Container - 1:1 aspect-square display */}
-                  <div className="relative w-full aspect-square border-b-2 sm:border-b-4 border-on-background overflow-hidden bg-black flex items-center justify-center">
+                  {/* Poster Aspect Container */}
+                  <div className="relative w-full aspect-[4/3] border-b-4 border-on-background overflow-hidden bg-black flex items-center justify-center">
                     {event.poster_url ? (
                       <img 
                         src={event.poster_url} 
@@ -184,31 +254,49 @@ export default function Events() {
                         <span className="font-data-label text-xs uppercase text-on-surface-variant font-bold">No Poster</span>
                       </div>
                     )}
-                    <div className="absolute top-3 left-3 flex gap-1.5 flex-wrap">
-                      <span className="bg-tertiary-fixed text-on-tertiary-fixed font-data-label text-[10px] sm:text-xs uppercase px-2 py-0.5 border border-sm:border-2 border-on-background font-bold shadow-sm">
-                        {event.type || 'EVENT'}
+
+                    {/* Category & Location Badges */}
+                    <div className="absolute top-3 left-3 flex gap-2 flex-wrap">
+                      <span className="bg-primary-fixed text-on-background font-mono text-xs uppercase px-2.5 py-1 border-2 border-on-background font-black shadow-sm">
+                        {event.type}
                       </span>
                       {venueObj?.city && (
-                        <span className="bg-primary-fixed text-on-primary-fixed font-data-label text-[10px] sm:text-xs uppercase px-2 py-0.5 border border-sm:border-2 border-on-background font-bold flex items-center gap-0.5 shadow-sm">
-                          <span className="material-symbols-outlined text-[12px] sm:text-[14px]">location_on</span>
+                        <span className="bg-surface text-on-background font-mono text-xs uppercase px-2.5 py-1 border-2 border-on-background font-black flex items-center gap-1 shadow-sm">
+                          <span className="material-symbols-outlined text-xs">location_on</span>
                           {venueObj.city}
                         </span>
                       )}
                     </div>
+
+                    {/* Shows Available Badge on Poster */}
+                    <div className="absolute bottom-3 right-3 bg-tertiary-fixed text-on-tertiary-fixed font-mono text-xs font-black px-2.5 py-1 border-2 border-on-background shadow-sm uppercase flex items-center gap-1">
+                      <span className="material-symbols-outlined text-xs font-black">bolt</span>
+                      {showCount} {showCount === 1 ? 'SHOW' : 'LIVE SHOWS'}
+                    </div>
                   </div>
-                  <div className="p-3.5 sm:p-4 flex flex-col flex-grow">
-                    <h2 className="font-headline-lg text-base sm:text-lg md:text-xl text-primary-container bg-on-background inline-block px-2 py-1 mb-2 uppercase break-words w-max max-w-full line-clamp-1 font-black">
-                      {event.title}
-                    </h2>
-                    <p className="font-data-label text-xs uppercase text-on-surface-variant mb-4 flex items-center gap-1 line-clamp-2 font-bold">
-                      {event.description}
-                    </p>
-                    <div className="mt-auto pt-3 border-t-2 border-on-background flex justify-between items-center gap-2">
-                      <span className="font-data-label text-[11px] sm:text-xs uppercase font-bold text-on-surface">
-                        {event.shows?.length || 0} Shows Available
-                      </span>
-                      <button className="bg-primary-fixed text-on-background font-headline-lg text-xs sm:text-sm uppercase font-black border-2 border-on-background px-3 sm:px-4 py-2 hover:bg-on-background hover:text-primary-fixed transition-colors min-h-[44px] flex items-center justify-center">
-                        Details
+
+                  {/* Card Content */}
+                  <div className="p-5 flex flex-col flex-grow justify-between">
+                    <div>
+                      <h2 className="font-headline-lg text-lg sm:text-xl text-on-background uppercase font-black line-clamp-1 mb-2 group-hover:text-primary transition-colors">
+                        {event.title}
+                      </h2>
+                      <p className="font-body-md text-xs text-on-surface-variant line-clamp-2 font-bold leading-relaxed mb-4">
+                        {event.description}
+                      </p>
+                    </div>
+
+                    <div className="pt-4 border-t-2 border-on-background/20 flex justify-between items-center">
+                      <div className="flex flex-col">
+                        <span className="font-mono text-[10px] text-on-surface-variant uppercase font-bold">VENUE</span>
+                        <span className="font-headline-lg text-xs uppercase font-black text-on-background line-clamp-1">
+                          {venueObj?.name || 'Partner Arena'}
+                        </span>
+                      </div>
+
+                      <button className="bg-on-background text-on-primary font-headline-lg text-xs uppercase font-black border-2 border-on-background px-4 py-2.5 group-hover:bg-primary-fixed group-hover:text-on-background transition-colors min-h-[42px] flex items-center gap-1">
+                        <span>SELECT</span>
+                        <span className="material-symbols-outlined text-sm font-black">arrow_forward</span>
                       </button>
                     </div>
                   </div>
@@ -219,21 +307,21 @@ export default function Events() {
         );
       })()}
 
-      {/* Event Details Modal */}
+      {/* 🎟️ Event Details & Multi-Show Selection Modal */}
       {selectedEvent && (
-        <div className="fixed inset-0 z-[99] flex items-center justify-center p-3 sm:p-4 bg-on-background/80 backdrop-blur-sm animate-fade-in">
-          <div className="bg-surface border-2 sm:border-4 border-on-background shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] max-w-4xl w-full flex flex-col md:flex-row relative overflow-hidden max-h-[90vh]">
+        <div className="fixed inset-0 z-[99] flex items-center justify-center p-4 bg-on-background/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-surface border-4 border-on-background shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] max-w-4xl w-full flex flex-col md:flex-row relative overflow-hidden max-h-[90vh]">
             <button 
               onClick={() => setSelectedEvent(null)}
-              className="absolute top-3 right-3 z-20 bg-error text-on-error border-2 border-on-background p-1.5 hover:bg-red-600 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center shadow-sm"
+              className="absolute top-4 right-4 z-20 bg-error text-on-error border-2 border-on-background w-9 h-9 flex items-center justify-center font-black hover:bg-on-background transition-colors shadow-sm cursor-pointer"
               aria-label="Close modal"
             >
-              <span className="material-symbols-outlined text-2xl font-black">close</span>
+              ✕
             </button>
             
-            <div className="w-full md:w-1/2 bg-black border-b-2 md:border-b-0 md:border-r-4 border-on-background flex items-center justify-center p-2 max-h-[300px] md:max-h-none">
+            <div className="w-full md:w-5/12 bg-black border-b-4 md:border-b-0 md:border-r-4 border-on-background flex items-center justify-center p-3 max-h-[260px] md:max-h-none">
               {selectedEvent.poster_url ? (
-                <img src={selectedEvent.poster_url} alt={selectedEvent.title} className="w-full h-full object-contain max-h-[280px] md:max-h-[500px]" />
+                <img src={selectedEvent.poster_url} alt={selectedEvent.title} className="w-full h-full object-contain max-h-[240px] md:max-h-[480px]" />
               ) : (
                 <div className="w-full h-full min-h-[200px] flex items-center justify-center blueprint-bg">
                   <span className="font-data-label text-xs uppercase text-on-surface-variant font-bold">No Poster</span>
@@ -241,47 +329,74 @@ export default function Events() {
               )}
             </div>
 
-            <div className="w-full md:w-1/2 p-4 sm:p-6 md:p-10 flex flex-col max-h-[60vh] md:max-h-[80vh] overflow-y-auto">
-              <div className="flex gap-2 mb-3 flex-wrap pr-10">
-                <span className="bg-tertiary-fixed text-on-tertiary-fixed font-data-label text-xs uppercase px-2 py-1 border border-on-background inline-block font-bold">
-                  {selectedEvent.type || 'EVENT'}
+            <div className="w-full md:w-7/12 p-6 sm:p-8 flex flex-col max-h-[65vh] md:max-h-[85vh] overflow-y-auto blueprint-bg">
+              <div className="flex gap-2 mb-3 flex-wrap pr-8">
+                <span className="bg-primary-fixed text-on-background font-mono text-xs uppercase px-2.5 py-1 border-2 border-on-background font-black">
+                  {selectedEvent.type}
                 </span>
                 {selectedEvent.shows?.[0]?.venue?.city && (
-                  <span className="bg-primary-fixed text-on-primary-fixed font-data-label text-xs uppercase px-2 py-1 border border-on-background font-bold flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[14px]">location_on</span>
+                  <span className="bg-surface text-on-background font-mono text-xs uppercase px-2.5 py-1 border-2 border-on-background font-black flex items-center gap-1">
+                    <span className="material-symbols-outlined text-xs">location_on</span>
                     {selectedEvent.shows[0].venue.city}
                   </span>
                 )}
+                <span className="bg-tertiary-fixed text-on-tertiary-fixed font-mono text-xs uppercase px-2.5 py-1 border-2 border-on-background font-black">
+                  {selectedEvent.shows?.length || 0} SHOW SLOTS
+                </span>
               </div>
 
-              <h2 className="font-display-xl text-2xl sm:text-3xl md:text-4xl uppercase text-on-background leading-none mb-3 font-black">{selectedEvent.title}</h2>
+              <h2 className="font-display-xl text-2xl sm:text-4xl uppercase text-on-background leading-tight mb-2 font-black">
+                {selectedEvent.title}
+              </h2>
+              
               <p className="font-body-md text-xs sm:text-sm text-on-surface-variant mb-6 leading-relaxed font-bold">
                 {selectedEvent.description}
               </p>
 
-              <h3 className="font-headline-lg text-lg uppercase mb-3 border-b-2 border-on-background pb-2 font-black">Select a Show</h3>
-              <div className="flex flex-col gap-2.5">
+              <div className="flex items-center justify-between border-b-4 border-on-background pb-2 mb-4">
+                <h3 className="font-headline-lg text-base sm:text-lg uppercase font-black flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary text-xl font-black">schedule</span>
+                  Select Show Timing
+                </h3>
+                <span className="font-mono text-xs font-black uppercase text-on-surface-variant">REAL-TIME LOCK</span>
+              </div>
+
+              <div className="flex flex-col gap-3">
                 {selectedEvent.shows.length === 0 ? (
                   <div className="font-data-label text-xs uppercase text-on-surface-variant p-4 border-2 border-on-background text-center bg-surface-variant font-bold">
                     No shows scheduled
                   </div>
                 ) : (
-                  selectedEvent.shows.map((show: any) => (
-                    <div key={show.id} className="bg-surface-lowest border-2 border-on-background p-3 sm:p-4 flex justify-between items-center hover:bg-primary-container transition-colors group gap-2">
-                      <div>
-                        <p className="font-data-label text-[10px] sm:text-xs text-on-surface-variant uppercase group-hover:text-on-primary-container transition-colors font-bold">
-                          {new Date(show.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
-                        </p>
-                        <p className="font-headline-lg text-lg sm:text-2xl font-black text-on-background">{show.time}</p>
+                  selectedEvent.shows.map((show: any, idx: number) => (
+                    <div key={show.id} className="bg-surface border-2 border-on-background p-4 flex flex-col sm:flex-row justify-between sm:items-center hover:bg-primary-container/20 transition-all gap-3 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                      <div className="flex flex-col gap-0.5">
+                        <div className="flex items-center gap-2">
+                          <span className="bg-on-background text-primary-fixed font-mono text-[10px] font-black px-1.5 py-0.5">
+                            SHOW #{idx + 1}
+                          </span>
+                          <span className="font-data-label text-xs uppercase font-black text-on-background">
+                            {new Date(show.date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                          </span>
+                        </div>
+                        
+                        <div className="font-display-xl text-2xl font-black text-on-background mt-1">
+                          {show.time} IST
+                        </div>
+                        
                         {show.venue?.name && (
-                          <p className="font-mono text-[10px] uppercase text-on-surface-variant font-bold">{show.venue.name}</p>
+                          <span className="font-mono text-[11px] uppercase text-on-surface-variant font-bold flex items-center gap-1">
+                            <span className="material-symbols-outlined text-xs">pin_drop</span>
+                            {show.venue.name} ({show.venue.city})
+                          </span>
                         )}
                       </div>
+
                       <button 
                         onClick={() => navigate(`/events/${selectedEvent.id}/shows/${show.id}/map`)}
-                        className="bg-secondary text-on-secondary font-headline-lg text-xs sm:text-sm uppercase font-black border-2 border-on-background px-4 sm:px-6 py-2.5 hover:bg-on-background hover:text-secondary transition-colors min-h-[44px] flex items-center justify-center"
+                        className="bg-primary-fixed text-on-background font-headline-lg text-xs sm:text-sm uppercase font-black border-2 border-on-background px-5 py-2.5 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:bg-on-background hover:text-primary-fixed transition-colors min-h-[44px] flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
                       >
-                        BOOK
+                        <span>BOOK SEATS</span>
+                        <span className="material-symbols-outlined text-sm font-black">arrow_forward</span>
                       </button>
                     </div>
                   ))

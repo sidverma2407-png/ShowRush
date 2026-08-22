@@ -33,20 +33,11 @@ export default function Login() {
       login(res.data.user, res.data.token);
       navigate(res.data.user.role === 'organiser' ? '/organiser/dashboard' : '/explore');
     } catch (err: any) {
-      if (err.message?.includes('verify your email')) {
-        // Trigger OTP resend and show OTP entry
-        try {
-          const resendRes = await fetchApi('/auth/resend-otp', {
-            method: 'POST',
-            body: JSON.stringify({ email })
-          });
-          if (resendRes.data?.dev_otp) setDevOtp(resendRes.data.dev_otp);
-          setShowOtpView(true);
-        } catch (resendErr) {
-          setShowOtpView(true);
-        }
+      if (err.status === 403 || err.data?.requires_verification || err.message?.toLowerCase().includes('verify')) {
+        if (err.data?.dev_otp) setDevOtp(err.data.dev_otp);
+        setShowOtpView(true);
       } else {
-        setError(err.message || 'Login failed');
+        setError(err.message || 'Invalid email or password. Please check your credentials.');
       }
     } finally {
       setLoading(false);
@@ -70,7 +61,7 @@ export default function Login() {
   const handleVerifyOtp = async (e: FormEvent) => {
     e.preventDefault();
     if (!otp || otp.trim().length !== 6) {
-      setError('Please enter 6-digit OTP code');
+      setError('Please enter the 6-digit code sent to your email');
       return;
     }
     setError('');
@@ -81,89 +72,108 @@ export default function Login() {
         body: JSON.stringify({ email, otp: otp.trim() })
       });
       showSuccess('Email verified! Logging you in...', {
-        title: 'VERIFIED',
+        title: 'VERIFICATION SUCCESS',
         onClose: () => {
           login(res.data.user, res.data.token);
           navigate(res.data.user.role === 'organiser' ? '/organiser/dashboard' : '/explore');
         }
       });
     } catch (err: any) {
-      setError(err.message || 'Verification failed');
+      setError(err.message || 'Invalid or expired code. Please try again.');
     } finally {
       setVerifying(false);
     }
   };
 
   return (
-    <main className="w-full max-w-[1200px] mx-auto flex flex-col md:flex-row border-2 sm:border-4 border-on-background shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-surface my-4 md:my-10 min-h-0 md:min-h-[600px] md:h-[85vh]">
-      {/* Left Panel: Brand / Visual Anchor */}
-      <section className="w-full md:w-1/2 bg-on-background text-on-primary flex flex-col justify-between p-5 sm:p-8 md:p-12 border-b-4 md:border-b-0 md:border-r-4 border-on-background relative overflow-hidden">
-        <div className="z-10 flex flex-col gap-4 sm:gap-8">
-          <h1 className="font-display-xl text-3xl sm:text-4xl md:text-5xl uppercase text-primary-container leading-none font-black italic tracking-tighter">
-            SEATZY
-          </h1>
-          <div className="mt-2 sm:mt-6">
-            <h2 className="font-display-xl text-3xl sm:text-5xl md:text-[64px] uppercase text-primary-container leading-none font-black">
-              GET IN<br className="hidden sm:inline" /> THE SEAT
-            </h2>
+    <main className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row border-4 border-on-background shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-surface my-6 md:my-12 min-h-0 md:min-h-[580px] overflow-hidden">
+      {/* Left Branding Panel */}
+      <section className="w-full md:w-5/12 bg-on-background text-on-primary flex flex-col justify-between p-6 sm:p-10 border-b-4 md:border-b-0 md:border-r-4 border-on-background relative overflow-hidden">
+        <div className="z-10 flex flex-col gap-6">
+          <div className="inline-flex items-center gap-2 bg-primary-fixed text-on-background font-mono text-xs font-black px-3 py-1 border-2 border-primary-fixed uppercase tracking-wider w-fit">
+            SEATZY AUTH PORTAL
           </div>
-          <div className="flex flex-wrap gap-2 sm:gap-4 mt-2 sm:mt-6">
-            <span className="bg-tertiary-fixed text-on-tertiary-fixed font-data-label text-[10px] sm:text-xs px-3 py-1.5 border border-sm:border-2 border-on-background uppercase font-bold">Verified Email</span>
-            <span className="bg-primary-container text-on-primary-container font-data-label text-[10px] sm:text-xs px-3 py-1.5 border border-sm:border-2 border-on-background uppercase font-bold">QR Email Tickets</span>
-            <span className="bg-secondary text-on-secondary font-data-label text-[10px] sm:text-xs px-3 py-1.5 border border-sm:border-2 border-on-background uppercase font-bold">Instant Access</span>
+          
+          <div>
+            <h1 className="font-display-xl text-4xl sm:text-5xl md:text-6xl uppercase text-primary-container leading-none font-black italic tracking-tighter">
+              WELCOME BACK
+            </h1>
+            <p className="font-body-md text-sm text-surface-variant font-bold mt-3">
+              Sign in to manage your bookings, discover exclusive live shows, and access instant QR tickets.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3 mt-4">
+            <div className="flex items-center gap-3 bg-surface/10 p-3 border border-surface/20">
+              <span className="material-symbols-outlined text-primary-container text-xl font-bold">verified_user</span>
+              <span className="font-data-label text-xs uppercase text-on-primary font-bold">Email Verified Account Access</span>
+            </div>
+            <div className="flex items-center gap-3 bg-surface/10 p-3 border border-surface/20">
+              <span className="material-symbols-outlined text-tertiary-fixed text-xl font-bold">qr_code_2</span>
+              <span className="font-data-label text-xs uppercase text-on-primary font-bold">Instant Email QR Ticket Delivery</span>
+            </div>
           </div>
         </div>
-        <div className="z-10 mt-6 md:mt-auto pt-4 md:pt-12">
-          <p className="font-data-label text-xs sm:text-sm text-surface-variant max-w-sm uppercase font-bold">
-            Access live events. Valid email required for verified tickets & automated QR code delivery.
+
+        <div className="z-10 mt-8 pt-4 border-t border-surface/20">
+          <p className="font-mono text-[11px] text-surface-variant uppercase font-bold">
+            Need help? Contact support@seatzy.com
           </p>
         </div>
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-primary-container opacity-20 transform rotate-45 pointer-events-none"></div>
+
+        {/* Abstract Background Accent */}
+        <div className="absolute -bottom-16 -left-16 w-80 h-80 bg-primary-container/20 rounded-full blur-2xl pointer-events-none"></div>
       </section>
 
-      {/* Right Panel: Login / OTP Form */}
-      <section className="w-full md:w-1/2 bg-surface p-5 sm:p-8 md:p-12 flex flex-col justify-center">
-        <div className="max-w-md w-full mx-auto flex flex-col gap-6 sm:gap-8">
+      {/* Right Form Panel */}
+      <section className="w-full md:w-7/12 bg-surface p-6 sm:p-10 md:p-12 flex flex-col justify-center blueprint-bg">
+        <div className="max-w-md w-full mx-auto flex flex-col gap-6">
           
           {!showOtpView ? (
             <>
-              <div className="flex flex-col gap-1.5 sm:gap-2">
-                <h2 className="font-headline-lg text-2xl sm:text-3xl md:text-4xl uppercase text-on-background font-black">Access Core</h2>
-                <p className="font-body-md text-xs sm:text-sm text-on-surface-variant font-bold">Enter your verified email and access code.</p>
+              <div>
+                <h2 className="font-headline-lg text-2xl sm:text-3xl uppercase text-on-background font-black tracking-tight">Sign In</h2>
+                <p className="font-body-md text-xs sm:text-sm text-on-surface-variant font-bold mt-1">Enter your registered account details below.</p>
               </div>
               
               {error && (
-                <div className="bg-error text-on-error border-2 border-on-background px-4 py-3 font-data-label text-xs sm:text-sm flex items-center gap-2 font-bold">
-                  <span className="material-symbols-outlined text-sm">warning</span>
+                <div className="bg-error text-on-error border-2 border-on-background px-4 py-3 font-data-label text-xs sm:text-sm flex items-start gap-2.5 font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                  <span className="material-symbols-outlined text-base mt-0.5 shrink-0">error</span>
                   <span>{error}</span>
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:gap-6">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="email" className="font-data-label text-xs sm:text-sm uppercase text-on-background font-bold">Email Identifier</label>
+                  <label htmlFor="email" className="font-data-label text-xs uppercase text-on-background font-black flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm text-primary">mail</span>
+                    Email Address
+                  </label>
                   <input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-surface-lowest text-on-background font-data-label text-xs sm:text-sm px-4 py-3.5 border-2 border-on-background focus:outline-none focus:ring-0 focus:border-primary placeholder:text-outline-variant transition-colors min-h-[44px] font-bold"
-                    placeholder="USER@SEATZY.COM"
+                    className="w-full bg-surface-lowest text-on-background font-data-label text-sm px-4 py-3 border-2 border-on-background focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-bold min-h-[46px]"
+                    placeholder="name@example.com"
                     required
                   />
                 </div>
                 
                 <div className="flex flex-col gap-1.5">
                   <div className="flex justify-between items-center">
-                    <label htmlFor="password" className="font-data-label text-xs sm:text-sm uppercase text-on-background font-bold">Access Code</label>
+                    <label htmlFor="password" className="font-data-label text-xs uppercase text-on-background font-black flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-sm text-primary">lock</span>
+                      Password
+                    </label>
                   </div>
                   <input
                     id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-surface-lowest text-on-background font-data-label text-xs sm:text-sm px-4 py-3.5 border-2 border-on-background focus:outline-none focus:ring-0 focus:border-primary placeholder:text-outline-variant transition-colors min-h-[44px] font-bold"
-                    placeholder="••••••••"
+                    className="w-full bg-surface-lowest text-on-background font-data-label text-sm px-4 py-3 border-2 border-on-background focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-bold min-h-[46px]"
+                    placeholder="••••••••••••"
                     required
                   />
                 </div>
@@ -171,44 +181,44 @@ export default function Login() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-primary-container text-on-primary-container font-headline-lg text-sm sm:text-base uppercase py-3.5 border-2 border-on-background shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all mt-2 flex justify-center items-center gap-2 disabled:opacity-50 font-black cursor-pointer min-h-[44px]"
+                  className="w-full bg-primary-container text-on-primary-container font-headline-lg text-sm sm:text-base uppercase py-3.5 border-2 border-on-background shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-[0px] active:translate-y-[0px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all mt-2 flex justify-center items-center gap-2 disabled:opacity-50 font-black cursor-pointer min-h-[46px]"
                 >
                   <span>{loading ? 'Authenticating...' : 'Sign In'}</span>
-                  <span className="material-symbols-outlined font-bold">login</span>
+                  <span className="material-symbols-outlined font-bold text-base">arrow_forward</span>
                 </button>
               </form>
               
-              <div className="mt-4 sm:mt-8 text-center border-t-2 border-on-background pt-4 sm:pt-6">
+              <div className="mt-4 text-center border-t-2 border-on-background/20 pt-5">
                 <p className="font-data-label text-xs sm:text-sm text-on-surface-variant uppercase font-bold">
-                  No access yet?{' '}
-                  <Link to="/register" className="text-on-background font-black underline hover:bg-primary-container transition-colors px-1">
-                    Register Entity
+                  Don't have an account?{' '}
+                  <Link to="/register" className="text-on-background font-black underline hover:bg-primary-container transition-colors px-1 py-0.5">
+                    Register Here
                   </Link>
                 </p>
               </div>
             </>
           ) : (
-            /* OTP Verification overlay for unverified login attempt */
-            <div className="flex flex-col gap-4 sm:gap-6 bg-surface p-4 sm:p-6 border-2 sm:border-4 border-on-background shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            /* OTP Verification overlay */
+            <div className="flex flex-col gap-5 bg-surface p-5 sm:p-6 border-4 border-on-background shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
               <div>
-                <div className="flex items-center gap-2 text-primary mb-2">
-                  <span className="material-symbols-outlined text-2xl sm:text-3xl font-black">mark_email_read</span>
-                  <span className="font-headline-lg text-lg sm:text-xl uppercase font-black">Verify Email Required</span>
+                <div className="flex items-center gap-2 text-primary mb-1">
+                  <span className="material-symbols-outlined text-2xl font-black">mark_email_read</span>
+                  <span className="font-headline-lg text-lg sm:text-xl uppercase font-black text-on-background">Verify Email Required</span>
                 </div>
                 <p className="font-body-md text-xs sm:text-sm text-on-surface-variant font-bold">
-                  Please verify your email address (<span className="bg-primary-container px-1 font-black">{email}</span>) to log in.
+                  Please enter the 6-digit verification code sent to <span className="bg-primary-container text-on-background px-1.5 py-0.5 font-black">{email}</span>.
                 </p>
               </div>
 
               {devOtp && (
-                <div className="bg-amber-200 border-2 border-on-background p-2.5">
-                  <p className="font-data-label text-xs uppercase font-black text-on-background">DEV AUTO-FILL OTP: {devOtp}</p>
+                <div className="bg-amber-200 border-2 border-on-background p-3">
+                  <p className="font-data-label text-xs uppercase font-black text-on-background">DEV CODE AUTO-FILL: {devOtp}</p>
                 </div>
               )}
 
               {error && (
-                <div className="bg-error text-on-error border-2 border-on-background px-4 py-3 font-data-label text-xs flex items-center gap-2 font-bold">
-                  <span className="material-symbols-outlined text-sm">warning</span>
+                <div className="bg-error text-on-error border-2 border-on-background px-3.5 py-2.5 font-data-label text-xs flex items-center gap-2 font-bold">
+                  <span className="material-symbols-outlined text-sm shrink-0">warning</span>
                   <span>{error}</span>
                 </div>
               )}
@@ -220,20 +230,21 @@ export default function Login() {
                   value={otp}
                   onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
                   placeholder="123456"
-                  className="w-full border-2 border-on-background p-3 bg-surface-lowest text-on-background font-display-xl text-2xl sm:text-3xl text-center tracking-[6px] sm:tracking-[8px] focus:outline-none min-h-[44px]"
+                  className="w-full border-2 border-on-background p-3 bg-surface-lowest text-on-background font-display-xl text-3xl text-center tracking-[8px] focus:outline-none focus:border-primary min-h-[48px] font-bold"
                   required
                   autoFocus
                 />
+
                 <button
                   type="submit"
                   disabled={verifying || otp.length !== 6}
-                  className="w-full bg-primary-container text-on-primary-container font-headline-lg text-sm sm:text-lg uppercase py-3 border-2 border-on-background shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] font-black min-h-[44px]"
+                  className="w-full bg-primary-container text-on-primary-container font-headline-lg text-sm uppercase py-3 border-2 border-on-background shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] font-black hover:bg-on-background hover:text-primary-container transition-colors disabled:opacity-50 min-h-[44px]"
                 >
-                  {verifying ? 'Verifying...' : 'VERIFY & SIGN IN'}
+                  {verifying ? 'Verifying Code...' : 'VERIFY & SIGN IN'}
                 </button>
               </form>
 
-              <div className="flex justify-between items-center border-t-2 border-on-background pt-3 font-data-label text-xs">
+              <div className="flex justify-between items-center border-t-2 border-on-background/20 pt-3 font-data-label text-xs">
                 <button
                   type="button"
                   onClick={() => setShowOtpView(false)}
