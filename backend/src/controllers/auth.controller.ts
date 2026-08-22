@@ -200,11 +200,23 @@ export const login = async (req: Request, res: Response) => {
 
   // Check email verification status
   if (!user.is_verified) {
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { verification_otp: otp, otp_expires_at: otpExpires }
+    });
+
+    const emailResult = await sendOtpEmail(cleanEmail, otp, user.name);
+
     return res.status(403).json({
       status: 'unverified',
       message: 'Please verify your email address before logging in.',
       requires_verification: true,
-      email: user.email
+      email: user.email,
+      dev_otp: process.env.NODE_ENV === 'production' ? undefined : otp,
+      dev_email_preview: emailResult.previewUrl
     });
   }
 

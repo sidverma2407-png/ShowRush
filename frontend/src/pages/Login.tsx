@@ -53,6 +53,20 @@ export default function Login() {
     }
   };
 
+  const handleResendCode = async () => {
+    setError('');
+    try {
+      const res = await fetchApi('/auth/resend-otp', {
+        method: 'POST',
+        body: JSON.stringify({ email })
+      });
+      if (res.data?.dev_otp) setDevOtp(res.data.dev_otp);
+      showSuccess(`A new 6-digit verification code has been sent to ${email}.`, { title: 'CODE RESENT' });
+    } catch (err: any) {
+      setError(err.message || 'Failed to resend code');
+    }
+  };
+
   const handleVerifyOtp = async (e: FormEvent) => {
     e.preventDefault();
     if (!otp || otp.trim().length !== 6) {
@@ -219,12 +233,22 @@ export default function Login() {
                 </button>
               </form>
 
-              <button
-                onClick={() => setShowOtpView(false)}
-                className="font-data-label text-xs uppercase font-bold text-center underline hover:text-primary cursor-pointer py-1 min-h-[44px]"
-              >
-                Back to Sign In
-              </button>
+              <div className="flex justify-between items-center border-t-2 border-on-background pt-3 font-data-label text-xs">
+                <button
+                  type="button"
+                  onClick={() => setShowOtpView(false)}
+                  className="uppercase font-bold underline hover:text-primary cursor-pointer min-h-[44px] flex items-center"
+                >
+                  Back to Sign In
+                </button>
+                <button
+                  type="button"
+                  onClick={handleResendCode}
+                  className="uppercase font-bold text-primary underline hover:text-on-background cursor-pointer min-h-[44px] flex items-center"
+                >
+                  Resend OTP Code
+                </button>
+              </div>
             </div>
           )}
 

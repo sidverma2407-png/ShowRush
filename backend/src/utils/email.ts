@@ -39,6 +39,13 @@ const getTransporter = () => {
   const port = Number(process.env.SMTP_PORT) || 587;
 
   if (user && pass) {
+    if (host.includes('gmail')) {
+      return nodemailer.createTransport({
+        service: 'gmail',
+        auth: { user, pass }
+      });
+    }
+
     return nodemailer.createTransport({
       host,
       port,
