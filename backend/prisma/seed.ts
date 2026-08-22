@@ -151,31 +151,31 @@ async function main() {
       title: 'Coldplay: Music Of The Spheres World Tour',
       type: 'concert',
       description: 'The iconic global rock band returns for a breathtaking live experience featuring light-up wristbands, pyrotechnics, and legendary anthems.',
-      poster_url: '/images/electric_concert.png'
+      poster_url: '/event_pics/electric_concert.png'
     },
     {
       title: 'A.R. Rahman: Symphony of Hope Live',
       type: 'concert',
       description: 'Oscar & Grammy winning maestro A.R. Rahman performs live with a full 60-piece orchestra playing timeless musical compositions.',
-      poster_url: '/images/golden_concert.png'
+      poster_url: '/event_pics/golden_concert.png'
     },
     {
       title: 'Sunburn Arena EDM Night',
       type: 'concert',
       description: 'Asia’s premier EDM festival featuring world-class DJs, massive laser displays, and 360-degree bass-heavy stadium acoustics.',
-      poster_url: '/images/bass_drop_concert.png'
+      poster_url: '/event_pics/bass_drop_concert.png'
     },
     {
       title: 'Underground Indie Rock Revolution',
       type: 'concert',
       description: 'An intimate indie rock night featuring raw electric guitars and top upcoming alternative rock talents.',
-      poster_url: '/images/underground_concert.png'
+      poster_url: '/event_pics/underground_concert.png'
     },
     {
       title: 'Midnight Jazz & Saxophone Lounge',
       type: 'concert',
       description: 'Smooth and sophisticated jazz saxophone solos under a clear moonlit open-air terrace.',
-      poster_url: '/images/jazz_concert.png'
+      poster_url: '/event_pics/jazz_concert.png'
     },
 
     // MOVIES
@@ -183,31 +183,31 @@ async function main() {
       title: 'Avatar: The Seed Bearer (IMAX 3D)',
       type: 'movie',
       description: 'James Cameron returns to Pandora in a mesmerizing IMAX 3D adventure exploring uncharted ocean depths and volcanic biomes.',
-      poster_url: '/images/neon_movie.png'
+      poster_url: '/event_pics/neon_movie.png'
     },
     {
       title: 'Neon Chronicles 2099',
       type: 'movie',
       description: 'A cyberpunk thriller following a rogue android detective racing against time across a neon-lit dystopian metropolis.',
-      poster_url: '/images/lost_voyage_movie.png'
+      poster_url: '/event_pics/lost_voyage_movie.png'
     },
     {
       title: 'Oppenheimer: 70mm Special Re-Release',
       type: 'movie',
       description: 'Christopher Nolan’s epic historical masterpiece returning to the big screen in full original 70mm film print.',
-      poster_url: '/images/midnight_movie.png'
+      poster_url: '/event_pics/midnight_movie.png'
     },
     {
       title: 'Echoes of Eternity',
       type: 'movie',
       description: 'A fantasy film detailing the rise of legendary dragons and ancient spellcasters fighting for the golden crown.',
-      poster_url: '/images/echoes_movie.png'
+      poster_url: '/event_pics/echoes_movie.png'
     },
     {
       title: 'Velocity Shift: Formula Night Race',
       type: 'movie',
       description: 'High-octane racing thriller taking audiences inside the cockpit of 200mph night street circuits.',
-      poster_url: '/images/velocity_movie.png'
+      poster_url: '/event_pics/velocity_movie.png'
     },
 
     // COMEDY
@@ -215,31 +215,31 @@ async function main() {
       title: 'Zakir Khan: Live & Tathastu Standup',
       type: 'comedy',
       description: 'India’s favorite Sakht Launda brings his hilarious observational comedy, relatable storytelling, and heartfelt punchlines.',
-      poster_url: '/images/laugh_comedy.png'
+      poster_url: '/event_pics/laugh_comedy.png'
     },
     {
       title: 'Anubhav Singh Bassi: Bas Kar Bassi',
       type: 'comedy',
       description: 'Razor-sharp college & hostel nostalgia comedy from one of the sharpest storytellers in the comedy circuit.',
-      poster_url: '/images/roast_comedy.png'
+      poster_url: '/event_pics/roast_comedy.png'
     },
     {
       title: 'Improv Comedy Battle Royale',
       type: 'comedy',
       description: 'Spontaneous, unscripted, and wildly hilarious crowd-interactive improvisational comedy show.',
-      poster_url: '/images/chuckles_comedy.png'
+      poster_url: '/event_pics/chuckles_comedy.png'
     },
     {
       title: 'The Great Indian Roast Special',
       type: 'comedy',
       description: 'Top comedians face off with quick-witted roasts, dark humor, and brutal punchlines.',
-      poster_url: '/images/standup_comedy.png'
+      poster_url: '/event_pics/standup_comedy.png'
     },
     {
       title: 'Midnight Giggles & Unfiltered Satire',
       type: 'comedy',
       description: 'Late night adult standup comedy special packed with political satire, dark jokes, and raw crowd work.',
-      poster_url: '/images/midnight_comedy.png'
+      poster_url: '/event_pics/midnight_comedy.png'
     },
 
     // SPORTS
@@ -248,35 +248,35 @@ async function main() {
       type: 'sports',
       subType: 'cricket',
       description: 'The ultimate cricket showdown! High-voltage T20 action packed with towering sixes and packed stadium roaring fans.',
-      poster_url: '/images/t20_sports.png'
+      poster_url: '/event_pics/t20_sports.png'
     },
     {
       title: 'ISL Cup Final: Mumbai City vs Mohun Bagan',
       type: 'sports',
       subType: 'football',
       description: 'The pinnacle of Indian football! Two rival heavyweights battle for 90 minutes under stadium floodlights.',
-      poster_url: '/images/champions_sports.png'
+      poster_url: '/event_pics/champions_sports.png'
     },
     {
       title: 'World Cricket Super Clash 2026',
       type: 'sports',
       subType: 'cricket',
       description: 'International cricket heavyweights collide live on the central turf pitch in an electric atmosphere.',
-      poster_url: '/images/world_sports.png'
+      poster_url: '/event_pics/world_sports.png'
     },
     {
       title: 'Apex Championship Fighting League (MMA)',
       type: 'sports',
       subType: 'boxing',
       description: 'Fierce mixed martial arts title bout featuring top championship fighters inside the Octagon ring.',
-      poster_url: '/images/apex_sports.png'
+      poster_url: '/event_pics/apex_sports.png'
     },
     {
       title: 'National Gridiron Super Bowl 2026',
       type: 'sports',
       subType: 'football',
       description: 'The annual gridiron football championship with halftime show performances and thrilling touchdowns.',
-      poster_url: '/images/gridiron_sports.png'
+      poster_url: '/event_pics/gridiron_sports.png'
     }
   ];
 
