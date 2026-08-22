@@ -143,291 +143,292 @@ async function main() {
     { rows: ['H', 'I'], catId: upperDeckCat.id }
   ], 14);
 
-  // --- 20 REAL WORLD EVENTS WITH MULTIPLE SHOW TIMINGS ---
+  // --- 20 EXACT USER SPECIFIED EVENTS (DATED AFTER AUG 24, 2026) WITH 2, 3, AND 4 SHOWS EACH ---
   const eventList = [
-    // CONCERTS
+    // --- 1. CONCERTS ---
     {
-      title: 'Coldplay: Music Of The Spheres World Tour',
+      title: 'A.R. Rahman – The Wonderment Tour Live',
       type: 'concert',
-      description: 'The global stadium phenomenon featuring LED wristbands, pyrotechnics, and iconic anthems live in Mumbai.',
-      poster_url: '/event_pics/concert1.png',
-      venue: jioMumbai,
-      price: 3500.00,
-      cat: goldenCircleCat.id,
-      shows: [
-        { dayOffset: 2, time: '16:00' },
-        { dayOffset: 2, time: '19:30' },
-        { dayOffset: 3, time: '19:30' }
-      ]
-    },
-    {
-      title: 'A.R. Rahman: Symphony of Hope Live',
-      type: 'concert',
-      description: 'Oscar & Grammy maestro A.R. Rahman performs live with a full 60-piece symphony orchestra.',
+      description: 'The Oscar and Grammy-winning musical maestro is hosting a rare, massive live arena performance. The concert will feature a full live orchestra, state-of-the-art immersive visual production, and a definitive journey through his legendary catalog.',
       poster_url: '/event_pics/concert2.png',
-      venue: jioMumbai,
-      price: 2800.00,
+      venue: chinnaswamyBlr,
+      price: 3500.00,
       cat: vipPitCat.id,
       shows: [
-        { dayOffset: 4, time: '18:00' },
-        { dayOffset: 5, time: '19:30' }
+        { dayOffset: 41, time: '19:00' }, // Saturday, Oct 3, 2026
+        { dayOffset: 42, time: '19:00' },
+        { dayOffset: 43, time: '18:30' }
       ]
     },
     {
-      title: 'Sunburn EDM Arena Festival',
+      title: 'Fred again.. – Debut India Tour',
       type: 'concert',
-      description: 'Asia’s largest electronic dance music arena featuring top international DJs and massive laser light shows.',
+      description: 'The international electronic music sensation is bringing his highly anticipated live show to India for the first time. The open-air festival tour spans major metropolitan cities, performing hits from his Actual Life series to his latest USB releases.',
       poster_url: '/event_pics/concert3.png',
-      venue: gachibowliHyd,
-      price: 2000.00,
+      venue: noidaStadium,
+      price: 2999.00,
       cat: goldenCircleCat.id,
       shows: [
-        { dayOffset: 6, time: '15:00' },
-        { dayOffset: 6, time: '19:00' },
-        { dayOffset: 7, time: '17:00' },
-        { dayOffset: 7, time: '21:00' }
+        { dayOffset: 104, time: '17:00' }, // Saturday, Dec 5, 2026
+        { dayOffset: 104, time: '21:00' },
+        { dayOffset: 111, time: '18:00' }, // Saturday, Dec 12, 2026
+        { dayOffset: 111, time: '21:30' }
       ]
     },
     {
-      title: 'Karan Aujla: It Was All A Dream Tour',
+      title: 'Sonu Nigam – Satrangi Re India Tour',
       type: 'concert',
-      description: 'Punjabi music sensation Karan Aujla live in concert performing his chart-topping hits with live band.',
-      poster_url: '/event_pics/concert4.png',
-      venue: noidaStadium,
-      price: 2500.00,
+      description: 'One of Bollywood’s most iconic playback singers is launching a massive multi-city stadium tour conceptualized by NR Talent & Event Management. The grand outdoor concept navigates the "seven colors" of romantic music and emotions.',
+      poster_url: '/event_pics/concert1.png',
+      venue: gachibowliHyd,
+      price: 2200.00,
       cat: lowerTierCat.id,
       shows: [
-        { dayOffset: 8, time: '17:30' },
-        { dayOffset: 8, time: '20:30' },
-        { dayOffset: 9, time: '19:00' }
+        { dayOffset: 120, time: '19:30' }, // Monday, Dec 21, 2026
+        { dayOffset: 121, time: '19:30' }
       ]
     },
     {
-      title: 'Diljit Dosanjh: Dil-Luminati India Tour',
+      title: 'Orchestral Qawwali Project – India Debut Tour',
       type: 'concert',
-      description: 'Global superstar Diljit Dosanjh brings his explosive Dil-Luminati stadium spectacle live to Bengaluru.',
-      poster_url: '/event_pics/concert5.png',
-      venue: chinnaswamyBlr,
-      price: 3200.00,
+      description: 'Led by composer Rushil Ranjan and singer Abi Sampa, this globally acclaimed ensemble seamlessly blends Western classical orchestration, choral arrangements, and traditional Sufi Qawwali following sell-out shows at London\'s Royal Albert Hall.',
+      poster_url: '/event_pics/concert4.png',
+      venue: jioMumbai,
+      price: 2500.00,
       cat: goldenCircleCat.id,
       shows: [
-        { dayOffset: 10, time: '18:00' },
-        { dayOffset: 11, time: '19:30' }
+        { dayOffset: 20, time: '18:00' }, // Saturday, Sept 12, 2026
+        { dayOffset: 21, time: '19:00' }, // Sunday, Sept 13, 2026
+        { dayOffset: 22, time: '19:30' }
+      ]
+    },
+    {
+      title: 'Film Expo India – 5-Day Mega Music Festival',
+      type: 'concert',
+      description: 'A massive five-day music, devotion, and pop-culture exhibition featuring heavyweights from across Indian music scenes, including Sufi melodies, massive Bollywood sets, and classical live performance nights. Headliners include Anup Jalota, Malini Awasthi, Madhubanti Bagchi, and Afsana Khan.',
+      poster_url: '/event_pics/concert5.png',
+      venue: noidaStadium,
+      price: 1800.00,
+      cat: lowerTierCat.id,
+      shows: [
+        { dayOffset: 3, time: '19:00' }, // Wednesday, Aug 26, 2026
+        { dayOffset: 4, time: '19:00' },
+        { dayOffset: 5, time: '18:30' },
+        { dayOffset: 6, time: '19:30' }
       ]
     },
 
-    // MOVIES
+    // --- 2. MOVIES ---
     {
-      title: 'Stree 2: Sarkate Ka Aatank (IMAX)',
+      title: 'Spider-Man: Brand New Day',
       type: 'movie',
-      description: 'The legendary horror-comedy blockbuster returns as Chanderi faces the terrifying headless myth Sarkata.',
-      poster_url: '/event_pics/movie1.png',
-      venue: pvrDelhi,
-      price: 450.00,
-      cat: reclinerCat.id,
-      shows: [
-        { dayOffset: 2, time: '11:00' },
-        { dayOffset: 2, time: '15:15' },
-        { dayOffset: 2, time: '18:30' },
-        { dayOffset: 2, time: '21:45' }
-      ]
-    },
-    {
-      title: 'Kalki 2898 AD (IMAX 3D)',
-      type: 'movie',
-      description: 'Prabhas and Amitabh Bachchan star in Nag Ashwin’s epic futuristic mythological sci-fi spectacle.',
-      poster_url: '/event_pics/movie2.png',
-      venue: pvrDelhi,
-      price: 500.00,
-      cat: reclinerCat.id,
-      shows: [
-        { dayOffset: 3, time: '13:00' },
-        { dayOffset: 3, time: '17:00' },
-        { dayOffset: 3, time: '21:00' }
-      ]
-    },
-    {
-      title: 'Deadpool & Wolverine (IMAX 3D)',
-      type: 'movie',
-      description: 'Marvel Studios ultimate team-up as the Merc with a Mouth joins forces with Wolverine in full 3D.',
-      poster_url: '/event_pics/movie3.png',
+      description: 'Tom Holland swings back onto the big screen in this highly-anticipated Marvel blockbuster, serving as a major theatrical draw across Indian multiplexes.',
+      poster_url: '/event_pics/spiderman_movie.png',
       venue: pvrDelhi,
       price: 480.00,
       cat: reclinerCat.id,
       shows: [
-        { dayOffset: 5, time: '14:00' },
-        { dayOffset: 5, time: '18:00' },
-        { dayOffset: 5, time: '21:30' }
+        { dayOffset: 5, time: '11:00' },
+        { dayOffset: 5, time: '15:15' },
+        { dayOffset: 5, time: '18:30' },
+        { dayOffset: 5, time: '21:45' }
       ]
     },
     {
-      title: 'Pushpa 2: The Rule (Dolby Atmos)',
+      title: 'Odyssey',
       type: 'movie',
-      description: 'Allu Arjun returns as Pushpa Raj in the grand action finale dominating the red sandalwood empire.',
-      poster_url: '/event_pics/movie4.png',
+      description: 'A grand historical epic starring Ralph Fiennes and Juliette Binoche, retelling Homer\'s classic tale of Odysseus returning home from the Trojan War.',
+      poster_url: '/event_pics/odyssey_movie.png',
       venue: pvrDelhi,
       price: 450.00,
       cat: reclinerCat.id,
       shows: [
-        { dayOffset: 7, time: '12:30' },
-        { dayOffset: 7, time: '16:45' },
-        { dayOffset: 7, time: '20:30' },
-        { dayOffset: 8, time: '19:00' }
+        { dayOffset: 8, time: '13:00' },
+        { dayOffset: 8, time: '17:00' },
+        { dayOffset: 8, time: '21:00' }
       ]
     },
     {
-      title: 'Gladiator II (IMAX 70mm)',
+      title: 'The End of Oak Street',
       type: 'movie',
-      description: 'Ridley Scott returns to the Colosseum in an epic sequel depicting power, revenge, and Roman glory.',
-      poster_url: '/event_pics/movie5.png',
+      description: 'A multi-lingual sci-fi adventure starring Anne Hathaway, where an entire suburban neighborhood is mysteriously transported back to the prehistoric age of dinosaurs.',
+      poster_url: '/event_pics/oakstreet_movie.png',
       venue: pvrDelhi,
-      price: 550.00,
+      price: 420.00,
       cat: reclinerCat.id,
       shows: [
-        { dayOffset: 9, time: '15:00' },
-        { dayOffset: 9, time: '19:00' }
+        { dayOffset: 12, time: '14:00' },
+        { dayOffset: 12, time: '18:00' },
+        { dayOffset: 12, time: '21:30' }
+      ]
+    },
+    {
+      title: 'Awarapan 2',
+      type: 'movie',
+      description: 'Emraan Hashmi returns as Shivam Pandit after nearly two decades in this intense, action-packed gangster romance sequel.',
+      poster_url: '/event_pics/awara_movie.png',
+      venue: pvrDelhi,
+      price: 400.00,
+      cat: reclinerCat.id,
+      shows: [
+        { dayOffset: 16, time: '12:30' },
+        { dayOffset: 16, time: '16:45' },
+        { dayOffset: 16, time: '20:30' }
+      ]
+    },
+    {
+      title: 'Batwara 1947',
+      type: 'movie',
+      description: 'A gripping, emotionally charged period drama centered around a Hindu family caught in the social conflicts of the Partition in Lahore.',
+      poster_url: '/event_pics/batwara_movie.png',
+      venue: pvrDelhi,
+      price: 380.00,
+      cat: reclinerCat.id,
+      shows: [
+        { dayOffset: 20, time: '15:00' },
+        { dayOffset: 20, time: '19:00' }
       ]
     },
 
-    // COMEDY
+    // --- 3. SPORTS ---
     {
-      title: 'Zakir Khan: Tathastu & Unfiltered Live',
-      type: 'comedy',
-      description: 'India’s Sakht Launda Zakir Khan brings his brand new hour of relatable storytelling and razor-sharp punchlines.',
-      poster_url: '/event_pics/comedy1.png',
-      venue: habitatBlr,
-      price: 799.00,
-      cat: generalCat.id,
-      shows: [
-        { dayOffset: 2, time: '17:00' },
-        { dayOffset: 2, time: '20:00' },
-        { dayOffset: 3, time: '19:00' }
-      ]
-    },
-    {
-      title: 'Anubhav Singh Bassi: Bas Kar Bassi',
-      type: 'comedy',
-      description: 'Bassi shares hilarious hostel memories, college nostalgia, and real-life misadventures live in Bengaluru.',
-      poster_url: '/event_pics/comedy2.png',
-      venue: habitatBlr,
-      price: 699.00,
-      cat: generalCat.id,
-      shows: [
-        { dayOffset: 4, time: '16:30' },
-        { dayOffset: 4, time: '19:30' }
-      ]
-    },
-    {
-      title: 'Samay Raina: Unfiltered Standup Tour',
-      type: 'comedy',
-      description: 'The king of dark humor and crowd work Samay Raina performs his raw, unscripted live comedy show.',
-      poster_url: '/event_pics/comedy3.png',
-      venue: habitatBlr,
-      price: 899.00,
-      cat: generalCat.id,
-      shows: [
-        { dayOffset: 6, time: '17:30' },
-        { dayOffset: 6, time: '21:00' },
-        { dayOffset: 7, time: '20:00' }
-      ]
-    },
-    {
-      title: 'Harsh Gujral: Jo Bolta Hai Wohi Hota Hai',
-      type: 'comedy',
-      description: 'Harsh Gujral brings his quick-witted North Indian observational comedy and interactive crowd roasting.',
-      poster_url: '/event_pics/comedy4.png',
-      venue: habitatBlr,
-      price: 599.00,
-      cat: generalCat.id,
-      shows: [
-        { dayOffset: 8, time: '16:00' },
-        { dayOffset: 8, time: '18:30' },
-        { dayOffset: 8, time: '21:00' },
-        { dayOffset: 9, time: '19:30' }
-      ]
-    },
-    {
-      title: 'Biswa Kalyan Rath: Live Standup Special',
-      type: 'comedy',
-      description: 'Biswa Mast Aadmi delivers hilarious analytical breakdowns of everyday Indian life and human behavior.',
-      poster_url: '/event_pics/comedy5.png',
-      venue: habitatBlr,
-      price: 749.00,
-      cat: generalCat.id,
-      shows: [
-        { dayOffset: 10, time: '18:00' },
-        { dayOffset: 10, time: '20:30' }
-      ]
-    },
-
-    // SPORTS
-    {
-      title: 'India vs England T20 International Series',
+      title: 'Indian Women\'s League (IWL) 2026',
       type: 'sports',
-      description: 'High-voltage T20 international cricket clash under stadium lights at Wankhede Stadium, Mumbai.',
+      description: 'Football (Club League): Indian Women\'s League (IWL) kicks off its top-tier women\'s club season stretching through early January.',
       poster_url: '/event_pics/sports1.png',
-      venue: wankhedeMumbai,
-      price: 1800.00,
+      venue: balewadiPune,
+      price: 499.00,
       cat: lowerTierCat.id,
       shows: [
-        { dayOffset: 3, time: '14:30' },
-        { dayOffset: 3, time: '19:00' }
+        { dayOffset: 11, time: '16:00' }, // Sept 3, 2026
+        { dayOffset: 11, time: '19:30' }
       ]
     },
     {
-      title: 'IPL Night: Mumbai Indians vs Chennai Super Kings',
+      title: 'India vs Afghanistan - Bilateral T20I Series',
       type: 'sports',
-      description: 'The blockbuster El Clásico of Indian cricket! Rohit Sharma vs MS Dhoni in a roaring stadium thriller.',
+      description: 'Cricket (International T20I): India national cricket team vs Afghanistan three-match bilateral T20 series takes place live under stadium lights.',
       poster_url: '/event_pics/sports2.png',
+      venue: noidaStadium,
+      price: 1999.00,
+      cat: lowerTierCat.id,
+      shows: [
+        { dayOffset: 21, time: '19:00' }, // Sept 13, 2026
+        { dayOffset: 23, time: '19:00' }, // Sept 15, 2026
+        { dayOffset: 25, time: '19:00' }  // Sept 17, 2026
+      ]
+    },
+    {
+      title: 'India vs Brazil - Historic International Friendly',
+      type: 'sports',
+      description: 'Football (International Friendly): India vs Brazil historic international friendly match for which the national team intentionally withdrew from the ASEAN Cup.',
+      poster_url: '/event_pics/sports3.png',
       venue: wankhedeMumbai,
       price: 2500.00,
       cat: lowerTierCat.id,
       shows: [
-        { dayOffset: 5, time: '15:30' },
-        { dayOffset: 5, time: '19:30' },
-        { dayOffset: 6, time: '19:30' }
+        { dayOffset: 41, time: '16:00' }, // Oct 3, 2026
+        { dayOffset: 41, time: '20:00' }
       ]
     },
     {
-      title: 'ISL Final: Mohun Bagan vs Mumbai City FC',
+      title: '65th National Open Athletics Championships',
       type: 'sports',
-      description: 'The pinnacle of Indian football! Two powerhouse football clubs battle for 90 minutes for the ISL Trophy.',
-      poster_url: '/event_pics/sports3.png',
-      venue: balewadiPune,
-      price: 999.00,
+      description: 'Athletics: 65th National Open Athletics Championships organized by the Athletics Federation of India featuring top national track and field stars.',
+      poster_url: '/event_pics/sports4.png',
+      venue: noidaStadium,
+      price: 350.00,
       cat: upperDeckCat.id,
       shows: [
-        { dayOffset: 7, time: '16:00' },
-        { dayOffset: 7, time: '19:30' }
+        { dayOffset: 46, time: '09:00' }, // Oct 8, 2026
+        { dayOffset: 47, time: '09:00' }, // Oct 9, 2026
+        { dayOffset: 49, time: '16:00' }  // Oct 11, 2026
       ]
     },
     {
-      title: 'Pro Kabaddi League Championship Final',
+      title: 'Syed Modi India International 2026',
       type: 'sports',
-      description: 'High-intensity raids, tackles, and non-stop kabaddi adrenaline live inside the Gachibowli Arena.',
-      poster_url: '/event_pics/sports4.png',
+      description: 'Badminton: Syed Modi India International, a major BWF World Tour event, hosting global badminton stars in Lucknow.',
+      poster_url: '/event_pics/sports5.png',
       venue: gachibowliHyd,
-      price: 750.00,
+      price: 650.00,
       cat: vipPitCat.id,
       shows: [
-        { dayOffset: 9, time: '17:00' },
-        { dayOffset: 9, time: '20:00' },
-        { dayOffset: 10, time: '19:30' }
+        { dayOffset: 93, time: '10:00' }, // Nov 24, 2026
+        { dayOffset: 96, time: '14:00' }, // Nov 27, 2026
+        { dayOffset: 98, time: '16:00' }  // Nov 29, 2026
+      ]
+    },
+
+    // --- 4. COMEDY ---
+    {
+      title: 'Anubhav Singh Bassi – Kisi Ko Batana Mat',
+      type: 'comedy',
+      description: 'Bassi is packing auditoriums with his hilarious, nostalgic storytelling format detailing his chaotic college days and everyday life.',
+      poster_url: '/event_pics/comedy2.png',
+      venue: habitatBlr,
+      price: 799.00,
+      cat: generalCat.id,
+      shows: [
+        { dayOffset: 10, time: '17:00' },
+        { dayOffset: 10, time: '20:00' },
+        { dayOffset: 21, time: '19:30' }
       ]
     },
     {
-      title: 'Formula 1 Indian Night Grand Prix 2026',
-      type: 'sports',
-      description: 'The ultimate motorsport spectacle! 200mph night circuit racing under towering stadium illuminations.',
-      poster_url: '/event_pics/sports5.png',
-      venue: noidaStadium,
-      price: 4500.00,
-      cat: lowerTierCat.id,
+      title: 'Abhishek Upmanyu – TOXIC',
+      type: 'comedy',
+      description: 'Known for his lightning-fast delivery and sharp, cynical observational style, Upmanyu\'s new special TOXIC is sweeping major cities.',
+      poster_url: '/event_pics/comedy1.png',
+      venue: habitatBlr,
+      price: 899.00,
+      cat: generalCat.id,
       shows: [
-        { dayOffset: 11, time: '16:00' },
-        { dayOffset: 11, time: '20:00' },
-        { dayOffset: 12, time: '19:00' },
-        { dayOffset: 12, time: '22:00' }
+        { dayOffset: 6, time: '19:00' },  // Aug 29, 2026
+        { dayOffset: 26, time: '18:00' }, // Sept 18, 2026
+        { dayOffset: 35, time: '20:00' }  // Sept 27, 2026
+      ]
+    },
+    {
+      title: 'Samay Raina – Still Alive',
+      type: 'comedy',
+      description: 'Blending dark humor and freewheeling crowd interaction, Samay is dropping into experimental club tapings alongside surprise top-tier acts.',
+      poster_url: '/event_pics/comedy3.png',
+      venue: habitatBlr,
+      price: 999.00,
+      cat: generalCat.id,
+      shows: [
+        { dayOffset: 4, time: '21:00' }, // Aug 27, 2026
+        { dayOffset: 7, time: '21:00' }, // Aug 30, 2026
+        { dayOffset: 9, time: '22:00' }  // Sept 1, 2026
+      ]
+    },
+    {
+      title: 'Harsh Gujral – Jo Bolta Hai Wahi Hota Hai',
+      type: 'comedy',
+      description: 'Renowned as the undisputed king of relentless front-row crowd-roasting and raw, high-energy North Indian observational humor.',
+      poster_url: '/event_pics/comedy4.png',
+      venue: habitatBlr,
+      price: 699.00,
+      cat: generalCat.id,
+      shows: [
+        { dayOffset: 15, time: '16:00' },
+        { dayOffset: 15, time: '18:30' },
+        { dayOffset: 15, time: '21:00' },
+        { dayOffset: 16, time: '19:30' }
+      ]
+    },
+    {
+      title: 'Munawar Faruqui – BEEDI',
+      type: 'comedy',
+      description: 'Following massive reality television triumphs and completely sold-out national stadium runs, Munawar returns with his brand new solo hour BEEDI blending honest storytelling and sharp crowd interaction.',
+      poster_url: '/event_pics/comedy5.png',
+      venue: habitatBlr,
+      price: 850.00,
+      cat: generalCat.id,
+      shows: [
+        { dayOffset: 97, time: '18:00' }, // Nov 28, 2026
+        { dayOffset: 98, time: '20:30' }  // Nov 29, 2026
       ]
     }
   ];
