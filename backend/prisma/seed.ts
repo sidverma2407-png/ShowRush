@@ -119,7 +119,7 @@ async function main() {
       title: 'Coldplay: Music Of The Spheres World Tour',
       type: 'concert',
       description: 'The global stadium phenomenon featuring LED wristbands, pyrotechnics, and iconic anthems live in Mumbai.',
-      poster_url: '/event_pics/concert_1.png',
+      poster_url: '/event_pics/concert1.png',
       venue: jioMumbai,
       dateOffset: 2, // Aug 25
       time: '19:30',
@@ -130,7 +130,7 @@ async function main() {
       title: 'A.R. Rahman: Symphony of Hope Live',
       type: 'concert',
       description: 'Oscar & Grammy maestro A.R. Rahman performs live with a full 60-piece symphony orchestra.',
-      poster_url: '/event_pics/concert_2.png',
+      poster_url: '/event_pics/concert2.png',
       venue: jioMumbai,
       dateOffset: 4, // Aug 27
       time: '19:00',
@@ -141,7 +141,7 @@ async function main() {
       title: 'Sunburn EDM Arena Festival',
       type: 'concert',
       description: 'Asia’s largest electronic dance music arena featuring top international DJs and massive laser light shows.',
-      poster_url: '/event_pics/concert_3.png',
+      poster_url: '/event_pics/concert3.png',
       venue: gachibowliHyd,
       dateOffset: 6, // Aug 29
       time: '18:00',
@@ -152,7 +152,7 @@ async function main() {
       title: 'Karan Aujla: It Was All A Dream Tour',
       type: 'concert',
       description: 'Punjabi music sensation Karan Aujla live in concert performing his chart-topping hits with live band.',
-      poster_url: '/event_pics/concert_4.png',
+      poster_url: '/event_pics/concert4.png',
       venue: noidaStadium,
       dateOffset: 8, // Aug 31
       time: '20:00',
@@ -163,7 +163,7 @@ async function main() {
       title: 'Diljit Dosanjh: Dil-Luminati India Tour',
       type: 'concert',
       description: 'Global superstar Diljit Dosanjh brings his explosive Dil-Luminati stadium spectacle live to Bengaluru.',
-      poster_url: '/event_pics/concert_5.png',
+      poster_url: '/event_pics/concert5.png',
       venue: chinnaswamyBlr,
       dateOffset: 10, // Sep 2
       time: '19:30',
@@ -176,7 +176,7 @@ async function main() {
       title: 'Stree 2: Sarkate Ka Aatank (IMAX)',
       type: 'movie',
       description: 'The legendary horror-comedy blockbuster returns as Chanderi faces the terrifying headless myth Sarkata.',
-      poster_url: '/event_pics/movie_1.png',
+      poster_url: '/event_pics/movie1.png',
       venue: pvrDelhi,
       dateOffset: 2, // Aug 25
       time: '18:30',
@@ -187,7 +187,7 @@ async function main() {
       title: 'Kalki 2898 AD (IMAX 3D)',
       type: 'movie',
       description: 'Prabhas and Amitabh Bachchan star in Nag Ashwin’s epic futuristic mythological sci-fi spectacle.',
-      poster_url: '/event_pics/movie_2.png',
+      poster_url: '/event_pics/movie2.png',
       venue: pvrDelhi,
       dateOffset: 3, // Aug 26
       time: '21:00',
@@ -198,7 +198,7 @@ async function main() {
       title: 'Deadpool & Wolverine (IMAX 3D)',
       type: 'movie',
       description: 'Marvel Studios ultimate team-up as the Merc with a Mouth joins forces with Wolverine in full 3D.',
-      poster_url: '/event_pics/movie_3.png',
+      poster_url: '/event_pics/movie3.png',
       venue: pvrDelhi,
       dateOffset: 5, // Aug 28
       time: '19:45',
@@ -209,7 +209,7 @@ async function main() {
       title: 'Pushpa 2: The Rule (Dolby Atmos)',
       type: 'movie',
       description: 'Allu Arjun returns as Pushpa Raj in the grand action finale dominating the red sandalwood empire.',
-      poster_url: '/event_pics/movie_4.png',
+      poster_url: '/event_pics/movie4.png',
       venue: pvrDelhi,
       dateOffset: 7, // Aug 30
       time: '20:30',
@@ -220,7 +220,7 @@ async function main() {
       title: 'Gladiator II (IMAX 70mm)',
       type: 'movie',
       description: 'Ridley Scott returns to the Colosseum in an epic sequel depicting power, revenge, and Roman glory.',
-      poster_url: '/event_pics/movie_5.png',
+      poster_url: '/event_pics/movie5.png',
       venue: pvrDelhi,
       dateOffset: 9, // Sep 1
       time: '17:30',
@@ -233,7 +233,7 @@ async function main() {
       title: 'Zakir Khan: Tathastu & Unfiltered Live',
       type: 'comedy',
       description: 'India’s Sakht Launda Zakir Khan brings his brand new hour of relatable storytelling and razor-sharp punchlines.',
-      poster_url: '/event_pics/comedy_1.png',
+      poster_url: '/event_pics/comedy1.png',
       venue: habitatBlr,
       dateOffset: 2, // Aug 25
       time: '20:00',
@@ -244,7 +244,7 @@ async function main() {
       title: 'Anubhav Singh Bassi: Bas Kar Bassi',
       type: 'comedy',
       description: 'Bassi shares hilarious hostel memories, college nostalgia, and real-life misadventures live in Bengaluru.',
-      poster_url: '/event_pics/comedy_2.png',
+      poster_url: '/event_pics/comedy2.png',
       venue: habitatBlr,
       dateOffset: 4, // Aug 27
       time: '19:30',
@@ -255,7 +255,7 @@ async function main() {
       title: 'Samay Raina: Unfiltered Standup Tour',
       type: 'comedy',
       description: 'The king of dark humor and crowd work Samay Raina performs his raw, unscripted live comedy show.',
-      poster_url: '/event_pics/comedy_3.png',
+      poster_url: '/event_pics/comedy3.png',
       venue: habitatBlr,
       dateOffset: 6, // Aug 29
       time: '21:00',
@@ -266,7 +266,7 @@ async function main() {
       title: 'Harsh Gujral: Jo Bolta Hai Wohi Hota Hai',
       type: 'comedy',
       description: 'Harsh Gujral brings his quick-witted North Indian observational comedy and interactive crowd roasting.',
-      poster_url: '/event_pics/comedy_4.png',
+      poster_url: '/event_pics/comedy4.png',
       venue: habitatBlr,
       dateOffset: 8, // Aug 31
       time: '18:30',
@@ -277,7 +277,7 @@ async function main() {
       title: 'Biswa Kalyan Rath: Live Standup Special',
       type: 'comedy',
       description: 'Biswa Mast Aadmi delivers hilarious analytical breakdowns of everyday Indian life and human behavior.',
-      poster_url: '/event_pics/comedy_5.png',
+      poster_url: '/event_pics/comedy5.png',
       venue: habitatBlr,
       dateOffset: 10, // Sep 2
       time: '20:30',
@@ -290,7 +290,7 @@ async function main() {
       title: 'India vs England T20 International Series',
       type: 'sports',
       description: 'High-voltage T20 international cricket clash under stadium lights at Wankhede Stadium, Mumbai.',
-      poster_url: '/event_pics/sports_1.png',
+      poster_url: '/event_pics/sports1.png',
       venue: wankhedeMumbai,
       dateOffset: 3, // Aug 26
       time: '19:00',
@@ -301,7 +301,7 @@ async function main() {
       title: 'IPL Night: Mumbai Indians vs Chennai Super Kings',
       type: 'sports',
       description: 'The blockbuster El Clásico of Indian cricket! Rohit Sharma vs MS Dhoni in a roaring stadium thriller.',
-      poster_url: '/event_pics/sports_2.png',
+      poster_url: '/event_pics/sports2.png',
       venue: wankhedeMumbai,
       dateOffset: 5, // Aug 28
       time: '19:30',
@@ -312,7 +312,7 @@ async function main() {
       title: 'ISL Final: Mohun Bagan vs Mumbai City FC',
       type: 'sports',
       description: 'The pinnacle of Indian football! Two powerhouse football clubs battle for 90 minutes for the ISL Trophy.',
-      poster_url: '/event_pics/sports_3.png',
+      poster_url: '/event_pics/sports3.png',
       venue: balewadiPune,
       dateOffset: 7, // Aug 30
       time: '19:30',
@@ -323,7 +323,7 @@ async function main() {
       title: 'Pro Kabaddi League Championship Final',
       type: 'sports',
       description: 'High-intensity raids, tackles, and non-stop kabaddi adrenaline live inside the Gachibowli Arena.',
-      poster_url: '/event_pics/sports_4.png',
+      poster_url: '/event_pics/sports4.png',
       venue: gachibowliHyd,
       dateOffset: 9, // Sep 1
       time: '20:00',
@@ -334,7 +334,7 @@ async function main() {
       title: 'Formula 1 Indian Night Grand Prix 2026',
       type: 'sports',
       description: 'The ultimate motorsport spectacle! 200mph night circuit racing under towering stadium illuminations.',
-      poster_url: '/event_pics/sports_5.png',
+      poster_url: '/event_pics/sports5.png',
       venue: noidaStadium,
       dateOffset: 11, // Sep 3
       time: '20:00',
