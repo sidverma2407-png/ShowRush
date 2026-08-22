@@ -21,9 +21,10 @@ export const errorHandler = (
 
   // Handle Prisma errors
   if (err.name === 'PrismaClientKnownRequestError') {
+    const metaDetails = (err as any).meta ? `: ${JSON.stringify((err as any).meta)}` : '';
     return res.status(400).json({
       status: 'error',
-      message: 'Database operation failed',
+      message: err.message ? `Database error: ${err.message}` : 'Database operation failed',
       details: (err as any).meta
     });
   }

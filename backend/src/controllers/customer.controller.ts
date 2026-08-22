@@ -77,6 +77,14 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
       show_id
     );
 
+    if (!seats || seats.length === 0) {
+      throw new NotFoundError('Held seats not found or hold has expired. Please re-select your seats.');
+    }
+
+    if (seats.length !== seat_status_ids.length) {
+      throw new ConflictError('One or more seats are no longer held. Please re-select your seats.');
+    }
+
     const now = new Date();
     for (const seat of seats) {
       const seatHeldBy = seat.held_by ? String(seat.held_by).toLowerCase().trim() : null;
@@ -104,10 +112,14 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
     let totalPrice = 0;
 
     // Fetch the venue_seats to know the category
-    const seatIds = seats.map(s => `'${s.venue_seat_id}'`).join(',');
-    const venueSeats = await tx.$queryRawUnsafe<any[]>(
-      `SELECT * FROM venue_seats WHERE id IN (${seatIds})`
-    );
+    const seatIds = seats.map(s => `'${s.venue_seat_id}'`).filter(Boolean).join(',');
+    let venueSeats: any[] = [];
+    if (seatIds.length > 0) {
+      venueSeats = await tx.$queryRawUnsafe<any[]>(
+        `SELECT * FROM venue_seats WHERE id IN (${seatIds})`
+      );
+    }
+
     const categoryMap = new Map();
     venueSeats.forEach(vs => categoryMap.set(vs.id, vs.category_id));
 
@@ -117,18 +129,31 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
     }
 
     const bookingRef = `QR-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-    const newBooking = await tx.booking.create({
-      data: { 
-        customer_id: req.user!.id, 
-        // @ts-ignore - IDE caches old Prisma types, tsc passes
-        customer_name,
-        // @ts-ignore
-        customer_phone,
-        show_id, 
-        booking_reference: bookingRef, 
-        total_price: totalPrice 
-      }
-    });
+    let newBooking: any;
+    try {
+      newBooking = await tx.booking.create({
+        data: { 
+          customer_id: req.user!.id, 
+          // @ts-ignore - IDE caches old Prisma types, tsc passes
+          customer_name,
+          // @ts-ignore
+          customer_phone,
+          show_id, 
+          booking_reference: bookingRef, 
+          total_price: totalPrice 
+        }
+      });
+    } catch (e) {
+      // Fallback if production PostgreSQL schema does not yet have customer_name / customer_phone columns
+      newBooking = await tx.booking.create({
+        data: { 
+          customer_id: req.user!.id, 
+          show_id, 
+          booking_reference: bookingRef, 
+          total_price: totalPrice 
+        }
+      });
+    }
 
     for (const seat of seats) {
       await tx.bookingSeat.create({
