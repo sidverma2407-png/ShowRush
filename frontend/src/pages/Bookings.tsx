@@ -1,12 +1,46 @@
 import { useEffect, useState } from 'react';
 import { fetchApi } from '../api/client';
 import { useModalStore } from '../store/modal';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export default function Bookings() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const { showConfirm, showSuccess, showError } = useModalStore();
+
+  const downloadTicketPDF = async (booking: any) => {
+    setDownloadingId(booking.id);
+    try {
+      const ticketElement = document.getElementById(`ticket-${booking.id}`);
+      if (!ticketElement) throw new Error('Ticket element not found in DOM');
+
+      const canvas = await html2canvas(ticketElement, {
+        scale: 2, // High resolution for PDF
+        useCORS: true,
+        backgroundColor: '#f8fafc' // slate-50 as fallback background
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      
+      // Calculate dimensions in mm (standard for jsPDF)
+      const pdf = new jsPDF({
+        orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+        unit: 'px',
+        format: [canvas.width, canvas.height]
+      });
+
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+      pdf.save(`Seatzy_Ticket_${booking.booking_reference}.pdf`);
+    } catch (err: any) {
+      console.error('Failed to generate PDF:', err);
+      showError(err.message || 'Failed to generate PDF ticket.');
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   const fetchBookings = () => {
     fetchApi('/bookings')
@@ -72,7 +106,7 @@ export default function Bookings() {
             <p className="font-data-label text-xs sm:text-sm uppercase font-bold">Go find some events and book your seats.</p>
           </div>
         ) : bookings.map(booking => (
-          <article key={booking.id} className="relative bg-surface border-2 sm:border-border-width border-on-background flex flex-col md:flex-row shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] blueprint-bg group overflow-hidden">
+          <article id={`ticket-${booking.id}`} key={booking.id} className="relative bg-surface border-2 sm:border-border-width border-on-background flex flex-col md:flex-row shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] blueprint-bg group overflow-hidden">
             
             {booking.status === 'cancelled' && (
               <div className="absolute top-3 right-3 z-20 pointer-events-none">
@@ -123,6 +157,20 @@ export default function Bookings() {
               </div>
 
               <div className="mt-6 flex flex-wrap gap-2.5 justify-end">
+                 {booking.status === 'confirmed' && (
+                   <button 
+                     onClick={() => downloadTicketPDF(booking)}
+                     disabled={downloadingId === booking.id}
+                     className="bg-secondary-fixed text-on-background border-2 border-on-background px-4 py-2 font-headline-lg text-xs sm:text-sm uppercase font-black hover:bg-on-background hover:text-secondary-fixed transition-colors min-h-[44px] flex items-center justify-center flex-grow sm:flex-grow-0 gap-1"
+                   >
+                     {downloadingId === booking.id ? (
+                       <span className="material-symbols-outlined animate-spin text-[18px]">sync</span>
+                     ) : (
+                       <span className="material-symbols-outlined text-[18px]">download</span>
+                     )}
+                     DOWNLOAD PDF
+                   </button>
+                 )}
                  <button 
                    onClick={() => setSelectedBooking(booking)}
                    className="bg-primary-fixed text-on-background border-2 border-on-background px-4 py-2 font-headline-lg text-xs sm:text-sm uppercase font-black hover:bg-on-background hover:text-primary-fixed transition-colors min-h-[44px] flex items-center justify-center flex-grow sm:flex-grow-0"
