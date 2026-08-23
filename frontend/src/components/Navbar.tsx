@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/auth';
 import CitySelectModal from './CitySelectModal';
+import AccountSettingsModal from './AccountSettingsModal';
 
 export default function Navbar() {
   const { user, logout } = useAuthStore();
@@ -11,6 +12,7 @@ export default function Navbar() {
   });
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   const handleCitySelect = (city: string) => {
     setSelectedCity(city);
@@ -36,7 +38,10 @@ export default function Navbar() {
       <nav className="w-full bg-on-background border-b-2 sm:border-b-4 border-on-background shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] sticky top-0 z-50">
         <div className="flex justify-between items-center w-full px-4 md:px-margin-desktop py-3 md:py-4">
           <div className="flex items-center gap-2 sm:gap-4 md:gap-6">
-            <Link to={user?.role === 'organiser' ? '/organiser/dashboard' : user?.role === 'admin' ? '/admin/venues' : '/'} className="font-headline-lg text-2xl sm:text-3xl md:text-4xl font-black text-primary-fixed italic tracking-tight flex items-center min-h-[44px] min-w-[44px]">
+            <Link
+              to={user?.role === 'organiser' ? '/organiser/dashboard' : user?.role === 'admin' ? '/admin/venues' : '/'}
+              className="font-headline-lg text-2xl sm:text-3xl md:text-4xl font-black text-primary-fixed italic tracking-tight flex items-center min-h-[44px] min-w-[44px]"
+            >
               SEATZY
             </Link>
 
@@ -93,9 +98,38 @@ export default function Navbar() {
                 <Link to="/register" className="font-headline-lg text-lg md:text-xl uppercase text-primary-fixed font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all">Register</Link>
               </div>
             ) : (
-              <button onClick={logout} className="hidden md:block bg-primary-fixed text-on-background font-data-label text-data-label uppercase border-2 border-on-background px-5 py-2 neo-brutalist-shadow neo-brutalist-hover neo-brutalist-active transition-all font-bold min-h-[44px]">
-                Logout
-              </button>
+              <div className="hidden md:flex items-center gap-3">
+                {/* Logged in email & Account settings trigger */}
+                <button
+                  onClick={() => setIsSettingsModalOpen(true)}
+                  className="flex items-center gap-2 bg-surface text-on-surface border-2 border-on-background px-3 py-1.5 font-mono text-xs shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-100 active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer group"
+                  title="Click to view Account Settings & change password"
+                >
+                  <div className="w-6 h-6 rounded-full bg-primary-fixed border border-black flex items-center justify-center font-black text-black text-[11px] uppercase">
+                    {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                  <div className="flex flex-col text-left">
+                    <span className="font-extrabold text-xs text-on-surface truncate max-w-[160px] lg:max-w-[200px]">
+                      {user.email}
+                    </span>
+                    <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider font-bold">
+                      {user.role} • Settings
+                    </span>
+                  </div>
+                  <span className="material-symbols-outlined text-sm font-black text-neutral-700 group-hover:rotate-45 transition-transform">
+                    settings
+                  </span>
+                </button>
+
+                {/* Logout button */}
+                <button
+                  onClick={logout}
+                  className="bg-primary-fixed text-on-background font-data-label text-data-label uppercase border-2 border-on-background px-4 py-2 neo-brutalist-shadow neo-brutalist-hover neo-brutalist-active transition-all font-bold min-h-[40px] flex items-center gap-1.5"
+                >
+                  <span className="material-symbols-outlined text-sm font-black">logout</span>
+                  Logout
+                </button>
+              </div>
             )}
 
             {/* Mobile Hamburger Toggle Button (44x44px min target) */}
@@ -116,12 +150,27 @@ export default function Navbar() {
           <div className="md:hidden border-t-4 border-on-background bg-on-background px-4 py-6 flex flex-col gap-4 shadow-[0px_8px_16px_rgba(0,0,0,0.5)]">
             {user ? (
               <>
-                <div className="bg-surface p-3 border-2 border-on-background mb-2">
-                  <span className="font-data-label text-xs uppercase font-bold text-on-surface-variant block">LOGGED IN AS</span>
-                  <span className="font-headline-lg text-base font-black text-on-surface uppercase truncate block">{user.name}</span>
-                  <span className="inline-block bg-primary-fixed text-on-primary-fixed text-[10px] font-black uppercase px-2 py-0.5 mt-1 border border-on-background">
-                    {user.role}
-                  </span>
+                <div className="bg-surface p-4 border-3 border-on-background mb-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div>
+                      <span className="font-data-label text-[10px] uppercase font-black text-neutral-500 block">LOGGED IN USER</span>
+                      <span className="font-headline-lg text-base font-black text-on-surface uppercase truncate block">{user.name}</span>
+                      <span className="font-mono text-xs font-bold text-neutral-700 break-all block">{user.email}</span>
+                    </div>
+                    <span className="inline-block bg-primary-fixed text-on-primary-fixed text-[10px] font-black uppercase px-2 py-0.5 border border-on-background">
+                      {user.role}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setIsSettingsModalOpen(true);
+                    }}
+                    className="w-full mt-2 bg-yellow-100 text-on-background border-2 border-black py-2 px-3 font-headline-lg text-xs uppercase font-black flex items-center justify-center gap-1.5 hover:bg-yellow-200"
+                  >
+                    <span className="material-symbols-outlined text-sm">settings</span>
+                    ACCOUNT SETTINGS & SECURITY
+                  </button>
                 </div>
 
                 {user.role === 'customer' && (
@@ -213,6 +262,12 @@ export default function Navbar() {
         onClose={() => setIsCityModalOpen(false)}
         selectedCity={selectedCity}
         onSelectCity={handleCitySelect}
+      />
+
+      {/* Account Settings & Security Modal */}
+      <AccountSettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
       />
     </>
   );

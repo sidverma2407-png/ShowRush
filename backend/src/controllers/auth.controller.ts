@@ -2,9 +2,10 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import prisma from '../utils/prisma';
-import { ConflictError, UnauthorizedError, BadRequestError } from '../utils/errors';
+import { ConflictError, UnauthorizedError, BadRequestError, NotFoundError } from '../utils/errors';
 import { Role } from '@prisma/client';
 import { validateEmailFormat, sendOtpEmail, isSmtpConfigured } from '../utils/email';
+import { AuthRequest } from '../middleware/auth';
 
 export const register = async (req: Request, res: Response) => {
   const { name, email, password, role } = req.body;
@@ -426,3 +427,99 @@ export const resetPasswordWithOtp = async (req: Request, res: Response) => {
   });
 };
 
+// Get authenticated user profile & metrics
+export const getProfile = async (req: AuthRequest, res: Response) => {
+  const userId = req.user!.id;
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      created_at: true,
+      _count: {
+        select: {
+          bookings: true,
+          events_organized: true
+        }
+      }
+    }
+  });
+
+  if (!user) throw new NotFoundError('User account not found');
+
+  res.json({
+    status: 'success',
+    data: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      created_at: user.created_at,
+      total_bookings: user._count.bookings,
+      total_events: user._count.events_organized
+    }
+  });
+};
+
+// Update profile name
+export const updateProfile = async (req: AuthRequest, res: Response) => {
+  const userId = req.user!.id;
+  const { name } = req.body;
+
+  if (!name || !name.trim()) {
+    throw new BadRequestError('Name cannot be empty');
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: { name: name.trim() },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      created_at: true
+    }
+  });
+
+  res.json({
+    status: 'success',
+    message: 'Profile name updated successfully',
+    data: updatedUser
+  });
+};
+
+// Change password for logged in user
+export const changePassword = async (req: AuthRequest, res: Response) => {
+  const userId = req.user!.id;
+  const { current_password, new_password } = req.body;
+
+  if (!current_password || !new_password) {
+    throw new BadRequestError('Current password and new password are required');
+  }
+
+  if (new_password.length < 6) {
+    throw new BadRequestError('New password must be at least 6 characters long');
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new NotFoundError('User not found');
+
+  const valid = await bcrypt.compare(current_password, user.password_hash);
+  if (!valid) {
+    throw new BadRequestError('Current password is incorrect');
+  }
+
+  const password_hash = await bcrypt.hash(new_password, 10);
+  await prisma.user.update({
+    where: { id: userId },
+    data: { password_hash }
+  });
+
+  res.json({
+    status: 'success',
+    message: 'Password changed successfully!'
+  });
+};

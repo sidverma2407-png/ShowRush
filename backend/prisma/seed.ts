@@ -14,10 +14,10 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log('Clearing old data and seeding database with real-world Indian events, cinema chains, metadata, trailers, addons & reviews...');
 
-  // Clean wipe tables for fresh layout seeding
-  await prisma.$executeRawUnsafe(`TRUNCATE TABLE "coupons", "booking_addons", "addon_items", "reviews", "bookings", "booking_seats", "waitlist_entries", "seat_status", "show_category_pricing", "shows", "events", "venue_seats", "seat_categories", "venues" CASCADE;`);
+  // Clean wipe tables for fresh layout seeding (including previous test accounts)
+  await prisma.$executeRawUnsafe(`TRUNCATE TABLE "coupons", "booking_addons", "addon_items", "reviews", "bookings", "booking_seats", "waitlist_entries", "seat_status", "show_category_pricing", "shows", "events", "venue_seats", "seat_categories", "venues", "users" CASCADE;`);
 
-  // Create users
+  // Create clean demo users
   const password_hash = await bcrypt.hash('password123', 10);
 
   const admin = await prisma.user.upsert({
@@ -30,6 +30,12 @@ async function main() {
     where: { email: 'organiser@seatzy.com' },
     update: { is_verified: true },
     create: { name: 'Organiser User', email: 'organiser@seatzy.com', password_hash, role: 'organiser', is_verified: true }
+  });
+
+  const customer = await prisma.user.upsert({
+    where: { email: 'customer@seatzy.com' },
+    update: { is_verified: true },
+    create: { name: 'Demo Customer', email: 'customer@seatzy.com', password_hash, role: 'customer', is_verified: true }
   });
 
   const reviewer1 = await prisma.user.upsert({

@@ -6,8 +6,12 @@ import {
   resendOtp,
   requestOtpLogin,
   verifyOtpLogin,
-  resetPasswordWithOtp
+  resetPasswordWithOtp,
+  getProfile,
+  updateProfile,
+  changePassword
 } from '../controllers/auth.controller';
+import { authenticate } from '../middleware/auth';
 
 const router = Router();
 
@@ -19,5 +23,9 @@ router.post('/request-otp-login', requestOtpLogin);
 router.post('/verify-otp-login', verifyOtpLogin);
 router.post('/reset-password-otp', resetPasswordWithOtp);
 
-export default router;
+// Authenticated user settings routes
+router.get('/profile', authenticate, getProfile);
+router.put('/profile', authenticate, updateProfile);
+router.put('/change-password', authenticate, changePassword);
 
+export default router;
