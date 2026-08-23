@@ -39,30 +39,38 @@ export const isSmtpConfigured = () => {
 
 // Create Nodemailer Transporter dynamically at runtime
 const getTransporter = () => {
-  const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
   const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
   // Strip any accidental spaces if user pasted "abcd efgh ijkl mnop"
   const pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim().replace(/\s+/g, '');
-  const port = Number(process.env.SMTP_PORT) || 587;
+  const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
+  const port = Number(process.env.SMTP_PORT) || 465;
 
   if (user && pass && !user.includes('ethereal.email')) {
-    if (host.includes('gmail') || user.endsWith('@gmail.com')) {
-      return nodemailer.createTransport({
-        service: 'gmail',
-        auth: { user, pass }
-      });
-    }
-
+    const isGmail = host.includes('gmail') || user.endsWith('@gmail.com');
     return nodemailer.createTransport({
-      host,
-      port,
-      secure: port === 465, // true for 465, false for 587
+      host: isGmail ? 'smtp.gmail.com' : host,
+      port: isGmail ? 465 : port,
+      secure: isGmail ? true : port === 465,
       auth: { user, pass },
-      tls: { rejectUnauthorized: false }
+      tls: {
+        rejectUnauthorized: false
+      }
     });
   }
 
   return null;
+};
+
+// Ensure From header matches authenticated Gmail account to prevent Google SMTP rejections
+const getSender = (displayName: string) => {
+  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
+  if (process.env.EMAIL_FROM && process.env.EMAIL_FROM.includes('@')) {
+    return process.env.EMAIL_FROM;
+  }
+  if (user) {
+    return `"${displayName}" <${user}>`;
+  }
+  return `"${displayName}" <verify@seatzy.com>`;
 };
 
 // Send 6-Digit Email Verification OTP
@@ -78,7 +86,7 @@ export const sendOtpEmail = async (email: string, otp: string, name: string) => 
   }
 
   const mailOptions = {
-    from: process.env.EMAIL_FROM || '"Seatzy Verification" <verify@seatzy.com>',
+    from: getSender('Seatzy Verification'),
     to: email,
     subject: `${otp} is your Seatzy Account Verification Code`,
     html: `
@@ -186,7 +194,7 @@ export const sendBookingEmail = async (
   }
 
   const mailOptions = {
-    from: process.env.EMAIL_FROM || '"Seatzy Tickets" <tickets@seatzy.com>',
+    from: getSender('Seatzy Tickets'),
     to: email,
     subject: `Ticket Confirmed: ${eventTitle} (${bookingRef})`,
     html: `
@@ -300,7 +308,7 @@ export const sendWaitlistOfferEmail = async (email: string, token: string, showD
   const offerLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/waitlist/offer/${token}`;
 
   const mailOptions = {
-    from: process.env.EMAIL_FROM || '"Seatzy Waitlist" <waitlist@seatzy.com>',
+    from: getSender('Seatzy Waitlist'),
     to: email,
     subject: `Seat Available! Claim your ticket for ${showDetails.event.title}`,
     html: `
