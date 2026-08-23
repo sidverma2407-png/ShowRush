@@ -32,18 +32,21 @@ export const validateEmailFormat = (email: string): { valid: boolean; reason?: s
 };
 
 export const isSmtpConfigured = () => {
-  return Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
+  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
+  const pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim();
+  return Boolean(user && pass && !user.includes('ethereal.email'));
 };
 
 // Create Nodemailer Transporter dynamically at runtime
 const getTransporter = () => {
-  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+  const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
+  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
+  // Strip any accidental spaces if user pasted "abcd efgh ijkl mnop"
+  const pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim().replace(/\s+/g, '');
   const port = Number(process.env.SMTP_PORT) || 587;
 
-  if (user && pass) {
-    if (host.includes('gmail')) {
+  if (user && pass && !user.includes('ethereal.email')) {
+    if (host.includes('gmail') || user.endsWith('@gmail.com')) {
       return nodemailer.createTransport({
         service: 'gmail',
         auth: { user, pass }
