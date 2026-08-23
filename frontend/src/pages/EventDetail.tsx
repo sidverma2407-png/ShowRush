@@ -225,7 +225,8 @@ export default function EventDetail() {
     );
   }
 
-  const embedUrl = extractYouTubeEmbedUrl(event.trailer_url);
+  const isMovie = event.type === 'movie';
+  const embedUrl = isMovie ? extractYouTubeEmbedUrl(event.trailer_url) : null;
 
   // Group shows by City -> Date -> Cinema Chain / Venue
   const availableCities = Array.from(new Set(event.shows.map(s => s.venue.city)));
@@ -297,12 +298,12 @@ export default function EventDetail() {
                 className="w-full h-96 md:h-[420px] object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute top-3 left-3 bg-black text-yellow-300 border-2 border-black px-2.5 py-1 font-mono font-black text-xs uppercase shadow-neo-sm">
-                In Cinemas
+                {isMovie ? 'In Cinemas' : 'Live Event'}
               </div>
             </div>
 
-            {/* Dedicated Watch Trailer Button Below Poster */}
-            {embedUrl && (
+            {/* Dedicated Watch Trailer Button Below Poster (ONLY FOR MOVIES) */}
+            {isMovie && embedUrl && (
               <button
                 onClick={() => setShowTrailerModal(true)}
                 className="w-full bg-red-600 hover:bg-red-700 text-white font-mono font-black text-sm uppercase py-3 px-4 border-3 border-black shadow-neo flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer"
@@ -322,7 +323,7 @@ export default function EventDetail() {
                 {event.type}
               </span>
               
-              {event.certification && (
+              {isMovie && event.certification && (
                 <span className="bg-red-600 text-white border-2 border-black font-black text-xs uppercase px-3 py-1 shadow-neo-sm tracking-wider">
                   RATED {event.certification}
                 </span>
@@ -334,7 +335,7 @@ export default function EventDetail() {
                 </span>
               )}
               
-              {event.format && (
+              {isMovie && event.format && (
                 <span className="bg-blue-500 text-white border-2 border-black font-mono font-black text-xs uppercase px-3 py-1 shadow-neo-sm">
                   {event.format}
                 </span>
@@ -363,10 +364,10 @@ export default function EventDetail() {
                   onClick={scrollToReviewSection}
                   className="px-3.5 py-2 bg-white text-black border-2 border-black font-mono font-black text-xs uppercase hover:bg-yellow-300 transition-all shadow-neo-sm cursor-pointer"
                 >
-                  Rate Movie
+                  {isMovie ? 'Rate Movie' : 'Rate Event'}
                 </button>
 
-                {embedUrl && (
+                {isMovie && embedUrl && (
                   <button
                     onClick={() => setShowTrailerModal(true)}
                     className="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white border-2 border-black font-mono font-black text-xs uppercase transition-all shadow-neo-sm flex items-center gap-1.5 cursor-pointer"
@@ -389,7 +390,7 @@ export default function EventDetail() {
                 </div>
               )}
               
-              {castMembers.length > 0 && (
+              {isMovie && castMembers.length > 0 && (
                 <div className="flex flex-wrap items-center gap-2 pt-1">
                   <span className="text-yellow-400 font-bold uppercase text-xs">Cast:</span>
                   {castMembers.map((actor, idx) => (
@@ -412,8 +413,8 @@ export default function EventDetail() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 space-y-10">
 
-        {/* 2. COMPACT TRAILER PROMPT BANNER */}
-        {embedUrl && (
+        {/* 2. COMPACT TRAILER PROMPT BANNER (MOVIES ONLY) */}
+        {isMovie && embedUrl && (
           <div className="bg-yellow-300 border-4 border-black p-4 sm:p-5 shadow-neo flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-black text-yellow-300 border-2 border-black flex items-center justify-center font-black shrink-0">
@@ -450,10 +451,10 @@ export default function EventDetail() {
               </span>
               <div>
                 <span className="text-[10px] font-mono font-black uppercase tracking-widest text-slate-600 block">
-                  REAL-TIME SEAT LOCK ENGINE
+                  {isMovie ? 'REAL-TIME SEAT LOCK ENGINE' : 'LIVE EVENT TICKET SELECTION'}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-black">
-                  SELECT SHOW TIMING
+                  {isMovie ? 'SELECT SHOW TIMING' : 'AVAILABLE SHOWTIMES & TICKETS'}
                 </h2>
               </div>
             </div>

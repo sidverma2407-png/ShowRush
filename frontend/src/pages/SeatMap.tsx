@@ -136,8 +136,16 @@ export default function SeatMap() {
   const handleCheckout = () => {
     const myHolds = seats.filter(s => s.status === 'held' && s.held_by === user?.id);
     if (myHolds.length === 0) return showAlert('No seats held. Please select and hold seats before checkout.', { title: 'HOLD SEATS FIRST', type: 'warning' });
-    if (!customerName || !customerPhone) return showAlert('Please enter your full name and phone number to complete booking.', { title: 'DETAILS REQUIRED', type: 'warning' });
     
+    if (!customerName || !customerName.trim()) {
+      return showAlert('Please enter your full name to complete booking.', { title: 'NAME REQUIRED', type: 'warning' });
+    }
+
+    const digitsOnly = customerPhone.replace(/\D/g, '');
+    if (digitsOnly.length !== 10) {
+      return showAlert('Please enter a valid 10-digit mobile number (e.g. 9876543210) to proceed.', { title: 'INVALID PHONE NUMBER', type: 'warning' });
+    }
+
     setIsAddonModalOpen(true);
   };
 
@@ -1070,13 +1078,31 @@ export default function SeatMap() {
                    onChange={e => setCustomerName(e.target.value)}
                    className="w-full bg-surface border-2 border-on-background p-3 font-data-label text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 font-bold min-h-[46px]"
                  />
-                 <input 
-                   type="tel" 
-                   placeholder="PHONE NUMBER" 
-                   value={customerPhone}
-                   onChange={e => setCustomerPhone(e.target.value)}
-                   className="w-full bg-surface border-2 border-on-background p-3 font-data-label text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 font-bold min-h-[46px]"
-                 />
+                 <div className="flex flex-col gap-1">
+                   <input 
+                     type="tel" 
+                     placeholder="10-DIGIT PHONE NUMBER (e.g. 9876543210)" 
+                     value={customerPhone}
+                     maxLength={10}
+                     onChange={e => {
+                       const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                       setCustomerPhone(digits);
+                     }}
+                     className={`w-full bg-surface border-2 border-on-background p-3 font-data-label text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 font-bold min-h-[46px] ${
+                       customerPhone && customerPhone.length !== 10 ? 'border-red-600 ring-2 ring-red-400/50' : ''
+                     }`}
+                   />
+                   {customerPhone && customerPhone.length !== 10 ? (
+                     <span className="text-[10px] font-mono font-bold text-red-600 uppercase flex items-center gap-1">
+                       <span>⚠️ MUST BE EXACTLY 10 DIGITS</span>
+                       <span>({customerPhone.length}/10)</span>
+                     </span>
+                   ) : customerPhone && customerPhone.length === 10 ? (
+                     <span className="text-[10px] font-mono font-bold text-emerald-700 uppercase flex items-center gap-1">
+                       <span>✓ VALID 10-DIGIT NUMBER</span>
+                     </span>
+                   ) : null}
+                 </div>
                </div>
             </div>
           )}

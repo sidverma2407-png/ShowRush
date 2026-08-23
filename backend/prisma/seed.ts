@@ -80,7 +80,7 @@ async function main() {
       { name: 'Salted Butter Popcorn (Medium)', category: 'food', price: 280.00, image_url: 'https://images.unsplash.com/photo-1585647347483-22b66260dfff?w=400', available: true },
       { name: 'Cheesy Nachos with Salsa', category: 'food', price: 320.00, image_url: 'https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=400', available: true },
       { name: 'Gourmet Chicken Burger', category: 'food', price: 390.00, image_url: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400', available: true },
-      { name: 'Cold Pepsi (500ml)', category: 'drink', price: 180.00, image_url: 'https://images.unsplash.com/photo-1629203851122-372655437577?w=400', available: true },
+      { name: 'Cold Pepsi (500ml)', category: 'drink', price: 180.00, image_url: '/event_pics/pepsi_can.png', available: true },
       { name: 'Coca-Cola Zero Sugar (500ml)', category: 'drink', price: 180.00, image_url: 'https://images.unsplash.com/photo-1554866585-cd94860890b7?w=400', available: true },
       { name: 'Iced Hazelnut Cold Coffee', category: 'drink', price: 240.00, image_url: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=400', available: true },
       { name: 'Blockbuster Combo: Large Popcorn + 2 Pepsi', category: 'combo', price: 590.00, image_url: 'https://images.unsplash.com/photo-1585647347483-22b66260dfff?w=400', available: true }
