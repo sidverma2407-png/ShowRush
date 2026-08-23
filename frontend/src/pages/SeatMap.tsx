@@ -82,6 +82,16 @@ export default function SeatMap() {
   };
 
   const handleHold = async () => {
+    if (!user) {
+      showAlert('Please log in to your Seatzy account to hold seats and proceed to checkout.', {
+        title: 'SIGN IN REQUIRED',
+        type: 'warning',
+        buttonText: 'SIGN IN NOW',
+        onClose: () => navigate('/login')
+      });
+      return;
+    }
+
     const seatsToHold = selectedSeats.filter(s => s.status === 'available');
     if (seatsToHold.length === 0) return;
     setHolding(true);
@@ -100,7 +110,15 @@ export default function SeatMap() {
         return up ? { ...s, ...up, venue_seat: up.venue_seat || s.venue_seat } : s;
       }));
     } catch (err: any) {
-      showError(err.message || 'Failed to hold seat');
+      if (err.status === 401) {
+        showError(err.message || 'Session expired. Please sign in again.', {
+          title: 'SESSION EXPIRED',
+          buttonText: 'SIGN IN NOW',
+          onClose: () => navigate('/login')
+        });
+      } else {
+        showError(err.message || 'Failed to hold seat');
+      }
       fetchApi(`/shows/${showId}/seats`).then(res => setSeats(res.data.seats || []));
       setSelectedSeats([]);
     } finally {
@@ -134,6 +152,15 @@ export default function SeatMap() {
   };
 
   const handleCheckout = () => {
+    if (!user) {
+      return showAlert('Please log in to your Seatzy account to complete your booking.', {
+        title: 'SIGN IN REQUIRED',
+        type: 'warning',
+        buttonText: 'SIGN IN NOW',
+        onClose: () => navigate('/login')
+      });
+    }
+
     const myHolds = seats.filter(s => s.status === 'held' && s.held_by === user?.id);
     if (myHolds.length === 0) return showAlert('No seats held. Please select and hold seats before checkout.', { title: 'HOLD SEATS FIRST', type: 'warning' });
     
@@ -150,6 +177,15 @@ export default function SeatMap() {
   };
 
   const executeFinalBooking = async (selectedAddons: { addon_item_id: string; quantity: number }[], couponCode?: string) => {
+    if (!user) {
+      return showAlert('Please sign in to complete your booking.', {
+        title: 'SIGN IN REQUIRED',
+        type: 'warning',
+        buttonText: 'SIGN IN NOW',
+        onClose: () => navigate('/login')
+      });
+    }
+
     setIsAddonModalOpen(false);
     const myHolds = seats.filter(s => s.status === 'held' && s.held_by === user?.id);
     setCheckingOut(true);
@@ -171,13 +207,30 @@ export default function SeatMap() {
         onClose: () => navigate('/bookings')
       });
     } catch (err: any) {
-      showError(err.message || 'Checkout failed');
+      if (err.status === 401) {
+        showError(err.message || 'Session expired. Please sign in again.', {
+          title: 'SESSION EXPIRED',
+          buttonText: 'SIGN IN NOW',
+          onClose: () => navigate('/login')
+        });
+      } else {
+        showError(err.message || 'Checkout failed');
+      }
     } finally {
       setCheckingOut(false);
     }
   };
 
   const handleWaitlist = async (seat: any) => {
+    if (!user) {
+      return showAlert('Please log in to your Seatzy account to join the priority waitlist.', {
+        title: 'SIGN IN REQUIRED',
+        type: 'warning',
+        buttonText: 'SIGN IN NOW',
+        onClose: () => navigate('/login')
+      });
+    }
+
     try {
       await fetchApi(`/shows/${showId}/waitlist`, {
         method: 'POST',
@@ -185,7 +238,15 @@ export default function SeatMap() {
       });
       showSuccess('You have successfully joined the waitlist for this seat category!\n\nIf a ticket becomes available, you will receive an exclusive email link.', { title: 'WAITLIST JOINED' });
     } catch (err: any) {
-      showError(err.message || 'Failed to join waitlist');
+      if (err.status === 401) {
+        showError(err.message || 'Session expired. Please sign in again.', {
+          title: 'SESSION EXPIRED',
+          buttonText: 'SIGN IN NOW',
+          onClose: () => navigate('/login')
+        });
+      } else {
+        showError(err.message || 'Failed to join waitlist');
+      }
     }
   };
 

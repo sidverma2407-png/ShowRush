@@ -50,8 +50,16 @@ export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('auth-storage');
+    }
     const errorData = await response.json().catch(() => ({}));
-    const err: any = new Error(errorData.message || 'API request failed');
+    let msg = errorData.message || 'API request failed';
+    if (response.status === 401 && (msg.toLowerCase().includes('token') || msg.toLowerCase().includes('unauthorized') || msg.toLowerCase().includes('no longer exists'))) {
+      msg = 'Your session has expired. Please sign in again to continue.';
+    }
+    const err: any = new Error(msg);
     err.data = errorData;
     err.status = response.status;
     throw err;
