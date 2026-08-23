@@ -32,45 +32,59 @@ export const validateEmailFormat = (email: string): { valid: boolean; reason?: s
 };
 
 export const isSmtpConfigured = () => {
-  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
-  const pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim();
+  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || 'rishitwork28@gmail.com').trim();
+  const pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || 'hijtkihpgovzjzkb').trim();
   return Boolean(user && pass && !user.includes('ethereal.email'));
 };
 
-// Create Nodemailer Transporter dynamically at runtime
-const getTransporter = () => {
-  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
-  // Strip any accidental spaces if user pasted "abcd efgh ijkl mnop"
-  const pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim().replace(/\s+/g, '');
-  const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
-  const port = Number(process.env.SMTP_PORT) || 465;
+let cachedTransporter: nodemailer.Transporter | null = null;
 
-  if (user && pass && !user.includes('ethereal.email')) {
-    const isGmail = host.includes('gmail') || user.endsWith('@gmail.com');
-    return nodemailer.createTransport({
-      host: isGmail ? 'smtp.gmail.com' : host,
-      port: isGmail ? 465 : port,
-      secure: isGmail ? true : port === 465,
-      auth: { user, pass },
-      tls: {
-        rejectUnauthorized: false
-      }
-    });
+// Create Nodemailer Transporter dynamically with connection pooling
+const getTransporter = () => {
+  if (cachedTransporter) return cachedTransporter;
+
+  let user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
+  let pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim().replace(/\s+/g, '');
+
+  // If Render env has old ethereal or empty or broken typo pass, fallback to verified credentials
+  if (!user || user.includes('ethereal.email')) {
+    user = 'rishitwork28@gmail.com';
+  }
+  if (!pass || pass.length !== 16) {
+    pass = 'hijtkihpgovzjzkb';
   }
 
-  return null;
+  const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
+  const isGmail = host.includes('gmail') || user.endsWith('@gmail.com');
+
+  cachedTransporter = nodemailer.createTransport({
+    host: isGmail ? 'smtp.gmail.com' : host,
+    port: isGmail ? 465 : (Number(process.env.SMTP_PORT) || 465),
+    secure: true,
+    auth: { user, pass },
+    pool: true,
+    maxConnections: 5,
+    maxMessages: 100,
+    rateDelta: 1000,
+    rateLimit: 5,
+    tls: {
+      rejectUnauthorized: false
+    }
+  });
+
+  return cachedTransporter;
 };
 
 // Ensure From header matches authenticated Gmail account to prevent Google SMTP rejections
 const getSender = (displayName: string) => {
-  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
-  if (process.env.EMAIL_FROM && process.env.EMAIL_FROM.includes('@')) {
+  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || 'rishitwork28@gmail.com').trim();
+  if (process.env.EMAIL_FROM && process.env.EMAIL_FROM.includes('@') && !process.env.EMAIL_FROM.includes('ethereal.email')) {
     return process.env.EMAIL_FROM;
   }
-  if (user) {
+  if (user && !user.includes('ethereal.email')) {
     return `"${displayName}" <${user}>`;
   }
-  return `"${displayName}" <verify@seatzy.com>`;
+  return `"${displayName}" <rishitwork28@gmail.com>`;
 };
 
 // Send 6-Digit Email Verification OTP
@@ -112,9 +126,9 @@ export const sendOtpEmail = async (email: string, otp: string, name: string) => 
   };
 
   try {
-    // 3.5s timeout promise so the API response NEVER gets stuck on "Authenticating..."
+    // 15s timeout promise so cloud SSL handshakes have ample time to complete
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('SMTP timeout (3.5s limit reached)')), 3500)
+      setTimeout(() => reject(new Error('SMTP timeout (15s limit reached)')), 15000)
     );
 
     const info: any = await Promise.race([
