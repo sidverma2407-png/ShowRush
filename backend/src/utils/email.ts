@@ -131,18 +131,11 @@ export const sendBookingEmail = async (
 ) => {
   const transporter = getTransporter();
   
-  // Create a unique secure payload inside the QR Code
-  const qrPayload = JSON.stringify({
-    ref: bookingRef,
-    event: showDetails?.event?.title || 'Seatzy Event',
-    attendee: customerName || 'Seatzy Guest',
-    phone: customerPhone || 'N/A',
-    seats: seatLabels || [],
-    amount: totalPrice ? `₹${totalPrice}` : 'Paid',
-    timestamp: new Date().toISOString()
-  });
+  // Create a live verification URL inside the QR Code
+  const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+  const qrVerificationUrl = `${frontendBaseUrl}/ticket/verify/${bookingRef}`;
 
-  const qrCodeDataUrl = await QRCode.toDataURL(qrPayload, { margin: 1, scale: 6 });
+  const qrCodeDataUrl = await QRCode.toDataURL(qrVerificationUrl, { margin: 1, scale: 6 });
 
   const eventTitle = showDetails?.event?.title || 'Seatzy Live Event';
   const eventType = showDetails?.event?.type || 'event';

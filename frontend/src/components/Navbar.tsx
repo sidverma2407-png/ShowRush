@@ -36,7 +36,7 @@ export default function Navbar() {
       <nav className="w-full bg-on-background border-b-2 sm:border-b-4 border-on-background shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] sticky top-0 z-50">
         <div className="flex justify-between items-center w-full px-4 md:px-margin-desktop py-3 md:py-4">
           <div className="flex items-center gap-2 sm:gap-4 md:gap-6">
-            <Link to="/" className="font-headline-lg text-2xl sm:text-3xl md:text-4xl font-black text-primary-fixed italic tracking-tight flex items-center min-h-[44px] min-w-[44px]">
+            <Link to={user?.role === 'organiser' ? '/organiser/dashboard' : user?.role === 'admin' ? '/admin/venues' : '/'} className="font-headline-lg text-2xl sm:text-3xl md:text-4xl font-black text-primary-fixed italic tracking-tight flex items-center min-h-[44px] min-w-[44px]">
               SEATZY
             </Link>
 

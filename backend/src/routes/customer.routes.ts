@@ -14,7 +14,8 @@ import {
   cancelBooking,
   joinWaitlist,
   viewWaitlistOffer,
-  acceptWaitlistOffer
+  acceptWaitlistOffer,
+  verifyTicketByRef
 } from '../controllers/customer.controller';
 
 import { validateCoupon } from '../controllers/coupons.controller';
@@ -28,6 +29,7 @@ router.get('/events/:id/reviews', getEventReviews);
 router.get('/addons', getAddonItems);
 router.get('/shows/:id/seats', getSeatMap);
 router.get('/waitlist/offer/:token', viewWaitlistOffer);
+router.get('/tickets/verify/:ref', verifyTicketByRef);
 router.post('/coupons/validate', validateCoupon);
 
 // Authenticated routes

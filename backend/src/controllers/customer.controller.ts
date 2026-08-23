@@ -720,3 +720,83 @@ export const acceptWaitlistOffer = async (req: AuthRequest, res: Response) => {
 
   res.json({ status: 'success', data: booking });
 };
+
+export const verifyTicketByRef = async (req: Request, res: Response) => {
+  const ref = req.params.ref as string;
+  if (!ref) {
+    return res.status(400).json({ status: 'error', message: 'Booking reference is required' });
+  }
+
+  const booking = await prisma.booking.findFirst({
+    where: { booking_reference: ref },
+    include: {
+      customer: true,
+      show: {
+        include: {
+          event: true,
+          venue: true
+        }
+      },
+      seats: {
+        include: {
+          venue_seat: {
+            include: { category: true }
+          }
+        }
+      },
+      booking_addons: {
+        include: {
+          addon_item: true
+        }
+      }
+    }
+  });
+
+  if (!booking) {
+    return res.status(404).json({ status: 'error', message: 'Ticket pass not found or invalid reference' });
+  }
+
+  res.json({
+    status: 'success',
+    data: {
+      id: booking.id,
+      booking_reference: booking.booking_reference,
+      status: booking.status,
+      customer_name: booking.customer_name || booking.customer?.name || 'Valued Guest',
+      customer_phone: booking.customer_phone || 'N/A',
+      total_price: Number(booking.total_price),
+      created_at: booking.created_at,
+      event: {
+        id: booking.show.event.id,
+        title: booking.show.event.title,
+        type: booking.show.event.type,
+        poster_url: booking.show.event.poster_url,
+        certification: booking.show.event.certification,
+        language: booking.show.language || booking.show.event.language,
+        format: booking.show.format || booking.show.event.format,
+        genre: booking.show.event.genre
+      },
+      show: {
+        id: booking.show.id,
+        date: booking.show.date,
+        time: booking.show.time,
+        language: booking.show.language,
+        format: booking.show.format
+      },
+      venue: {
+        name: booking.show.venue.name,
+        city: booking.show.venue.city,
+        address: booking.show.venue.address
+      },
+      seats: booking.seats.map((s: any) => ({
+        label: `${s.venue_seat.row_label}${s.venue_seat.seat_number}`,
+        category: s.venue_seat.category.name,
+        price: Number(s.venue_seat.category.price || 0)
+      })),
+      addons: booking.booking_addons.map((ba: any) => ({
+        name: ba.addon_item.name,
+        quantity: ba.quantity
+      }))
+    }
+  });
+};

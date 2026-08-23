@@ -12,6 +12,7 @@ import Bookings from './pages/Bookings';
 import WaitlistOffer from './pages/WaitlistOffer';
 import AdminVenues from './pages/AdminVenues';
 import OrganiserDashboard from './pages/OrganiserDashboard';
+import TicketVerification from './pages/TicketVerification';
 
 // Components
 import Navbar from './components/Navbar';
@@ -55,6 +56,7 @@ function App() {
                   <Route path="/bookings" element={
                     <ProtectedRoute allowedRoles={['customer']}><Bookings /></ProtectedRoute>
                   } />
+                  <Route path="/ticket/verify/:ref" element={<TicketVerification />} />
                   <Route path="/waitlist/offer/:token" element={<WaitlistOffer />} />
                   <Route path="/organiser/dashboard" element={
                     <ProtectedRoute allowedRoles={['organiser']}><OrganiserDashboard /></ProtectedRoute>
