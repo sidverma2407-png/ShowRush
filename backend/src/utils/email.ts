@@ -34,37 +34,37 @@ export const validateEmailFormat = (email: string): { valid: boolean; reason?: s
 export const isSmtpConfigured = () => {
   const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
   const pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim();
-  return Boolean(user && pass && !user.includes('ethereal.email'));
+  const host = (process.env.SMTP_HOST || '').trim();
+  return Boolean(user && pass && host && !user.includes('ethereal.email'));
 };
 
 // Create a fresh Nodemailer Transporter on each call.
-// Cloud hosts (Render free tier) have NO outbound IPv6 routing.
-// Gmail smtp.gmail.com resolves to IPv6 (2607:f8b0:..) → ENETUNREACH on Render.
-// Fix: family:4 forces Node DNS to only pick IPv4 (74.125.x.x) records.
+// Supports Brevo (smtp-relay.brevo.com), Gmail, or any SMTP provider.
+// family:4 forces IPv4 DNS — Render free tier has no outbound IPv6 routing.
 const getTransporter = () => {
   const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
   const pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim().replace(/\s+/g, '');
-  const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
-  const isGmail = host.includes('gmail') || user.endsWith('@gmail.com');
+  const host = (process.env.SMTP_HOST || '').trim();
 
-  if (!user || !pass || user.includes('ethereal.email')) return null;
+  if (!user || !pass || user.includes('ethereal.email') || !host) return null;
 
-  // Force IPv4 DNS resolution to avoid Render's IPv6-blind network
-  const baseConfig = {
+  // Brevo uses port 587 + STARTTLS. Gmail also works on 587.
+  // family:4 → force IPv4 to avoid ENETUNREACH on Render free tier.
+  const port = Number(process.env.SMTP_PORT) || 587;
+  const transportConfig: any = {
+    host,
+    port,
+    secure: port === 465,   // true only for SSL (port 465), false for STARTTLS (587)
     auth: { user, pass },
     tls: { rejectUnauthorized: false },
-    family: 4,           // ← critical: forces IPv4 on Render (prevents ENETUNREACH)
-    connectionTimeout: 25000,
-    greetingTimeout: 20000,
-    socketTimeout: 25000
+    family: 4,              // ← forces IPv4 DNS — critical for Render free tier
+    connectionTimeout: 30000,
+    greetingTimeout: 25000,
+    socketTimeout: 30000
   };
 
-  const transportConfig: any = isGmail
-    ? { ...baseConfig, host: 'smtp.gmail.com', port: 587, secure: false }
-    : { ...baseConfig, host, port: Number(process.env.SMTP_PORT) || 587, secure: Number(process.env.SMTP_PORT) === 465 };
-
   const t = nodemailer.createTransport(transportConfig);
-  console.log(`[SMTP] Transporter: host=${isGmail ? 'smtp.gmail.com' : host} port=${transportConfig.port} family=IPv4 user=${user.substring(0, 4)}***`);
+  console.log(`[SMTP] Transporter: host=${host} port=${port} family=IPv4 user=${user.substring(0, 4)}***`);
   return t;
 };
 
@@ -119,9 +119,9 @@ export const sendOtpEmail = async (email: string, otp: string, name: string) => 
   };
 
   try {
-    // 15s timeout promise so cloud SSL handshakes have ample time to complete
+    // 30s timeout — enough for Brevo/SMTP cloud handshakes on Render cold starts
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('SMTP timeout (15s limit reached)')), 15000)
+      setTimeout(() => reject(new Error('SMTP timeout after 30s — check SMTP_HOST, port, and credentials')), 30000)
     );
 
     const info: any = await Promise.race([
@@ -129,7 +129,7 @@ export const sendOtpEmail = async (email: string, otp: string, name: string) => 
       timeoutPromise
     ]);
 
-    console.log(`[REAL GMAIL OTP DELIVERED] To: ${email} | Code: ${otp} | MessageId: ${info.messageId}`);
+    console.log(`[SMTP OTP SENT] To: ${email} | Code: ${otp} | MessageId: ${info.messageId}`);
     return { success: true, messageId: info.messageId, previewUrl: undefined };
   } catch (err: any) {
     console.error(`[SMTP ERROR sending OTP to ${email}]:`, err.message || err);
