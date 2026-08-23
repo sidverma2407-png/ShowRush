@@ -209,7 +209,7 @@ export default function Bookings() {
       {/* Ticket Details Modal */}
       {selectedBooking && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-background/80 backdrop-blur-sm animate-fade-in">
-          <div className="bg-surface border-4 border-on-background shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-w-lg w-full p-6 relative flex flex-col gap-4">
+          <div className="bg-surface border-4 border-on-background shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-w-lg w-full p-5 sm:p-6 relative flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setSelectedBooking(null)}
               className="absolute top-4 right-4 bg-error text-on-error border-2 border-on-background w-8 h-8 flex items-center justify-center font-black text-sm hover:scale-105 transition-transform"

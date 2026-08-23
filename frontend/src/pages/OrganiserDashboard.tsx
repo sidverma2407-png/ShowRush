@@ -269,7 +269,7 @@ export default function OrganiserDashboard() {
                 LIVE HUB
               </span>
             </div>
-            <h1 className="font-display-xl text-display-xl text-on-primary uppercase leading-none break-words">
+            <h1 className="font-display-xl text-4xl sm:text-6xl md:text-7xl font-black text-on-primary uppercase leading-none break-words italic">
               COMMAND<br />CENTER
             </h1>
           </div>

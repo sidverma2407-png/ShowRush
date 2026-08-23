@@ -956,6 +956,15 @@ export default function SeatMap() {
             </div>
           )}
 
+          {/* Mobile Swipe & Zoom Hint Banner */}
+          <div className="md:hidden flex items-center justify-between bg-yellow-300 text-black border-2 border-black p-2.5 mb-2 font-mono text-[11px] font-black uppercase shadow-neo-sm">
+            <span className="flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-base">touch_app</span>
+              <span>SWIPE OR PINCH TO NAVIGATE SEAT MAP</span>
+            </span>
+            <span className="material-symbols-outlined text-base">pinch</span>
+          </div>
+
           {/* Seat Map Bounded Scroll Wrapper */}
           <div className="seat-map-container overflow-auto max-w-full touch-pan-x touch-pan-y flex-grow pb-8 w-full flex justify-center border-2 border-dashed border-on-background/20 p-2 bg-surface/50 rounded-lg">
             {showData?.event?.type === 'concert' ? (
