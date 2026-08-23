@@ -168,10 +168,6 @@ export default function Login() {
       {/* Left Branding Panel */}
       <section className="w-full md:w-5/12 bg-on-background text-on-primary flex flex-col justify-between p-6 sm:p-10 border-b-4 md:border-b-0 md:border-r-4 border-on-background relative overflow-hidden">
         <div className="z-10 flex flex-col gap-6">
-          <div className="inline-flex items-center gap-2 bg-primary-fixed text-on-background font-mono text-xs font-black px-3 py-1 border-2 border-primary-fixed uppercase tracking-wider w-fit">
-            SEATZY AUTH PORTAL
-          </div>
-          
           <div>
             <h1 className="font-display-xl text-4xl sm:text-5xl md:text-6xl uppercase text-primary-container leading-none font-black italic tracking-tighter">
               WELCOME BACK

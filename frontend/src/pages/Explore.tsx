@@ -69,15 +69,6 @@ export default function Explore() {
       <section className="w-full bg-on-background text-on-primary py-12 sm:py-16 px-4 md:px-margin-desktop border-b-4 border-on-background relative overflow-hidden">
         <div className="max-w-7xl mx-auto flex flex-col gap-8 relative z-10">
 
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="bg-primary-fixed text-on-background font-mono font-black text-xs px-3 py-1 border-2 border-primary-fixed uppercase tracking-wider">
-              WHAT SEATZY OFFERS
-            </span>
-            <span className="bg-tertiary-fixed text-on-tertiary-fixed font-mono font-black text-xs px-3 py-1 border-2 border-tertiary-fixed uppercase tracking-wider">
-              REAL-TIME TICKETING PLATFORM
-            </span>
-          </div>
-
           <div className="max-w-4xl">
             <h1 className="font-display-xl text-4xl sm:text-6xl md:text-7xl font-black text-primary-container uppercase tracking-tighter leading-none mb-4 italic">
               REAL-TIME SEAT SELECTION & INSTANT QR TICKETS

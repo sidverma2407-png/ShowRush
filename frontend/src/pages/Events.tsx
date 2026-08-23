@@ -76,28 +76,28 @@ export default function Events() {
     <div className="w-full bg-background selection:bg-primary-fixed selection:text-on-primary-fixed pb-20">
       
       {/* Header Hero Section */}
-      <section className="w-full bg-on-background text-on-primary py-12 md:py-16 px-4 md:px-margin-desktop border-b-4 border-on-background relative overflow-hidden">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6 relative z-10">
+      <section className="w-full bg-on-background text-on-primary py-8 sm:py-12 md:py-16 px-4 md:px-margin-desktop border-b-2 sm:border-b-4 border-on-background relative overflow-hidden">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 relative z-10">
           <div>
-            <div className="flex items-center gap-3 mb-3 flex-wrap">
-              <span className="font-mono text-xs uppercase font-black bg-primary-fixed text-on-background px-3 py-1 border-2 border-primary-fixed flex items-center gap-1.5 shadow-sm">
-                <span className="material-symbols-outlined text-sm font-black">location_on</span>
+            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3 flex-wrap">
+              <span className="font-mono text-[11px] sm:text-xs uppercase font-black bg-primary-fixed text-on-background px-2.5 sm:px-3 py-1 border-2 border-primary-fixed flex items-center gap-1.5 shadow-sm">
+                <span className="material-symbols-outlined text-xs sm:text-sm font-black">location_on</span>
                 {selectedCity === 'All Cities' ? 'ALL LOCATIONS' : selectedCity.toUpperCase()}
               </span>
-              <span className="font-mono text-xs uppercase font-black bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 border-2 border-tertiary-fixed">
-                LIVE SEAT LOCKING ENGINE
+              <span className="font-mono text-[11px] sm:text-xs uppercase font-black bg-tertiary-fixed text-on-tertiary-fixed px-2.5 sm:px-3 py-1 border-2 border-tertiary-fixed">
+                LIVE SEAT LOCKING
               </span>
             </div>
 
-            <h1 className="font-display-xl text-4xl sm:text-6xl md:text-7xl font-black text-primary-container uppercase tracking-tight leading-none mb-3 italic">
+            <h1 className="font-display-xl text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-primary-container uppercase tracking-tight leading-none mb-2 sm:mb-3 italic">
               EXPLORE LIVE EVENTS
             </h1>
-            <p className="font-body-md text-xs sm:text-sm text-surface-variant max-w-2xl font-bold uppercase">
+            <p className="font-body-md text-xs sm:text-sm text-surface-variant max-w-2xl font-bold uppercase leading-relaxed">
               Select any event below to view showtimes, trailers, viewer reviews and pick your seats.
             </p>
           </div>
 
-          <div className="bg-primary-fixed text-on-background border-4 border-on-background px-6 py-3 font-display-xl text-xl sm:text-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transform md:-rotate-2 self-start md:self-auto font-black shrink-0">
+          <div className="bg-primary-fixed text-on-background border-2 sm:border-4 border-on-background px-4 sm:px-6 py-2.5 sm:py-3 font-display-xl text-lg sm:text-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transform md:-rotate-2 self-start md:self-auto font-black shrink-0">
             {events.length} EVENTS LOADED
           </div>
         </div>
@@ -107,19 +107,19 @@ export default function Events() {
       </section>
 
       {/* Filter Bar & Category Chips */}
-      <section ref={eventsGridRef} className="max-w-7xl mx-auto px-4 md:px-margin-desktop py-8 flex flex-col gap-6">
+      <section ref={eventsGridRef} className="max-w-7xl mx-auto px-4 md:px-margin-desktop py-6 sm:py-8 flex flex-col gap-4 sm:gap-6">
         
         {/* Category Quick Selector Chips */}
-        <div className="flex items-center gap-2.5 overflow-x-auto pb-2 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none touch-pan-x -mx-4 px-4 sm:mx-0 sm:px-0">
           {categoryChips.map((chip) => {
             const isActive = typeFilter.toLowerCase() === chip.id.toLowerCase();
             return (
               <button
                 key={chip.id}
                 onClick={() => handleCategorySelect(chip.id)}
-                className={`px-4 py-2.5 border-2 border-on-background font-headline-lg text-xs sm:text-sm uppercase font-black whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+                className={`px-3.5 sm:px-4 py-2 sm:py-2.5 border-2 border-on-background font-headline-lg text-xs sm:text-sm uppercase font-black whitespace-nowrap transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer min-h-[44px] shrink-0 ${
                   isActive
-                    ? 'bg-primary-fixed text-on-background shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] translate-y-[-2px]'
+                    ? 'bg-primary-fixed text-on-background shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] translate-y-[-1px]'
                     : 'bg-surface text-on-background hover:bg-surface-variant shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
                 }`}
               >
@@ -131,58 +131,60 @@ export default function Events() {
         </div>
 
         {/* BookMyShow Style Filters: Language, Format, Genre */}
-        <div className="bg-stone-50 border-3 border-on-background p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-wrap gap-4 items-center">
-          <span className="font-mono font-black text-xs uppercase bg-black text-white px-3 py-1 border border-black">
+        <div className="bg-stone-50 border-2 sm:border-3 border-on-background p-3 sm:p-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 sm:items-center">
+          <span className="font-mono font-black text-xs uppercase bg-black text-white px-2.5 py-1 border border-black self-start">
             Movie Filters:
           </span>
 
-          {/* Language Dropdown */}
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-bold uppercase">Language:</span>
-            <select
-              value={languageFilter}
-              onChange={(e) => setLanguageFilter(e.target.value)}
-              className="bg-white border-2 border-black font-mono font-bold text-xs uppercase px-2.5 py-1.5 focus:outline-none cursor-pointer"
-            >
-              <option value="All">All Languages</option>
-              <option value="Hindi">Hindi</option>
-              <option value="English">English</option>
-              <option value="Tamil">Tamil</option>
-              <option value="Telugu">Telugu</option>
-            </select>
-          </div>
+          <div className="grid grid-cols-1 xs:grid-cols-2 sm:flex sm:flex-wrap gap-2.5 sm:gap-4 items-center w-full sm:w-auto">
+            {/* Language Dropdown */}
+            <div className="flex items-center justify-between sm:justify-start gap-2 bg-white border-2 border-black px-2.5 py-1.5 min-h-[42px]">
+              <span className="font-mono text-xs font-bold uppercase shrink-0">Lang:</span>
+              <select
+                value={languageFilter}
+                onChange={(e) => setLanguageFilter(e.target.value)}
+                className="bg-transparent font-mono font-bold text-xs uppercase focus:outline-none cursor-pointer w-full text-right sm:text-left"
+              >
+                <option value="All">All Languages</option>
+                <option value="Hindi">Hindi</option>
+                <option value="English">English</option>
+                <option value="Tamil">Tamil</option>
+                <option value="Telugu">Telugu</option>
+              </select>
+            </div>
 
-          {/* Format Dropdown */}
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-bold uppercase">Format:</span>
-            <select
-              value={formatFilter}
-              onChange={(e) => setFormatFilter(e.target.value)}
-              className="bg-white border-2 border-black font-mono font-bold text-xs uppercase px-2.5 py-1.5 focus:outline-none cursor-pointer"
-            >
-              <option value="All">All Formats</option>
-              <option value="2D">2D</option>
-              <option value="3D">3D</option>
-              <option value="IMAX 3D">IMAX 3D</option>
-              <option value="4DX">4DX</option>
-            </select>
-          </div>
+            {/* Format Dropdown */}
+            <div className="flex items-center justify-between sm:justify-start gap-2 bg-white border-2 border-black px-2.5 py-1.5 min-h-[42px]">
+              <span className="font-mono text-xs font-bold uppercase shrink-0">Format:</span>
+              <select
+                value={formatFilter}
+                onChange={(e) => setFormatFilter(e.target.value)}
+                className="bg-transparent font-mono font-bold text-xs uppercase focus:outline-none cursor-pointer w-full text-right sm:text-left"
+              >
+                <option value="All">All Formats</option>
+                <option value="2D">2D</option>
+                <option value="3D">3D</option>
+                <option value="IMAX 3D">IMAX 3D</option>
+                <option value="4DX">4DX</option>
+              </select>
+            </div>
 
-          {/* Genre Dropdown */}
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-bold uppercase">Genre:</span>
-            <select
-              value={genreFilter}
-              onChange={(e) => setGenreFilter(e.target.value)}
-              className="bg-white border-2 border-black font-mono font-bold text-xs uppercase px-2.5 py-1.5 focus:outline-none cursor-pointer"
-            >
-              <option value="All">All Genres</option>
-              <option value="Action">Action</option>
-              <option value="Comedy">Comedy</option>
-              <option value="Sci-Fi">Sci-Fi</option>
-              <option value="Drama">Drama</option>
-              <option value="Romance">Romance</option>
-            </select>
+            {/* Genre Dropdown */}
+            <div className="flex items-center justify-between sm:justify-start gap-2 bg-white border-2 border-black px-2.5 py-1.5 min-h-[42px]">
+              <span className="font-mono text-xs font-bold uppercase shrink-0">Genre:</span>
+              <select
+                value={genreFilter}
+                onChange={(e) => setGenreFilter(e.target.value)}
+                className="bg-transparent font-mono font-bold text-xs uppercase focus:outline-none cursor-pointer w-full text-right sm:text-left"
+              >
+                <option value="All">All Genres</option>
+                <option value="Action">Action</option>
+                <option value="Comedy">Comedy</option>
+                <option value="Sci-Fi">Sci-Fi</option>
+                <option value="Drama">Drama</option>
+                <option value="Romance">Romance</option>
+              </select>
+            </div>
           </div>
 
           {(languageFilter !== 'All' || formatFilter !== 'All' || genreFilter !== 'All') && (
@@ -192,7 +194,7 @@ export default function Events() {
                 setFormatFilter('All');
                 setGenreFilter('All');
               }}
-              className="font-mono text-xs font-black text-red-600 underline uppercase hover:text-black ml-auto cursor-pointer"
+              className="font-mono text-xs font-black text-red-600 underline uppercase hover:text-black sm:ml-auto cursor-pointer self-start py-1"
             >
               Reset Movie Filters
             </button>
@@ -200,12 +202,12 @@ export default function Events() {
         </div>
 
         {/* Search & Date Filter Inputs */}
-        <div className="flex flex-col md:flex-row gap-4 items-stretch">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch">
           <div className="flex-grow min-w-0 flex relative">
-            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-xl text-on-surface-variant z-10 font-black">search</span>
+            <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-xl text-on-surface-variant z-10 font-black">search</span>
             <input 
-              className="w-full bg-surface border-2 border-on-background pl-12 pr-10 py-3 font-data-label text-sm placeholder:text-on-surface-variant focus:outline-none focus:border-primary shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-bold min-h-[46px]" 
-              placeholder={`Search artist, event title or venue in ${selectedCity.toUpperCase()}...`} 
+              className="w-full bg-surface border-2 border-on-background pl-11 pr-10 py-2.5 sm:py-3 font-data-label text-xs sm:text-sm placeholder:text-on-surface-variant focus:outline-none focus:border-primary shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-bold min-h-[46px]" 
+              placeholder={`Search title, artist or venue...`} 
               type="text" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -213,21 +215,22 @@ export default function Events() {
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-background font-bold text-sm"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-background font-bold text-sm min-w-[32px] min-h-[32px] flex items-center justify-center"
+                aria-label="Clear search"
               >
                 ✕
               </button>
             )}
           </div>
 
-          <div className="flex gap-3 items-center">
-            <div className="flex items-center gap-2 bg-surface border-2 border-on-background px-3 py-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] min-h-[46px]">
+          <div className="flex gap-2 sm:gap-3 items-center">
+            <div className="flex-1 sm:flex-initial flex items-center gap-2 bg-surface border-2 border-on-background px-3 py-1.5 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] min-h-[46px]">
               <span className="material-symbols-outlined text-sm font-black text-primary">calendar_month</span>
               <input 
                 type="date"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="bg-transparent text-on-surface font-data-label text-xs sm:text-sm uppercase font-bold focus:outline-none cursor-pointer"
+                className="bg-transparent text-on-surface font-data-label text-xs sm:text-sm uppercase font-bold focus:outline-none cursor-pointer w-full"
               />
               {dateFilter && (
                 <button onClick={() => setDateFilter('')} className="text-xs font-black hover:text-error ml-1">✕</button>
@@ -245,7 +248,7 @@ export default function Events() {
                   setGenreFilter('All');
                   setSearchParams({});
                 }}
-                className="bg-error text-on-error border-2 border-on-background px-4 py-3 font-headline-lg text-xs uppercase font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-on-background hover:text-error transition-colors min-h-[46px] whitespace-nowrap cursor-pointer"
+                className="bg-error text-on-error border-2 border-on-background px-3.5 sm:px-4 py-2.5 sm:py-3 font-headline-lg text-xs uppercase font-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-on-background hover:text-error transition-colors min-h-[46px] whitespace-nowrap cursor-pointer"
               >
                 CLEAR ALL
               </button>
@@ -302,11 +305,11 @@ export default function Events() {
 
         if (filteredEvents.length === 0) {
           return (
-            <section className="max-w-7xl mx-auto px-4 md:px-margin-desktop py-12">
-              <div className="bg-surface border-4 border-on-background p-8 sm:p-12 flex flex-col items-center gap-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-center max-w-2xl mx-auto">
-                <span className="material-symbols-outlined text-6xl text-on-surface-variant font-black">event_busy</span>
-                <h3 className="font-headline-lg text-2xl uppercase font-black text-on-background">No Events Match Your Filter</h3>
-                <p className="font-body-md text-sm text-on-surface-variant font-bold max-w-md">
+            <section className="max-w-7xl mx-auto px-4 md:px-margin-desktop py-8 sm:py-12">
+              <div className="bg-surface border-2 sm:border-4 border-on-background p-6 sm:p-12 flex flex-col items-center gap-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-center max-w-2xl mx-auto">
+                <span className="material-symbols-outlined text-5xl sm:text-6xl text-on-surface-variant font-black">event_busy</span>
+                <h3 className="font-headline-lg text-xl sm:text-2xl uppercase font-black text-on-background">No Events Match Your Filter</h3>
+                <p className="font-body-md text-xs sm:text-sm text-on-surface-variant font-bold max-w-md">
                   No shows found matching your selected search criteria in {selectedCity}. Try resetting filters.
                 </p>
                 <button
@@ -319,7 +322,7 @@ export default function Events() {
                     setGenreFilter('All');
                     setSearchParams({});
                   }}
-                  className="bg-primary-fixed text-black border-2 border-on-background px-6 py-3 font-headline-lg text-xs uppercase font-black shadow-neo hover:bg-black hover:text-primary-fixed transition-colors"
+                  className="bg-primary-fixed text-black border-2 border-on-background px-6 py-3 font-headline-lg text-xs uppercase font-black shadow-neo hover:bg-black hover:text-primary-fixed transition-colors min-h-[44px]"
                 >
                   Reset All Filters
                 </button>
@@ -329,131 +332,133 @@ export default function Events() {
         }
 
         return (
-          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {filteredEvents.map((event) => {
-              const venueObj = event.shows?.[0]?.venue;
-              const showCount = event.shows?.length || 0;
+          <section className="max-w-7xl mx-auto px-4 md:px-margin-desktop">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
+              {filteredEvents.map((event) => {
+                const venueObj = event.shows?.[0]?.venue;
+                const showCount = event.shows?.length || 0;
 
-              return (
-                <article 
-                  key={event.id}
-                  onClick={() => navigate(`/events/${event.id}`)}
-                  className="bg-surface border-4 border-on-background shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all flex flex-col justify-between overflow-hidden cursor-pointer group"
-                >
-                  {/* Poster Image Container */}
-                  <div className="relative aspect-[16/10] bg-black border-b-4 border-on-background overflow-hidden flex items-center justify-center">
-                    {event.poster_url ? (
-                      <>
-                        <img
-                          src={getImageUrl(event.poster_url)}
-                          alt=""
-                          aria-hidden="true"
-                          className="absolute inset-0 w-full h-full object-cover blur-sm opacity-35 scale-110 pointer-events-none"
-                        />
-                        <img 
-                          src={getImageUrl(event.poster_url)} 
-                          alt={event.title} 
-                          className="relative z-10 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </>
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center blueprint-bg">
-                        <span className="font-data-label text-xs uppercase text-on-surface-variant font-bold">No Poster Available</span>
-                      </div>
-                    )}
-
-                    {/* Category & Location Badges */}
-                    <div className="absolute top-3 left-3 flex gap-2 flex-wrap">
-                      <span className="bg-primary-fixed text-on-background font-mono text-xs uppercase px-2.5 py-1 border-2 border-on-background font-black shadow-sm">
-                        {event.type}
-                      </span>
-                      {event.certification && (
-                        <span className="bg-red-500 text-white font-mono text-xs uppercase px-2 py-1 border-2 border-on-background font-black shadow-sm">
-                          {event.certification}
-                        </span>
+                return (
+                  <article 
+                    key={event.id}
+                    onClick={() => navigate(`/events/${event.id}`)}
+                    className="bg-surface border-2 sm:border-4 border-on-background shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] sm:hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all flex flex-col justify-between overflow-hidden cursor-pointer group"
+                  >
+                    {/* Poster Image Container */}
+                    <div className="relative aspect-[16/10] bg-black border-b-2 sm:border-b-4 border-on-background overflow-hidden flex items-center justify-center">
+                      {event.poster_url ? (
+                        <>
+                          <img
+                            src={getImageUrl(event.poster_url)}
+                            alt=""
+                            aria-hidden="true"
+                            className="absolute inset-0 w-full h-full object-cover blur-sm opacity-35 scale-110 pointer-events-none"
+                          />
+                          <img 
+                            src={getImageUrl(event.poster_url)} 
+                            alt={event.title} 
+                            className="relative z-10 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center blueprint-bg">
+                          <span className="font-data-label text-xs uppercase text-on-surface-variant font-bold">No Poster Available</span>
+                        </div>
                       )}
-                    </div>
 
-                    {/* Rating Badge */}
-                    {event.average_rating && (
-                      <div className="absolute top-3 right-3 bg-primary-fixed text-black font-mono text-xs font-black px-2.5 py-1 border-2 border-on-background shadow-sm flex items-center gap-1">
-                        ★ {event.average_rating}
-                      </div>
-                    )}
-
-                    {/* Shows Available Badge on Poster */}
-                    <div className="absolute bottom-3 right-3 bg-tertiary-fixed text-on-tertiary-fixed font-mono text-xs font-black px-2.5 py-1 border-2 border-on-background shadow-sm uppercase flex items-center gap-1">
-                      <span className="material-symbols-outlined text-xs font-black">bolt</span>
-                      {showCount} {showCount === 1 ? 'SHOW' : 'LIVE SHOWS'}
-                    </div>
-                  </div>
-
-                  {/* Card Content */}
-                  <div className="p-5 flex flex-col flex-grow justify-between">
-                    <div>
-                      <h2 className="font-headline-lg text-lg sm:text-xl text-on-background uppercase font-black line-clamp-1 mb-2 group-hover:text-primary transition-colors">
-                        {event.title}
-                      </h2>
-                      
-                      {/* Language, Format & Genre Tags */}
-                      <div className="flex flex-wrap gap-1 mb-2 font-mono text-[9px] font-black uppercase">
-                        {(event.language || '')
-                          .split(',')
-                          .map((l: string) => l.trim())
-                          .filter(Boolean)
-                          .map((lang: string) => (
-                            <span key={lang} className="bg-slate-100 text-slate-900 border border-black px-1.5 py-0.5">
-                              {lang}
-                            </span>
-                          ))}
-                        {(event.format || '')
-                          .split(',')
-                          .map((f: string) => f.trim())
-                          .filter(Boolean)
-                          .map((fmt: string) => (
-                            <span key={fmt} className="bg-primary-fixed text-black border border-black px-1.5 py-0.5">
-                              {fmt}
-                            </span>
-                          ))}
-                        {(event.genre || '')
-                          .split(',')
-                          .map((g: string) => g.trim())
-                          .filter(Boolean)
-                          .map((gnr: string) => (
-                            <span key={gnr} className="bg-emerald-100 text-emerald-950 border border-black px-1.5 py-0.5">
-                              {gnr}
-                            </span>
-                          ))}
-                      </div>
-
-                      <p className="font-body-md text-xs text-on-surface-variant line-clamp-2 font-bold leading-relaxed mb-4">
-                        {event.description}
-                      </p>
-                    </div>
-
-                    <div className="pt-4 border-t-2 border-on-background/20 flex justify-between items-center">
-                      <div className="flex flex-col">
-                        <span className="font-mono text-[10px] text-on-surface-variant uppercase font-bold">VENUE</span>
-                        <span className="font-headline-lg text-xs uppercase font-black text-on-background line-clamp-1">
-                          {venueObj?.name || 'Partner Arena'}
+                      {/* Category & Location Badges */}
+                      <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 flex gap-1.5 sm:gap-2 flex-wrap">
+                        <span className="bg-primary-fixed text-on-background font-mono text-[10px] sm:text-xs uppercase px-2 sm:px-2.5 py-0.5 sm:py-1 border-2 border-on-background font-black shadow-sm">
+                          {event.type}
                         </span>
+                        {event.certification && (
+                          <span className="bg-red-500 text-white font-mono text-[10px] sm:text-xs uppercase px-2 py-0.5 sm:py-1 border-2 border-on-background font-black shadow-sm">
+                            {event.certification}
+                          </span>
+                        )}
                       </div>
 
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/events/${event.id}`);
-                        }}
-                        className="bg-primary-fixed text-black font-headline-lg text-xs uppercase font-black border-2 border-on-background px-4 py-2.5 group-hover:bg-black group-hover:text-primary-fixed transition-colors min-h-[42px] flex items-center gap-1 shadow-neo-sm"
-                      >
-                        <span>BOOK SHOWS</span>
-                        <span className="material-symbols-outlined text-sm font-black">arrow_forward</span>
-                      </button>
+                      {/* Rating Badge */}
+                      {event.average_rating && (
+                        <div className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 bg-primary-fixed text-black font-mono text-[10px] sm:text-xs font-black px-2 sm:px-2.5 py-0.5 sm:py-1 border-2 border-on-background shadow-sm flex items-center gap-1">
+                          ★ {event.average_rating}
+                        </div>
+                      )}
+
+                      {/* Shows Available Badge on Poster */}
+                      <div className="absolute bottom-2.5 right-2.5 sm:bottom-3 sm:right-3 bg-tertiary-fixed text-on-tertiary-fixed font-mono text-[10px] sm:text-xs font-black px-2 sm:px-2.5 py-0.5 sm:py-1 border-2 border-on-background shadow-sm uppercase flex items-center gap-1">
+                        <span className="material-symbols-outlined text-xs font-black">bolt</span>
+                        {showCount} {showCount === 1 ? 'SHOW' : 'SHOWS'}
+                      </div>
                     </div>
-                  </div>
-                </article>
-              );
-            })}
+
+                    {/* Card Content */}
+                    <div className="p-4 sm:p-5 flex flex-col flex-grow justify-between">
+                      <div>
+                        <h2 className="font-headline-lg text-base sm:text-xl text-on-background uppercase font-black line-clamp-1 mb-2 group-hover:text-primary transition-colors">
+                          {event.title}
+                        </h2>
+                        
+                        {/* Language, Format & Genre Tags */}
+                        <div className="flex flex-wrap gap-1 mb-2 font-mono text-[9px] font-black uppercase">
+                          {(event.language || '')
+                            .split(',')
+                            .map((l: string) => l.trim())
+                            .filter(Boolean)
+                            .map((lang: string) => (
+                              <span key={lang} className="bg-slate-100 text-slate-900 border border-black px-1.5 py-0.5">
+                                {lang}
+                              </span>
+                            ))}
+                          {(event.format || '')
+                            .split(',')
+                            .map((f: string) => f.trim())
+                            .filter(Boolean)
+                            .map((fmt: string) => (
+                              <span key={fmt} className="bg-primary-fixed text-black border border-black px-1.5 py-0.5">
+                                {fmt}
+                              </span>
+                            ))}
+                          {(event.genre || '')
+                            .split(',')
+                            .map((g: string) => g.trim())
+                            .filter(Boolean)
+                            .map((gnr: string) => (
+                              <span key={gnr} className="bg-emerald-100 text-emerald-950 border border-black px-1.5 py-0.5">
+                                {gnr}
+                              </span>
+                            ))}
+                        </div>
+
+                        <p className="font-body-md text-xs text-on-surface-variant line-clamp-2 font-bold leading-relaxed mb-3 sm:mb-4">
+                          {event.description}
+                        </p>
+                      </div>
+
+                      <div className="pt-3 sm:pt-4 border-t-2 border-on-background/20 flex justify-between items-center gap-2">
+                        <div className="flex flex-col min-w-0">
+                          <span className="font-mono text-[9px] sm:text-[10px] text-on-surface-variant uppercase font-bold">VENUE</span>
+                          <span className="font-headline-lg text-xs uppercase font-black text-on-background truncate">
+                            {venueObj?.name || 'Partner Arena'}
+                          </span>
+                        </div>
+
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/events/${event.id}`);
+                          }}
+                          className="bg-primary-fixed text-black font-headline-lg text-xs uppercase font-black border-2 border-on-background px-3.5 sm:px-4 py-2 sm:py-2.5 group-hover:bg-black group-hover:text-primary-fixed transition-colors min-h-[42px] flex items-center gap-1 shadow-neo-sm shrink-0"
+                        >
+                          <span>BOOK</span>
+                          <span className="material-symbols-outlined text-sm font-black">arrow_forward</span>
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
           </section>
         );
       })()}

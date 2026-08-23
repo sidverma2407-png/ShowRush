@@ -459,9 +459,6 @@ export default function OrganiserDashboard() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="bg-primary-fixed text-on-background font-mono font-black text-xs px-2.5 py-0.5 border border-primary-fixed uppercase tracking-wider">
-                ORGANISER CONSOLE
-              </span>
               <span className={`font-mono text-xs flex items-center gap-1.5 font-bold px-2.5 py-0.5 border ${
                 livePulse ? 'bg-emerald-400 text-emerald-950 border-emerald-950 animate-bounce' : 'bg-slate-800 text-emerald-400 border-emerald-500'
               }`}>

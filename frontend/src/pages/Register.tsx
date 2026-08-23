@@ -104,9 +104,6 @@ export default function Register() {
       <div className="w-full md:w-5/12 p-6 sm:p-10 border-b-4 md:border-b-0 md:border-r-4 border-on-background relative overflow-hidden bg-primary-fixed flex flex-col justify-between">
         <div className="relative z-10 flex flex-col justify-between h-full gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 bg-on-background text-primary-fixed font-mono text-xs font-black px-3 py-1 border-2 border-on-background uppercase tracking-wider w-fit mb-4">
-              NEW ACCOUNT REGISTRATION
-            </div>
             <h1 className="font-display-xl text-4xl sm:text-5xl md:text-6xl text-on-background uppercase leading-none font-black italic">
               JOIN THE<br />LIVE RIOT
             </h1>

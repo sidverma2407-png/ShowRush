@@ -1,6 +1,6 @@
-# Seatzy: High-Concurrency Ticket Booking and Reservation Platform
+# Seatzy
 
-Seatzy is a full-stack, production-ready ticket booking engine for Movies, Concerts, and Sports events designed to handle high-demand ticket sales, zero-double-booking concurrency control, automatic waitlist reallocation, real-time seat maps, and QR code ticket generation.
+Ticket booking platform for Movies and Concerts. Supports high-demand ticket sales, zero-double-booking concurrency control, automatic waitlist reallocation, real-time seat maps, and QR code ticket generation.
 
 ---
 
@@ -10,7 +10,7 @@ Seatzy is a full-stack, production-ready ticket booking engine for Movies, Conce
 - **Pessimistic Concurrency Control**: Prevents simultaneous double-holds or double-bookings using PostgreSQL row-level locks (`SELECT ... FOR UPDATE`).
 - **10-Minute Hold TTL and Auto-Release**: Temporary seat holds on checkout auto-expire if abandoned, with live WebSocket updates (`Socket.IO`) to all connected users.
 - **Automatic Waitlist Reallocation**: Sold-out categories support FIFO waitlists. On booking cancellation, the freed seat is automatically held and offered to the next waitlisted user via a time-limited email link.
-- **QR Code Ticket Delivery**: Confirmed bookings generate a unique QR code ticket containing the booking reference code and email it directly to the customer via `nodemailer`.
+- **QR Code Ticket Delivery**: Confirmed bookings generate a unique QR code ticket containing the booking reference code and email it directly to the customer via the **Brevo API**.
 - **Organiser and Admin Command Center**: Comprehensive dashboard tracking Gross Revenue (INR), Tickets Sold, Capacity Utilization %, Show Schedules, Per-Category Pricing, and Booking Logs.
 
 ---

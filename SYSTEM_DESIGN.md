@@ -1,7 +1,7 @@
-# Seatzy: High-Concurrency System Design Write-Up
+# Seatzy: System Design Write-Up
 
-## 1. Executive Summary & Architecture Overview
-Seatzy is architected as a high-throughput, fault-tolerant ticket booking platform designed to eliminate race conditions during high-demand flash sales and prevent seat wastage during last-minute cancellations. The architecture is composed of:
+## 1. Architecture Overview
+The platform architecture is composed of:
 - **Presentation Tier**: React 18 + Vite SPA utilizing WebSocket (`Socket.IO`) clients for live seat status and canvas rendering.
 - **Application Tier**: Node.js / Express / TypeScript API server with transactional business logic and scheduled cron workers (`node-cron`).
 - **Data Tier**: PostgreSQL 16 managed via Prisma ORM with strict foreign-key integrity and row-level locking capabilities (`SELECT ... FOR UPDATE`).

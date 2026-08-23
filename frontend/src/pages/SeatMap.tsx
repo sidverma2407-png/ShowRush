@@ -22,6 +22,8 @@ export default function SeatMap() {
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [isAddonModalOpen, setIsAddonModalOpen] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false);
 
   const user = useAuthStore(state => state.user);
   const navigate = useNavigate();
@@ -986,113 +988,153 @@ export default function SeatMap() {
             </div>
           )}
 
-          {/* Mobile Swipe & Zoom Hint Banner */}
-          <div className="md:hidden flex items-center justify-between bg-primary-fixed text-black border-2 border-black p-2.5 mb-2 font-mono text-[11px] font-black uppercase shadow-neo-sm">
-            <span className="flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-base">touch_app</span>
-              <span>SWIPE OR PINCH TO NAVIGATE SEAT MAP</span>
-            </span>
-            <span className="material-symbols-outlined text-base">pinch</span>
+          {/* Mobile Floating Action & Zoom Controls Bar */}
+          <div className="flex items-center justify-between gap-2 mb-3 bg-surface border-2 border-on-background p-2 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+            <div className="flex items-center gap-1.5 text-[11px] font-mono uppercase font-black">
+              <span className="material-symbols-outlined text-sm text-primary">touch_app</span>
+              <span className="hidden sm:inline">PAN &amp; ZOOM:</span>
+              <span className="bg-black text-primary-fixed px-1.5 py-0.5 border border-black">{Math.round(zoomLevel * 100)}%</span>
+            </div>
+
+            {/* Zoom Controls */}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setZoomLevel(prev => Math.max(0.6, Number((prev - 0.15).toFixed(2))))}
+                className="w-8 h-8 sm:w-9 sm:h-9 bg-surface text-on-surface border-2 border-on-background flex items-center justify-center font-black shadow-sm active:translate-y-px hover:bg-surface-variant min-h-[36px] min-w-[36px]"
+                title="Zoom Out"
+                aria-label="Zoom Out"
+              >
+                <span className="material-symbols-outlined text-base">remove</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setZoomLevel(1)}
+                className="px-2 h-8 sm:h-9 bg-surface text-on-surface border-2 border-on-background font-mono text-xs font-black shadow-sm active:translate-y-px hover:bg-surface-variant min-h-[36px]"
+                title="Reset Zoom"
+              >
+                100%
+              </button>
+              <button
+                type="button"
+                onClick={() => setZoomLevel(prev => Math.min(1.6, Number((prev + 0.15).toFixed(2))))}
+                className="w-8 h-8 sm:w-9 sm:h-9 bg-primary-fixed text-on-background border-2 border-on-background flex items-center justify-center font-black shadow-sm active:translate-y-px hover:bg-primary-container min-h-[36px] min-w-[36px]"
+                title="Zoom In"
+                aria-label="Zoom In"
+              >
+                <span className="material-symbols-outlined text-base">add</span>
+              </button>
+            </div>
           </div>
 
           {/* Seat Map Bounded Scroll Wrapper */}
-          <div className="seat-map-container overflow-auto max-w-full touch-pan-x touch-pan-y flex-grow pb-8 w-full flex justify-center border-2 border-dashed border-on-background/20 p-2 bg-surface/50 rounded-lg">
-            {showData?.event?.type === 'concert' ? (
-              renderConcertStadiumLayout()
-            ) : showData?.event?.type === 'comedy' ? (
-              renderComedyLayout()
-            ) : showData?.event?.type === 'sports' ? (
-              renderSportsLayout()
-            ) : (
-              renderCinemaLayout()
-            )}
+          <div className="seat-map-container overflow-auto max-w-full touch-pan-x touch-pan-y flex-grow pb-8 w-full flex justify-center border-2 border-dashed border-on-background/20 p-2 sm:p-4 bg-surface/50 rounded-lg min-h-[320px]">
+            <div 
+              style={{ 
+                transform: `scale(${zoomLevel})`, 
+                transformOrigin: 'top center',
+                transition: 'transform 0.12s cubic-bezier(0.4, 0, 0.2, 1)' 
+              }}
+              className="w-fit transition-transform"
+            >
+              {showData?.event?.type === 'concert' ? (
+                renderConcertStadiumLayout()
+              ) : showData?.event?.type === 'comedy' ? (
+                renderComedyLayout()
+              ) : showData?.event?.type === 'sports' ? (
+                renderSportsLayout()
+              ) : (
+                renderCinemaLayout()
+              )}
+            </div>
           </div>
 
           {/* Seat Status & Category Legend */}
-          <div className="mt-4 bg-surface border-2 sm:border-4 border-on-background p-3 sm:p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-wrap gap-3 sm:gap-4 items-center z-10 text-xs">
+          <div className="mt-4 bg-surface border-2 sm:border-4 border-on-background p-2.5 sm:p-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-wrap gap-2.5 sm:gap-4 items-center z-10 text-xs">
             <div className="flex items-center gap-1.5">
               <div className="w-5 h-5 border border-amber-900 bg-amber-300 font-black text-amber-950 flex items-center justify-center text-[10px]">R</div>
-              <span className="font-data-label text-[11px] sm:text-xs uppercase font-bold text-on-surface">Recliner (₹450)</span>
+              <span className="font-data-label text-[10px] sm:text-xs uppercase font-bold text-on-surface">Recliner (₹450)</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-5 h-5 border border-cyan-900 bg-cyan-300 font-black text-cyan-950 flex items-center justify-center text-[10px]">P</div>
-              <span className="font-data-label text-[11px] sm:text-xs uppercase font-bold text-on-surface">Premium (₹300)</span>
+              <span className="font-data-label text-[10px] sm:text-xs uppercase font-bold text-on-surface">Premium (₹300)</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-5 h-5 border border-slate-700 bg-slate-200 font-black text-slate-900 flex items-center justify-center text-[10px]">S</div>
-              <span className="font-data-label text-[11px] sm:text-xs uppercase font-bold text-on-surface">Standard (₹200)</span>
+              <span className="font-data-label text-[10px] sm:text-xs uppercase font-bold text-on-surface">Standard (₹200)</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-5 h-5 border border-on-background bg-tertiary-fixed font-black text-on-tertiary-fixed flex items-center justify-center text-[10px]">✓</div>
-              <span className="font-data-label text-[11px] sm:text-xs uppercase font-bold text-on-surface">Selected</span>
+              <span className="font-data-label text-[10px] sm:text-xs uppercase font-bold text-on-surface">Selected</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-5 h-5 border border-on-background bg-secondary-container opacity-60 flex items-center justify-center text-[10px]">✕</div>
-              <span className="font-data-label text-[11px] sm:text-xs uppercase font-bold text-on-surface">Booked/Held</span>
+              <span className="font-data-label text-[10px] sm:text-xs uppercase font-bold text-on-surface">Booked/Held</span>
             </div>
           </div>
         </section>
 
-        {/* Sidebar Panel */}
-        <aside className="w-full md:w-[380px] lg:w-[420px] flex-shrink-0 bg-surface flex flex-col h-auto md:h-[calc(100vh-80px)] md:sticky md:top-[80px]">
-          <div className="p-4 border-b-2 sm:border-b-4 border-on-background bg-on-background text-on-primary">
+        {/* Sidebar Panel - Reflows as Desktop Sidebar / Mobile Expandable Section */}
+        <aside className="w-full md:w-[360px] lg:w-[400px] flex-shrink-0 bg-surface flex flex-col h-auto md:h-[calc(100vh-80px)] md:sticky md:top-[80px]">
+          <div className="p-3.5 sm:p-4 border-b-2 sm:border-b-4 border-on-background bg-on-background text-on-primary">
             {selectedSeats.length > 0 ? (
                <>
-                <h2 className="font-headline-lg text-base sm:text-xl uppercase mb-1 font-black">
+                <h2 className="font-headline-lg text-sm sm:text-lg uppercase mb-1 font-black">
                   {selectedSeats.length} SEAT(S) SELECTED
                 </h2>
                 
                 {hasAvailableSelected && (
-                   <button onClick={handleHold} disabled={holding} className="mt-3 w-full bg-primary-fixed text-on-primary-fixed border-4 border-on-background py-3 font-headline-lg text-sm sm:text-base uppercase shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:translate-x-[0px] active:translate-y-[0px] transition-all disabled:opacity-50 font-black min-h-[48px]">
+                   <button onClick={handleHold} disabled={holding} className="mt-2 sm:mt-3 w-full bg-primary-fixed text-on-primary-fixed border-2 sm:border-4 border-on-background py-2.5 sm:py-3 font-headline-lg text-xs sm:text-base uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[0px] active:translate-y-[0px] transition-all disabled:opacity-50 font-black min-h-[44px]">
                      {holding ? 'Holding...' : 'Hold Selected'}
                    </button>
                 )}
                 
                 {onlyOtherHeldSelected && (
-                   <button onClick={() => handleWaitlist(selectedSeats[0])} className="mt-3 w-full bg-tertiary-fixed text-on-tertiary-fixed border-4 border-on-background py-3 font-headline-lg text-sm sm:text-base uppercase shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:translate-x-[0px] active:translate-y-[0px] transition-all font-black min-h-[48px]">
+                   <button onClick={() => handleWaitlist(selectedSeats[0])} className="mt-2 sm:mt-3 w-full bg-tertiary-fixed text-on-tertiary-fixed border-2 sm:border-4 border-on-background py-2.5 sm:py-3 font-headline-lg text-xs sm:text-base uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[0px] active:translate-y-[0px] transition-all font-black min-h-[44px]">
                      Join Waitlist
                    </button>
                 )}
                </>
             ) : (
                <>
-                 <h2 className="font-headline-lg text-base sm:text-lg uppercase mb-1 text-on-surface-variant font-black">Select Seats</h2>
-                 <p className="font-data-label text-xs text-on-surface-variant opacity-80">Click seats on the map to view details.</p>
+                 <h2 className="font-headline-lg text-sm sm:text-base uppercase mb-1 text-on-surface-variant font-black">Select Seats</h2>
+                 <p className="font-data-label text-[11px] sm:text-xs text-on-surface-variant opacity-80">Click seats on the map to view details.</p>
                </>
             )}
             
             {myHolds.length > 0 && (
-               <button onClick={handleReleaseAll} className="mt-3 w-full bg-secondary-container text-on-primary border-4 border-on-background py-2.5 font-headline-lg text-xs uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-error hover:text-on-error transition-all min-h-[44px] font-black cursor-pointer">
+               <button onClick={handleReleaseAll} className="mt-2 sm:mt-3 w-full bg-secondary-container text-on-primary border-2 sm:border-4 border-on-background py-2 sm:py-2.5 font-headline-lg text-xs uppercase shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-error hover:text-on-error transition-all min-h-[40px] font-black cursor-pointer">
                  Release All Holds
                </button>
             )}
           </div>
 
-          <div className="flex-grow p-4 overflow-y-auto blueprint-bg bg-surface-container border-b-2 sm:border-b-4 border-on-background max-h-[300px] md:max-h-none">
-            <h3 className="font-headline-lg text-sm uppercase mb-3 text-on-surface border-b-2 border-on-background pb-1 inline-block font-black">Your Holds</h3>
-            <div className="flex flex-col gap-3">
+          <div className="flex-grow p-3.5 sm:p-4 overflow-y-auto blueprint-bg bg-surface-container border-b-2 sm:border-b-4 border-on-background max-h-[250px] md:max-h-none">
+            <h3 className="font-headline-lg text-xs sm:text-sm uppercase mb-2.5 sm:mb-3 text-on-surface border-b-2 border-on-background pb-1 inline-block font-black">Your Holds ({myHolds.length})</h3>
+            <div className="flex flex-col gap-2.5">
               {myHolds.length === 0 ? (
-                 <div className="text-center p-6 bg-surface border-2 border-on-background opacity-60">
+                 <div className="text-center p-4 sm:p-6 bg-surface border-2 border-on-background opacity-60">
                    <span className="font-data-label text-xs uppercase font-bold">No active holds</span>
                  </div>
               ) : (
                 myHolds.map(s => (
-                  <div key={s.id} className="bg-surface border-2 border-on-background p-3 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden group">
+                  <div key={s.id} className="bg-surface border-2 border-on-background p-2.5 sm:p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden group">
                     <div className="flex justify-between items-start">
                       <div>
-                        <div className="font-data-label text-[10px] bg-tertiary-fixed text-on-tertiary-fixed px-2 py-0.5 border border-on-background inline-block mb-1 font-bold">
+                        <div className="font-data-label text-[10px] bg-tertiary-fixed text-on-tertiary-fixed px-1.5 py-0.5 border border-on-background inline-block mb-1 font-bold">
                           {getCategoryName(s.venue_seat.category_id)}
                         </div>
-                        <div className="font-headline-lg text-sm text-on-surface font-black">ROW {s.venue_seat.row_label} · NUM {s.venue_seat.seat_number}</div>
+                        <div className="font-headline-lg text-xs sm:text-sm text-on-surface font-black">ROW {s.venue_seat.row_label} · NUM {s.venue_seat.seat_number}</div>
                       </div>
                       <div className="flex flex-col items-end gap-1">
-                        <div className="font-headline-lg text-secondary text-sm font-black">₹{getPrice(s.venue_seat.category_id)}</div>
+                        <div className="font-headline-lg text-secondary text-xs sm:text-sm font-black">₹{getPrice(s.venue_seat.category_id)}</div>
                         <button 
                           onClick={() => handleReleaseSingle(s.id)}
-                          className="bg-error text-on-error p-1 border border-on-background hover:bg-red-600 transition-colors min-h-[32px] min-w-[32px] flex items-center justify-center"
+                          className="bg-error text-on-error p-1 border border-on-background hover:bg-red-600 transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
                           title="Release Hold"
+                          aria-label="Release Seat"
                         >
-                          <span className="material-symbols-outlined text-[16px]">close</span>
+                          <span className="material-symbols-outlined text-[14px]">close</span>
                         </button>
                       </div>
                     </div>
@@ -1102,42 +1144,42 @@ export default function SeatMap() {
             </div>
           </div>
 
-           {/* Guest Checkout Details Form */}
+          {/* Guest Checkout Details Form */}
           {myHolds.length > 0 && (
-            <div className="p-4 bg-surface-variant border-b-4 border-on-background">
-               <h3 className="font-headline-lg text-xs uppercase mb-3 text-on-surface font-black flex items-center gap-1.5">
+            <div className="p-3.5 sm:p-4 bg-surface-variant border-b-2 sm:border-b-4 border-on-background">
+               <h3 className="font-headline-lg text-xs uppercase mb-2 sm:mb-3 text-on-surface font-black flex items-center gap-1.5">
                  <span className="material-symbols-outlined text-sm">person</span>
                  Guest Details
                </h3>
-               <div className="flex flex-col gap-2.5">
+               <div className="flex flex-col gap-2">
                  <input 
                    type="text" 
                    placeholder="FULL NAME" 
                    value={customerName}
                    onChange={e => setCustomerName(e.target.value)}
-                   className="w-full bg-surface border-2 border-on-background p-3 font-data-label text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 font-bold min-h-[46px]"
+                   className="w-full bg-surface border-2 border-on-background p-2.5 sm:p-3 font-data-label text-xs sm:text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 font-bold min-h-[44px]"
                  />
                  <div className="flex flex-col gap-1">
                    <input 
                      type="tel" 
-                     placeholder="10-DIGIT PHONE NUMBER (e.g. 9876543210)" 
+                     placeholder="10-DIGIT MOBILE (e.g. 9876543210)" 
                      value={customerPhone}
                      maxLength={10}
                      onChange={e => {
                        const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
                        setCustomerPhone(digits);
                      }}
-                     className={`w-full bg-surface border-2 border-on-background p-3 font-data-label text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 font-bold min-h-[46px] ${
+                     className={`w-full bg-surface border-2 border-on-background p-2.5 sm:p-3 font-data-label text-xs sm:text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 font-bold min-h-[44px] ${
                        customerPhone && customerPhone.length !== 10 ? 'border-red-600 ring-2 ring-red-400/50' : ''
                      }`}
                    />
                    {customerPhone && customerPhone.length !== 10 ? (
-                     <span className="text-[10px] font-mono font-bold text-red-600 uppercase flex items-center gap-1">
+                     <span className="text-[9px] sm:text-[10px] font-mono font-bold text-red-600 uppercase flex items-center gap-1">
                        <span>MUST BE EXACTLY 10 DIGITS</span>
                        <span>({customerPhone.length}/10)</span>
                      </span>
                    ) : customerPhone && customerPhone.length === 10 ? (
-                     <span className="text-[10px] font-mono font-bold text-emerald-700 uppercase flex items-center gap-1">
+                     <span className="text-[9px] sm:text-[10px] font-mono font-bold text-emerald-700 uppercase flex items-center gap-1">
                        <span>✓ VALID 10-DIGIT NUMBER</span>
                      </span>
                    ) : null}
@@ -1147,15 +1189,15 @@ export default function SeatMap() {
           )}
 
           {/* Desktop Total & Checkout */}
-          <div className="p-5 bg-surface hidden md:block mt-auto border-t-4 border-on-background">
-            <div className="flex justify-between items-center mb-4">
-              <span className="font-data-label text-sm uppercase font-black">Subtotal ({myHolds.length})</span>
-              <span className="font-headline-lg text-2xl text-on-background font-black bg-primary-container px-2 py-1 border-2 border-on-background shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">₹{subtotal.toFixed(0)}</span>
+          <div className="p-4 sm:p-5 bg-surface hidden md:block mt-auto border-t-2 sm:border-t-4 border-on-background">
+            <div className="flex justify-between items-center mb-3 sm:mb-4">
+              <span className="font-data-label text-xs sm:text-sm uppercase font-black">Subtotal ({myHolds.length})</span>
+              <span className="font-headline-lg text-xl sm:text-2xl text-on-background font-black bg-primary-container px-2 py-1 border-2 border-on-background shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">₹{subtotal.toFixed(0)}</span>
             </div>
             <button 
               onClick={handleCheckout}
               disabled={myHolds.length === 0 || checkingOut}
-              className="w-full bg-primary-fixed text-on-background border-4 border-on-background py-3 font-headline-lg text-base uppercase shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:translate-x-[0px] active:translate-y-[0px] transition-all disabled:opacity-50 flex items-center justify-center gap-2 font-black min-h-[48px] cursor-pointer"
+              className="w-full bg-primary-fixed text-on-background border-2 sm:border-4 border-on-background py-2.5 sm:py-3 font-headline-lg text-sm sm:text-base uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[0px] active:translate-y-[0px] transition-all disabled:opacity-50 flex items-center justify-center gap-2 font-black min-h-[48px] cursor-pointer"
             >
               <span>{checkingOut ? 'Processing...' : 'Checkout Booking'}</span>
               <span className="material-symbols-outlined font-black text-xl">arrow_forward</span>
@@ -1164,37 +1206,138 @@ export default function SeatMap() {
         </aside>
 
         {/* Mobile Fixed Neo-Brutalist Bottom Action Bar */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-on-background text-on-primary border-t-4 border-on-background p-3 flex items-center justify-between gap-3 shadow-[0px_-4px_10px_rgba(0,0,0,0.5)]">
-          <div>
-            <div className="font-data-label text-[10px] uppercase text-primary-fixed font-bold">
-              {myHolds.length > 0 ? `${myHolds.length} SEATS HELD` : `${selectedSeats.length} SELECTED`}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-on-background text-on-primary border-t-2 sm:border-t-4 border-on-background p-2.5 sm:p-3 flex items-center justify-between gap-2 shadow-[0px_-4px_12px_rgba(0,0,0,0.4)]">
+          <div className="flex flex-col">
+            <div className="font-data-label text-[10px] uppercase text-primary-fixed font-bold flex items-center gap-1">
+              <span>{myHolds.length > 0 ? `${myHolds.length} HELD` : `${selectedSeats.length} SELECTED`}</span>
+              {countdown !== null && (
+                <span className="bg-red-600 text-white px-1 py-0.2 text-[9px] font-mono font-black">
+                  {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
+                </span>
+              )}
             </div>
-            <div className="font-headline-lg text-lg text-white font-black">
+            <div className="font-headline-lg text-base sm:text-lg text-white font-black leading-tight">
               ₹{subtotal.toFixed(0)}
             </div>
           </div>
-          {myHolds.length > 0 ? (
-            <button
-              onClick={handleCheckout}
-              disabled={checkingOut}
-              className="bg-primary-fixed text-on-primary-fixed border-2 border-on-background px-4 py-2.5 font-headline-lg text-xs uppercase font-black shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] min-h-[44px] flex items-center gap-1"
-            >
-              <span>{checkingOut ? 'Processing...' : 'CHECKOUT'}</span>
-              <span className="material-symbols-outlined text-sm">arrow_forward</span>
-            </button>
-          ) : hasAvailableSelected ? (
-            <button
-              onClick={handleHold}
-              disabled={holding}
-              className="bg-primary-fixed text-on-primary-fixed border-2 border-on-background px-4 py-2.5 font-headline-lg text-xs uppercase font-black shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] min-h-[44px]"
-            >
-              {holding ? 'Holding...' : 'HOLD SEATS'}
-            </button>
-          ) : (
-            <div className="font-data-label text-[10px] uppercase text-on-surface-variant">Tap seats to select</div>
-          )}
+          
+          <div className="flex items-center gap-2">
+            {myHolds.length > 0 && (
+              <button
+                onClick={() => setIsMobileDetailsOpen(true)}
+                className="bg-surface text-on-surface border-2 border-on-background px-2.5 py-2 font-headline-lg text-[11px] uppercase font-black min-h-[44px] flex items-center gap-1"
+                aria-label="View holds and guest info"
+              >
+                <span className="material-symbols-outlined text-sm">badge</span>
+                <span className="hidden xs:inline">GUEST</span>
+              </button>
+            )}
+
+            {myHolds.length > 0 ? (
+              <button
+                onClick={handleCheckout}
+                disabled={checkingOut}
+                className="bg-primary-fixed text-on-primary-fixed border-2 border-on-background px-4 py-2 font-headline-lg text-xs uppercase font-black shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] min-h-[44px] flex items-center gap-1 cursor-pointer"
+              >
+                <span>{checkingOut ? '...' : 'CHECKOUT'}</span>
+                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </button>
+            ) : hasAvailableSelected ? (
+              <button
+                onClick={handleHold}
+                disabled={holding}
+                className="bg-primary-fixed text-on-primary-fixed border-2 border-on-background px-4 py-2 font-headline-lg text-xs uppercase font-black shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] min-h-[44px]"
+              >
+                {holding ? 'HOLDING...' : 'HOLD SEATS'}
+              </button>
+            ) : (
+              <div className="font-data-label text-[10px] uppercase text-on-surface-variant">Tap seats to select</div>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Mobile Guest Details Slide-up Sheet */}
+      {isMobileDetailsOpen && (
+        <div className="fixed inset-0 z-50 md:hidden flex flex-col justify-end bg-black/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-surface border-t-4 border-on-background p-4 shadow-2xl flex flex-col max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b-2 border-on-background mb-3">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary-fixed bg-black p-1">badge</span>
+                <h3 className="font-headline-lg text-base uppercase font-black">Guest Info &amp; Holds</h3>
+              </div>
+              <button
+                onClick={() => setIsMobileDetailsOpen(false)}
+                className="w-8 h-8 bg-error text-on-error border-2 border-black flex items-center justify-center font-black"
+                aria-label="Close drawer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-3 mb-4">
+              <div className="flex flex-col gap-1">
+                <label className="font-mono text-[10px] uppercase font-black text-neutral-600">Full Name</label>
+                <input 
+                  type="text" 
+                  placeholder="Enter attendee full name" 
+                  value={customerName}
+                  onChange={e => setCustomerName(e.target.value)}
+                  className="w-full bg-white border-2 border-black p-2.5 font-data-label text-sm font-bold min-h-[44px]"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="font-mono text-[10px] uppercase font-black text-neutral-600">10-Digit Mobile Number</label>
+                <input 
+                  type="tel" 
+                  placeholder="e.g. 9876543210" 
+                  value={customerPhone}
+                  maxLength={10}
+                  onChange={e => {
+                    const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                    setCustomerPhone(digits);
+                  }}
+                  className={`w-full bg-white border-2 border-black p-2.5 font-data-label text-sm font-bold min-h-[44px] ${
+                    customerPhone && customerPhone.length !== 10 ? 'border-red-600 ring-1 ring-red-400' : ''
+                  }`}
+                />
+              </div>
+            </div>
+
+            {/* Holds list in drawer */}
+            <div className="border-t-2 border-black pt-3 mb-4">
+              <div className="font-mono text-xs uppercase font-black mb-2">Held Seats ({myHolds.length})</div>
+              <div className="flex flex-wrap gap-1.5">
+                {myHolds.map(s => (
+                  <div key={s.id} className="bg-white border-2 border-black px-2 py-1 flex items-center gap-1.5 text-xs font-mono font-bold">
+                    <span>{s.venue_seat.row_label}{s.venue_seat.seat_number}</span>
+                    <span className="text-secondary font-black">₹{getPrice(s.venue_seat.category_id)}</span>
+                    <button 
+                      onClick={() => handleReleaseSingle(s.id)}
+                      className="text-red-600 hover:text-black font-black ml-1 text-xs"
+                      aria-label="Remove seat"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                setIsMobileDetailsOpen(false);
+                handleCheckout();
+              }}
+              disabled={myHolds.length === 0 || checkingOut}
+              className="w-full bg-primary-fixed text-on-background border-2 border-black py-3 font-headline-lg text-sm uppercase font-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-px min-h-[48px]"
+            >
+              Confirm Details &amp; Proceed to Checkout (₹{subtotal.toFixed(0)})
+            </button>
+          </div>
+        </div>
+      )}
 
       <AddonSelectionModal
         isOpen={isAddonModalOpen}
