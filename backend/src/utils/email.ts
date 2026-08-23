@@ -38,8 +38,9 @@ export const isSmtpConfigured = () => {
 };
 
 // Create a fresh Nodemailer Transporter on each call.
-// Cloud hosts (Render) often block port 465/SSL; port 587 with STARTTLS is universally supported.
-// No caching — pooled connections go stale on Render's ephemeral infra.
+// Cloud hosts (Render free tier) have NO outbound IPv6 routing.
+// Gmail smtp.gmail.com resolves to IPv6 (2607:f8b0:..) → ENETUNREACH on Render.
+// Fix: family:4 forces Node DNS to only pick IPv4 (74.125.x.x) records.
 const getTransporter = () => {
   const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
   const pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim().replace(/\s+/g, '');
@@ -48,31 +49,22 @@ const getTransporter = () => {
 
   if (!user || !pass || user.includes('ethereal.email')) return null;
 
-  // Gmail: force port 587 + STARTTLS (port 465/SSL is blocked on most cloud providers)
+  // Force IPv4 DNS resolution to avoid Render's IPv6-blind network
+  const baseConfig = {
+    auth: { user, pass },
+    tls: { rejectUnauthorized: false },
+    family: 4,           // ← critical: forces IPv4 on Render (prevents ENETUNREACH)
+    connectionTimeout: 25000,
+    greetingTimeout: 20000,
+    socketTimeout: 25000
+  };
+
   const transportConfig: any = isGmail
-    ? {
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false, // STARTTLS upgrade after connect
-        auth: { user, pass },
-        tls: { rejectUnauthorized: false },
-        connectionTimeout: 20000,
-        greetingTimeout: 15000,
-        socketTimeout: 20000
-      }
-    : {
-        host,
-        port: Number(process.env.SMTP_PORT) || 587,
-        secure: Number(process.env.SMTP_PORT) === 465,
-        auth: { user, pass },
-        tls: { rejectUnauthorized: false },
-        connectionTimeout: 20000,
-        greetingTimeout: 15000,
-        socketTimeout: 20000
-      };
+    ? { ...baseConfig, host: 'smtp.gmail.com', port: 587, secure: false }
+    : { ...baseConfig, host, port: Number(process.env.SMTP_PORT) || 587, secure: Number(process.env.SMTP_PORT) === 465 };
 
   const t = nodemailer.createTransport(transportConfig);
-  console.log(`[SMTP] Transporter created: host=${isGmail ? 'smtp.gmail.com' : host} port=${isGmail ? 587 : (Number(process.env.SMTP_PORT) || 587)} user=${user.substring(0, 4)}***`);
+  console.log(`[SMTP] Transporter: host=${isGmail ? 'smtp.gmail.com' : host} port=${transportConfig.port} family=IPv4 user=${user.substring(0, 4)}***`);
   return t;
 };
 

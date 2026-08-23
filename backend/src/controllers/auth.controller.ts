@@ -524,8 +524,9 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
   });
 };
 
-// SMTP Diagnostic endpoint — use to verify Render env vars & Gmail connectivity
-// GET /api/auth/test-smtp?to=your@email.com
+// SMTP Diagnostic endpoint — verifies Render env vars & IPv4 Gmail connectivity
+// GET /api/auth/test-smtp          → shows env var status (no email sent)
+// GET /api/auth/test-smtp?to=x@y.com → sends a real test email via the live transporter
 export const testSmtp = async (req: Request, res: Response) => {
   const smtpUser = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
   const smtpPass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim();
@@ -552,53 +553,29 @@ export const testSmtp = async (req: Request, res: Response) => {
     });
   }
 
-  // Optional: send a real test email if ?to= is provided
+  // Send a live test email using the same sendOtpEmail path (includes family:4 IPv4 fix)
   const toEmail = (req.query.to as string || '').trim();
   if (toEmail && toEmail.includes('@')) {
-    try {
-      const nodemailer = await import('nodemailer');
-      const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        auth: { user: smtpUser, pass: smtpPass },
-        tls: { rejectUnauthorized: false },
-        connectionTimeout: 20000,
-        greetingTimeout: 15000,
-        socketTimeout: 20000
-      } as any);
+    const TEST_OTP = 'TEST-' + Math.floor(100000 + Math.random() * 900000).toString();
+    const result = await sendOtpEmail(toEmail, TEST_OTP, 'SMTP Test');
 
-      // First verify connection
-      await transporter.verify();
-      console.log('[SMTP TEST] Connection verified successfully');
-
-      const info = await transporter.sendMail({
-        from: emailFrom || `"Seatzy Test" <${smtpUser}>`,
-        to: toEmail,
-        subject: 'Seatzy SMTP Test Email ✓',
-        html: `<div style="font-family:Arial;padding:20px;border:3px solid #000;max-width:400px">
-          <h2 style="color:#000">✅ SMTP is Working!</h2>
-          <p>If you received this email, your Render SMTP configuration is correct.</p>
-          <p><strong>SMTP User:</strong> ${smtpUser}</p>
-          <p><strong>SMTP Host:</strong> smtp.gmail.com:587</p>
-          <p style="color:#666;font-size:12px">Sent from Seatzy backend on Render.</p>
-        </div>`
-      });
-
+    if (result.success) {
       return res.json({
         status: 'success',
-        message: `✅ Test email delivered to ${toEmail}`,
-        messageId: info.messageId,
+        message: `✅ Test email delivered to ${toEmail} — SMTP is fully working!`,
+        messageId: result.messageId,
         env: envSummary
       });
-    } catch (err: any) {
-      console.error('[SMTP TEST ERROR]', err.message);
+    } else {
+      const reason = result.reason || 'Unknown error';
       return res.status(500).json({
         status: 'smtp_error',
-        message: `❌ SMTP connection failed: ${err.message}`,
-        hint: err.message?.includes('535') ? 'Invalid Gmail credentials — check App Password' :
-              err.message?.includes('ETIMEDOUT') || err.message?.includes('ECONNREFUSED') ? 'Port 587 blocked on Render — try Resend/SendGrid instead' :
-              err.message?.includes('534') ? 'Gmail requires App Password (not your account password)' : 'Check Render logs for more details',
+        message: `❌ SMTP failed: ${reason}`,
+        hint: reason.includes('535') ? 'Invalid Gmail credentials — check your App Password in Render env vars' :
+              reason.includes('ENETUNREACH') ? 'IPv6 routing issue — ensure family:4 is set in transporter config' :
+              reason.includes('ETIMEDOUT') || reason.includes('ECONNREFUSED') ? 'Port 587 is blocked — contact Render support or switch to Resend.com' :
+              reason.includes('534') ? 'Gmail requires an App Password, not your account password' :
+              'Check Render service logs for full error details',
         env: envSummary
       });
     }
@@ -606,7 +583,8 @@ export const testSmtp = async (req: Request, res: Response) => {
 
   return res.json({
     status: 'configured',
-    message: 'SMTP env vars are set. Add ?to=email@gmail.com to send a real test email.',
+    message: 'SMTP env vars are set. Add ?to=your@email.com to fire a real test email.',
     env: envSummary
   });
 };
+
