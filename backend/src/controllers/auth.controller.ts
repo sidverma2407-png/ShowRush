@@ -524,58 +524,46 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
   });
 };
 
-// SMTP Diagnostic endpoint — verifies Render env vars & IPv4 Gmail connectivity
-// GET /api/auth/test-smtp          → shows env var status (no email sent)
-// GET /api/auth/test-smtp?to=x@y.com → sends a real test email via the live transporter
+// Email Diagnostic endpoint — verifies Brevo API key & sends a test email
+// GET /api/auth/test-smtp          → shows env var status
+// GET /api/auth/test-smtp?to=x@y.com → sends a real test email via Brevo HTTP API
 export const testSmtp = async (req: Request, res: Response) => {
-  const smtpUser = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
-  const smtpPass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim();
-  const smtpHost = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
-  const smtpPort = process.env.SMTP_PORT || '587';
+  const apiKey = (process.env.BREVO_API_KEY || '').trim();
   const emailFrom = process.env.EMAIL_FROM || '';
   const frontendUrl = process.env.FRONTEND_URL || 'not set';
 
   const envSummary = {
-    SMTP_USER: smtpUser ? `${smtpUser.substring(0, 4)}...${smtpUser.split('@')[1] || ''}` : 'NOT SET',
-    SMTP_PASS: smtpPass ? `${'*'.repeat(Math.min(smtpPass.length, 8))} (${smtpPass.length} chars)` : 'NOT SET',
-    SMTP_HOST: smtpHost,
-    SMTP_PORT: smtpPort,
+    BREVO_API_KEY: apiKey ? `${apiKey.substring(0, 12)}... (${apiKey.length} chars)` : 'NOT SET',
     EMAIL_FROM: emailFrom || 'not set',
     FRONTEND_URL: frontendUrl,
-    smtpConfigured: Boolean(smtpUser && smtpPass && !smtpUser.includes('ethereal.email'))
+    emailConfigured: Boolean(apiKey && apiKey.startsWith('xkeysib-'))
   };
 
-  if (!smtpUser || !smtpPass) {
+  if (!apiKey || !apiKey.startsWith('xkeysib-')) {
     return res.status(400).json({
       status: 'error',
-      message: 'SMTP credentials missing from environment variables',
+      message: 'BREVO_API_KEY missing or invalid. It must start with xkeysib-',
       env: envSummary
     });
   }
 
-  // Send a live test email using the same sendOtpEmail path (includes family:4 IPv4 fix)
   const toEmail = (req.query.to as string || '').trim();
   if (toEmail && toEmail.includes('@')) {
-    const TEST_OTP = 'TEST-' + Math.floor(100000 + Math.random() * 900000).toString();
-    const result = await sendOtpEmail(toEmail, TEST_OTP, 'SMTP Test');
-
+    const result = await sendOtpEmail(toEmail, 'TEST-OK', 'Test User');
     if (result.success) {
       return res.json({
         status: 'success',
-        message: `✅ Test email delivered to ${toEmail} — SMTP is fully working!`,
+        message: `✅ Test email delivered to ${toEmail} via Brevo HTTP API!`,
         messageId: result.messageId,
         env: envSummary
       });
     } else {
-      const reason = result.reason || 'Unknown error';
       return res.status(500).json({
-        status: 'smtp_error',
-        message: `❌ SMTP failed: ${reason}`,
-        hint: reason.includes('535') ? 'Invalid Gmail credentials — check your App Password in Render env vars' :
-              reason.includes('ENETUNREACH') ? 'IPv6 routing issue — ensure family:4 is set in transporter config' :
-              reason.includes('ETIMEDOUT') || reason.includes('ECONNREFUSED') ? 'Port 587 is blocked — contact Render support or switch to Resend.com' :
-              reason.includes('534') ? 'Gmail requires an App Password, not your account password' :
-              'Check Render service logs for full error details',
+        status: 'error',
+        message: `❌ Email failed: ${result.reason}`,
+        hint: result.reason?.includes('401') ? 'Invalid Brevo API key — regenerate from Brevo → SMTP & API → API Keys tab' :
+              result.reason?.includes('400') ? 'Bad request — check EMAIL_FROM format: "Name <email@domain.com>"' :
+              'Check Render logs for details',
         env: envSummary
       });
     }
@@ -583,8 +571,7 @@ export const testSmtp = async (req: Request, res: Response) => {
 
   return res.json({
     status: 'configured',
-    message: 'SMTP env vars are set. Add ?to=your@email.com to fire a real test email.',
+    message: 'BREVO_API_KEY is set. Add ?to=your@email.com to send a real test email.',
     env: envSummary
   });
 };
-

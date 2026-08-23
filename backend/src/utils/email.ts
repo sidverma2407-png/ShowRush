@@ -1,6 +1,6 @@
-import nodemailer from 'nodemailer';
 import QRCode from 'qrcode';
 import dotenv from 'dotenv';
+import https from 'https';
 dotenv.config();
 
 // Disposable / Fake Email domains list to block non-genuine emails
@@ -31,72 +31,101 @@ export const validateEmailFormat = (email: string): { valid: boolean; reason?: s
   return { valid: true };
 };
 
+// Check if Brevo API key is configured
 export const isSmtpConfigured = () => {
-  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
-  const pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim();
-  const host = (process.env.SMTP_HOST || '').trim();
-  return Boolean(user && pass && host && !user.includes('ethereal.email'));
+  const apiKey = (process.env.BREVO_API_KEY || '').trim();
+  return Boolean(apiKey && apiKey.startsWith('xkeysib-'));
 };
 
-// Create a fresh Nodemailer Transporter on each call.
-// Supports Brevo (smtp-relay.brevo.com), Gmail, or any SMTP provider.
-// family:4 forces IPv4 DNS — Render free tier has no outbound IPv6 routing.
-const getTransporter = () => {
-  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
-  const pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim().replace(/\s+/g, '');
-  const host = (process.env.SMTP_HOST || '').trim();
-
-  if (!user || !pass || user.includes('ethereal.email') || !host) return null;
-
-  // Brevo uses port 587 + STARTTLS. Gmail also works on 587.
-  // family:4 → force IPv4 to avoid ENETUNREACH on Render free tier.
-  const port = Number(process.env.SMTP_PORT) || 587;
-  const transportConfig: any = {
-    host,
-    port,
-    secure: port === 465,   // true only for SSL (port 465), false for STARTTLS (587)
-    auth: { user, pass },
-    tls: { rejectUnauthorized: false },
-    family: 4,              // ← forces IPv4 DNS — critical for Render free tier
-    connectionTimeout: 30000,
-    greetingTimeout: 25000,
-    socketTimeout: 30000
-  };
-
-  const t = nodemailer.createTransport(transportConfig);
-  console.log(`[SMTP] Transporter: host=${host} port=${port} family=IPv4 user=${user.substring(0, 4)}***`);
-  return t;
+// Sender name & email from env
+const getSenderEmail = () => {
+  const fromEnv = (process.env.EMAIL_FROM || '').trim();
+  // Parse "Name <email>" format
+  const match = fromEnv.match(/<(.+)>/);
+  if (match) return match[1];
+  if (fromEnv.includes('@')) return fromEnv;
+  return 'noreply@seatzy.com';
 };
 
-// Ensure From header matches authenticated Gmail account to prevent Google SMTP rejections
-const getSender = (displayName: string) => {
-  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
-  if (process.env.EMAIL_FROM && process.env.EMAIL_FROM.includes('@') && !process.env.EMAIL_FROM.includes('ethereal.email')) {
-    return process.env.EMAIL_FROM;
+const getSenderName = () => {
+  const fromEnv = (process.env.EMAIL_FROM || '').trim();
+  const match = fromEnv.match(/^"?([^"<]+)"?\s*</);
+  if (match) return match[1].trim();
+  return 'Seatzy';
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Core Brevo HTTP API sender — uses HTTPS port 443, works on ALL cloud hosts.
+// SMTP ports (587/465) are blocked by Render free tier; HTTP API is not.
+// Docs: https://developers.brevo.com/reference/sendtransacemail
+// ─────────────────────────────────────────────────────────────────────────────
+const sendViaBrevoApi = (payload: object): Promise<{ success: boolean; messageId?: string; reason?: string }> => {
+  const apiKey = (process.env.BREVO_API_KEY || '').trim();
+  if (!apiKey) {
+    return Promise.resolve({ success: false, reason: 'BREVO_API_KEY not set' });
   }
-  if (user && !user.includes('ethereal.email')) {
-    return `"${displayName}" <${user}>`;
-  }
-  return `"${displayName}" <verify@seatzy.com>`;
+
+  const body = JSON.stringify(payload);
+
+  return new Promise((resolve) => {
+    const req = https.request({
+      hostname: 'api.brevo.com',
+      path: '/v3/smtp/email',
+      method: 'POST',
+      headers: {
+        'api-key': apiKey,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Content-Length': Buffer.byteLength(body)
+      }
+    }, (res) => {
+      let data = '';
+      res.on('data', (chunk) => { data += chunk; });
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+            console.log(`[BREVO API] Email sent | MessageId: ${json.messageId}`);
+            resolve({ success: true, messageId: json.messageId });
+          } else {
+            console.error(`[BREVO API ERROR] Status ${res.statusCode}:`, data);
+            resolve({ success: false, reason: json.message || `HTTP ${res.statusCode}` });
+          }
+        } catch {
+          resolve({ success: false, reason: 'Failed to parse Brevo API response' });
+        }
+      });
+    });
+
+    req.on('error', (err) => {
+      console.error('[BREVO API NETWORK ERROR]', err.message);
+      resolve({ success: false, reason: err.message });
+    });
+
+    req.setTimeout(15000, () => {
+      req.destroy();
+      resolve({ success: false, reason: 'Brevo API request timed out after 15s' });
+    });
+
+    req.write(body);
+    req.end();
+  });
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
 // Send 6-Digit Email Verification OTP
+// ─────────────────────────────────────────────────────────────────────────────
 export const sendOtpEmail = async (email: string, otp: string, name: string) => {
   if (!isSmtpConfigured()) {
-    console.log(`[SMTP SKIPPED] No SMTP credentials configured. OTP code for ${email} is ${otp}`);
-    return { success: false, otp, reason: 'SMTP not configured' };
+    console.log(`[EMAIL SKIPPED] No BREVO_API_KEY configured. OTP for ${email} is ${otp}`);
+    return { success: false, otp, reason: 'Email service not configured' };
   }
 
-  const transporter = getTransporter();
-  if (!transporter) {
-    return { success: false, otp, reason: 'Transporter creation failed' };
-  }
-
-  const mailOptions = {
-    from: getSender('Seatzy Verification'),
-    to: email,
+  const result = await sendViaBrevoApi({
+    sender: { name: getSenderName(), email: getSenderEmail() },
+    to: [{ email, name }],
     subject: `${otp} is your Seatzy Account Verification Code`,
-    html: `
+    htmlContent: `
       <div style="font-family: Arial, sans-serif; background-color: #f4f4f5; padding: 30px; text-align: center;">
         <div style="max-width: 500px; margin: 0 auto; background: #ffffff; border: 4px solid #000000; box-shadow: 6px 6px 0px #000000; padding: 30px; text-align: left;">
           <h1 style="font-size: 28px; text-transform: uppercase; margin-bottom: 5px; color: #000000;">SEATZY</h1>
@@ -112,32 +141,23 @@ export const sendOtpEmail = async (email: string, otp: string, name: string) => 
 
           <p style="font-size: 12px; color: #666666;">This code is valid for 10 minutes. If you did not register for Seatzy, please ignore this email.</p>
           <hr style="border: 1px solid #e4e4e7; margin: 20px 0;" />
-          <p style="font-size: 11px; text-transform: uppercase; color: #a1a1aa; text-align: center;">Seatzy Live Events & Ticketing</p>
+          <p style="font-size: 11px; text-transform: uppercase; color: #a1a1aa; text-align: center;">Seatzy Live Events &amp; Ticketing</p>
         </div>
       </div>
     `
-  };
+  });
 
-  try {
-    // 30s timeout — enough for Brevo/SMTP cloud handshakes on Render cold starts
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('SMTP timeout after 30s — check SMTP_HOST, port, and credentials')), 30000)
-    );
-
-    const info: any = await Promise.race([
-      transporter.sendMail(mailOptions),
-      timeoutPromise
-    ]);
-
-    console.log(`[SMTP OTP SENT] To: ${email} | Code: ${otp} | MessageId: ${info.messageId}`);
-    return { success: true, messageId: info.messageId, previewUrl: undefined };
-  } catch (err: any) {
-    console.error(`[SMTP ERROR sending OTP to ${email}]:`, err.message || err);
-    return { success: false, otp, reason: err.message };
+  if (!result.success) {
+    console.error(`[EMAIL ERROR OTP to ${email}]:`, result.reason);
+    return { success: false, otp, reason: result.reason };
   }
+
+  return { success: true, messageId: result.messageId, previewUrl: undefined };
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
 // Send Official Ticket with QR Code & Details
+// ─────────────────────────────────────────────────────────────────────────────
 export const sendBookingEmail = async (
   email: string,
   bookingRef: string,
@@ -147,8 +167,6 @@ export const sendBookingEmail = async (
   totalPrice?: number,
   customerPhone?: string
 ) => {
-  const transporter = getTransporter();
-  
   const eventTitle = showDetails?.event?.title || 'Seatzy Live Event';
   const eventType = (showDetails?.event?.type || 'EVENT').toUpperCase();
   const showDate = showDetails?.date ? new Date(showDetails.date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) : '';
@@ -163,7 +181,7 @@ export const sendBookingEmail = async (
   const attendeePhone = customerPhone || 'N/A';
   const formatLang = [showDetails?.format || showDetails?.event?.format, showDetails?.language || showDetails?.event?.language].filter(Boolean).join(' - ');
 
-  // Clean, structured plain text ticket pass for instant offline camera & scanner verification
+  // QR code plain text
   const qrPlainText = [
     '========================================',
     '       SEATZY OFFICIAL ADMISSION PASS   ',
@@ -187,24 +205,26 @@ export const sendBookingEmail = async (
   ].join('\n');
 
   const qrCodeDataUrl = await QRCode.toDataURL(qrPlainText, { margin: 1, scale: 6 });
+  const qrBase64 = qrCodeDataUrl.split('base64,')[1];
 
   // Event specific tailored warm wish
   let eventWish = "We hope you have an incredible time at the event!";
-  if (eventType === 'movie') {
-    eventWish = "Grab your popcorn, sit back, and enjoy the cinematic experience on the big screen!";
-  } else if (eventType === 'concert') {
-    eventWish = "Get ready for an unmissable night of electrifying live music and pure energy!";
-  } else if (eventType === 'comedy') {
-    eventWish = "Prepare for non-stop laughter, hilarious stand-up punchlines, and great vibes!";
-  } else if (eventType === 'sports') {
-    eventWish = "Wear your team colors, cheer loud, and feel the live stadium adrenaline!";
+  if (eventType === 'MOVIE') eventWish = "Grab your popcorn, sit back, and enjoy the cinematic experience on the big screen!";
+  else if (eventType === 'CONCERT') eventWish = "Get ready for an unmissable night of electrifying live music and pure energy!";
+  else if (eventType === 'COMEDY') eventWish = "Prepare for non-stop laughter, hilarious stand-up punchlines, and great vibes!";
+  else if (eventType === 'SPORTS') eventWish = "Wear your team colors, cheer loud, and feel the live stadium adrenaline!";
+
+  if (!isSmtpConfigured()) {
+    console.log(`[EMAIL SKIPPED] No BREVO_API_KEY. Ticket generated for ${email} Ref: ${bookingRef}`);
+    return qrCodeDataUrl;
   }
 
-  const mailOptions = {
-    from: getSender('Seatzy Tickets'),
-    to: email,
+  const result = await sendViaBrevoApi({
+    sender: { name: getSenderName(), email: getSenderEmail() },
+    to: [{ email, name: attendeeName }],
     subject: `Ticket Confirmed: ${eventTitle} (${bookingRef})`,
-    html: `
+    attachment: [{ content: qrBase64, name: `ticket-${bookingRef}.png` }],
+    htmlContent: `
       <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f5; padding: 30px; text-align: center;">
         <div style="max-width: 580px; margin: 0 auto; background: #ffffff; border: 4px solid #000000; box-shadow: 8px 8px 0px #000000; text-align: left; overflow: hidden;">
           
@@ -218,7 +238,7 @@ export const sendBookingEmail = async (
               <h3 style="font-size: 18px; font-weight: 900; margin: 0 0 8px 0; color: #000000; text-transform: uppercase;">
                 Thank you ${attendeeName} for your booking!
               </h3>
-              <p style="font-size: 14px; margin: 0; color: #18181b; font-weight: bold; leading-relaxed;">
+              <p style="font-size: 14px; margin: 0; color: #18181b; font-weight: bold;">
                 ${eventWish}
               </p>
             </div>
@@ -253,7 +273,7 @@ export const sendBookingEmail = async (
                 <td style="padding: 10px 0; font-size: 13px; color: #000000; font-weight: bold; text-align: right; line-height: 1.5;">${seatsText}</td>
               </tr>
               <tr>
-                <td style="padding: 10px 0; font-size: 12px; color: #52525b; font-weight: 900; text-transform: uppercase; vertical-align: top;">Venue & City</td>
+                <td style="padding: 10px 0; font-size: 12px; color: #52525b; font-weight: 900; text-transform: uppercase; vertical-align: top;">Venue &amp; City</td>
                 <td style="padding: 10px 0; font-size: 13px; color: #000000; font-weight: bold; text-align: right; line-height: 1.4;">
                   ${venueName}<br/>
                   <span style="font-weight: normal; color: #52525b;">${venueAddress}</span>
@@ -262,9 +282,9 @@ export const sendBookingEmail = async (
             </table>
 
             <div style="text-align: center; background-color: #fafafa; border: 4px solid #000000; box-shadow: 6px 6px 0px #000000; padding: 25px; margin: 25px 0;">
-              <img src="cid:qrcode" alt="Unique Verification QR Code" style="width: 200px; height: 200px; display: block; margin: 0 auto; border: 3px solid #000000; background: #ffffff; padding: 5px;" />
-              <p style="font-size: 11px; text-transform: uppercase; font-weight: 900; color: #000000; margin-top: 15px; letter-spacing: 2px;">
-                SECURITY SCAN AT GATE
+              <p style="font-size: 13px; color: #52525b; margin: 0 0 12px 0;">Your QR code ticket is attached to this email as <strong>ticket-${bookingRef}.png</strong></p>
+              <p style="font-size: 11px; text-transform: uppercase; font-weight: 900; color: #000000; margin: 0; letter-spacing: 2px;">
+                PRESENT AT ENTRY GATE FOR SCANNING
               </p>
               <p style="font-size: 10px; color: #71717a; margin-top: 4px;">
                 Ref: ${bookingRef}
@@ -280,45 +300,34 @@ export const sendBookingEmail = async (
 
         </div>
       </div>
-    `,
-    attachments: [
-      {
-        filename: `ticket-${bookingRef}.png`,
-        content: qrCodeDataUrl.split('base64,')[1],
-        encoding: 'base64',
-        cid: 'qrcode'
-      }
-    ]
-  };
+    `
+  });
 
-  try {
-    if (!transporter) {
-      console.log(`[SMTP SKIPPED] No SMTP credentials. Ticket generated for ${email} Ref: ${bookingRef}`);
-      return qrCodeDataUrl;
-    }
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`[REAL GMAIL TICKET DELIVERED] To: ${email} | Ref: ${bookingRef} | MessageId: ${info.messageId}`);
-    return qrCodeDataUrl;
-  } catch (err: any) {
-    console.error(`[SMTP GMAIL ERROR sending ticket to ${email}]:`, err.message || err);
-    return qrCodeDataUrl;
+  if (!result.success) {
+    console.error(`[EMAIL ERROR ticket to ${email}]:`, result.reason);
+  } else {
+    console.log(`[BREVO TICKET SENT] To: ${email} | Ref: ${bookingRef}`);
   }
+
+  return qrCodeDataUrl;
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Send Waitlist Offer Email
+// ─────────────────────────────────────────────────────────────────────────────
 export const sendWaitlistOfferEmail = async (email: string, token: string, showDetails: any) => {
-  const transporter = getTransporter();
-  if (!transporter) {
-    console.log(`[SMTP SKIPPED] No SMTP credentials. Waitlist link for ${email}`);
+  if (!isSmtpConfigured()) {
+    console.log(`[EMAIL SKIPPED] No BREVO_API_KEY. Waitlist link for ${email}`);
     return;
   }
 
   const offerLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/waitlist/offer/${token}`;
 
-  const mailOptions = {
-    from: getSender('Seatzy Waitlist'),
-    to: email,
+  const result = await sendViaBrevoApi({
+    sender: { name: getSenderName(), email: getSenderEmail() },
+    to: [{ email }],
     subject: `Seat Available! Claim your ticket for ${showDetails.event.title}`,
-    html: `
+    htmlContent: `
       <div style="font-family: Arial, sans-serif; background-color: #f4f4f5; padding: 30px; text-align: center;">
         <div style="max-width: 500px; margin: 0 auto; background: #ffffff; border: 4px solid #000000; box-shadow: 6px 6px 0px #000000; padding: 30px; text-align: left;">
           <h1 style="font-size: 24px; text-transform: uppercase; margin-top: 0;">SEAT AVAILABLE!</h1>
@@ -330,12 +339,9 @@ export const sendWaitlistOfferEmail = async (email: string, token: string, showD
         </div>
       </div>
     `
-  };
+  });
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`[REAL GMAIL WAITLIST OFFER SENT] To: ${email} | MessageId: ${info.messageId}`);
-  } catch (err: any) {
-    console.error(`[SMTP GMAIL ERROR sending waitlist offer to ${email}]:`, err.message || err);
+  if (!result.success) {
+    console.error(`[EMAIL ERROR waitlist to ${email}]:`, result.reason);
   }
 };
