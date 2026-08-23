@@ -247,7 +247,7 @@ export const holdSeats = async (req: AuthRequest, res: Response) => {
 };
 
 export const confirmBooking = async (req: AuthRequest, res: Response) => {
-  const { show_id, seat_status_ids, customer_name, customer_phone, addons } = req.body;
+  const { show_id, seat_status_ids, customer_name, customer_phone, addons, coupon_code } = req.body;
   if (!show_id || !Array.isArray(seat_status_ids)) throw new BadRequestError('show_id and seat_status_ids required');
 
   const booking = await prisma.$transaction(async (tx) => {
@@ -308,6 +308,10 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
       seatTotalPrice += priceMap.get(catId) || 0;
     }
 
+    // STACKING RULE 1: Group Discount applied FIRST to full seat subtotal (10% off for 5+ seats)
+    const groupDiscountAmount = seats.length >= 5 ? Math.round(seatTotalPrice * 0.10 * 100) / 100 : 0;
+    const reducedSeatSubtotal = Math.max(0, seatTotalPrice - groupDiscountAmount);
+
     // Process optional food & drinks add-ons
     let addonTotalPrice = 0;
     const validatedAddons: { addon_item_id: string; quantity: number; unit_price: number }[] = [];
@@ -328,33 +332,84 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
       }
     }
 
-    const finalTotalPrice = seatTotalPrice + addonTotalPrice;
-    const bookingRef = `QR-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-    let newBooking: any;
-    try {
-      newBooking = await tx.booking.create({
-        data: { 
-          customer_id: req.user!.id, 
-          // @ts-ignore - IDE caches old Prisma types, tsc passes
-          customer_name,
-          // @ts-ignore
-          customer_phone,
-          show_id, 
-          booking_reference: bookingRef, 
-          total_price: finalTotalPrice 
+    const totalCartBeforeCoupon = reducedSeatSubtotal + addonTotalPrice;
+
+    // STACKING RULE 2 & CONCURRENCY: Coupon processing
+    let couponDiscountAmount = 0;
+    let appliedCouponId: string | null = null;
+
+    if (coupon_code && typeof coupon_code === 'string' && coupon_code.trim()) {
+      const formattedCode = coupon_code.trim().toUpperCase();
+      const coupon = await tx.coupon.findUnique({ where: { code: formattedCode } });
+
+      if (!coupon) {
+        throw new BadRequestError('Invalid coupon code');
+      }
+
+      // Check 4 strict validation conditions inside transaction
+      if (!coupon.is_active) {
+        throw new BadRequestError('This promo code is currently inactive');
+      }
+
+      if (coupon.expires_at && coupon.expires_at < now) {
+        throw new BadRequestError('This promo code has expired');
+      }
+
+      if (coupon.max_uses !== null && coupon.used_count >= coupon.max_uses) {
+        throw new ConflictError('This promo code usage limit has been reached');
+      }
+
+      if (coupon.min_amount !== null && totalCartBeforeCoupon < Number(coupon.min_amount)) {
+        throw new BadRequestError(`Minimum subtotal of ₹${coupon.min_amount} is required to apply ${coupon.code}`);
+      }
+
+      // Atomic reservation of coupon slot with concurrency protection
+      const incrementResult = await tx.coupon.updateMany({
+        where: {
+          id: coupon.id,
+          is_active: true,
+          OR: [
+            { max_uses: null },
+            { used_count: { lt: coupon.max_uses! } }
+          ]
+        },
+        data: {
+          used_count: { increment: 1 }
         }
       });
-    } catch (e) {
-      // Fallback if production PostgreSQL schema does not yet have customer_name / customer_phone columns
-      newBooking = await tx.booking.create({
-        data: { 
-          customer_id: req.user!.id, 
-          show_id, 
-          booking_reference: bookingRef, 
-          total_price: finalTotalPrice 
-        }
-      });
+
+      if (incrementResult.count === 0) {
+        throw new ConflictError('Coupon slot was taken by another user during checkout');
+      }
+
+      appliedCouponId = coupon.id;
+      const discountVal = Number(coupon.discount_value);
+
+      if (coupon.discount_type === 'percentage') {
+        couponDiscountAmount = Math.round((reducedSeatSubtotal * (discountVal / 100)) * 100) / 100;
+      } else {
+        couponDiscountAmount = Math.min(reducedSeatSubtotal, discountVal);
+      }
     }
+
+    const finalTotalPrice = Math.max(0, seatTotalPrice - groupDiscountAmount + addonTotalPrice - couponDiscountAmount);
+    const bookingRef = `QR-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    
+    const newBooking = await tx.booking.create({
+      data: { 
+        customer_id: req.user!.id, 
+        // @ts-ignore
+        customer_name,
+        // @ts-ignore
+        customer_phone,
+        show_id, 
+        booking_reference: bookingRef, 
+        total_price: finalTotalPrice,
+        group_discount_amount: groupDiscountAmount,
+        discount_amount: couponDiscountAmount,
+        coupon_id: appliedCouponId
+      }
+    });
 
     for (const seat of seats) {
       await tx.bookingSeat.create({
@@ -475,6 +530,18 @@ export const cancelBooking = async (req: AuthRequest, res: Response) => {
     where: { id },
     data: { status: 'cancelled' }
   });
+
+  // RULE 4: Decrement coupon used_count if booking used a promo code
+  if (booking.coupon_id) {
+    try {
+      await prisma.coupon.update({
+        where: { id: booking.coupon_id },
+        data: { used_count: { decrement: 1 } }
+      });
+    } catch (err) {
+      console.error('Failed to decrement coupon used_count on cancellation:', err);
+    }
+  }
 
   // Reallocate each freed seat via waitlist mechanism
   for (const bSeat of booking.seats) {

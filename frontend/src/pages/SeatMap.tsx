@@ -141,7 +141,7 @@ export default function SeatMap() {
     setIsAddonModalOpen(true);
   };
 
-  const executeFinalBooking = async (selectedAddons: { addon_item_id: string; quantity: number }[]) => {
+  const executeFinalBooking = async (selectedAddons: { addon_item_id: string; quantity: number }[], couponCode?: string) => {
     setIsAddonModalOpen(false);
     const myHolds = seats.filter(s => s.status === 'held' && s.held_by === user?.id);
     setCheckingOut(true);
@@ -153,7 +153,8 @@ export default function SeatMap() {
           seat_status_ids: myHolds.map(s => s.id),
           customer_name: customerName,
           customer_phone: customerPhone,
-          addons: selectedAddons
+          addons: selectedAddons,
+          coupon_code: couponCode
         })
       });
       showSuccess(`Booking Confirmed!\n\nReference Code: ${res.data.booking_reference}\n\nYour QR Code ticket has been sent to your email.`, {

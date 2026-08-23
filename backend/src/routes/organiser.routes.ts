@@ -17,6 +17,11 @@ import {
   updateAddonItem,
   deleteAddonItem
 } from '../controllers/adminAddons.controller';
+import {
+  getCoupons,
+  createCoupon,
+  updateCoupon
+} from '../controllers/coupons.controller';
 
 const router = Router();
 const orgAuth = [authenticate, requireRole(['organiser', 'admin'])];
@@ -45,5 +50,10 @@ router.get('/seat-categories', authenticate, getSeatCategories);
 router.post('/addons', ...orgAuth, createAddonItem);
 router.patch('/addons/:id', ...orgAuth, updateAddonItem);
 router.delete('/addons/:id', ...orgAuth, deleteAddonItem);
+
+// Coupon / Promo code management
+router.get('/coupons', ...orgAuth, getCoupons);
+router.post('/coupons', ...orgAuth, createCoupon);
+router.patch('/coupons/:id', ...orgAuth, updateCoupon);
 
 export default router;

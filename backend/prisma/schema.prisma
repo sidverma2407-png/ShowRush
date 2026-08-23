@@ -240,21 +240,49 @@ model SeatStatus {
   @@map("seat_status")
 }
 
+enum DiscountType {
+  percentage
+  flat
+}
+
+model Coupon {
+  id             String       @id @default(uuid()) @db.Uuid
+  code           String       @unique
+  discount_type  DiscountType @default(percentage)
+  discount_value Decimal      @db.Decimal(10, 2)
+  max_uses       Int?
+  used_count     Int          @default(0)
+  min_amount     Decimal?     @db.Decimal(10, 2)
+  expires_at     DateTime?
+  is_active      Boolean      @default(true)
+  created_by     String?      @db.Uuid
+  created_at     DateTime     @default(now())
+  updated_at     DateTime     @updatedAt
+
+  bookings       Booking[]
+
+  @@map("coupons")
+}
+
 model Booking {
-  id                String        @id @default(uuid()) @db.Uuid
-  customer_id       String        @db.Uuid
-  customer_name     String?
-  customer_phone    String?
-  show_id           String        @db.Uuid
-  booking_reference String        @unique
-  total_price       Decimal       @db.Decimal(10, 2)
-  status            BookingStatus @default(confirmed)
-  qr_code_url       String?
-  created_at        DateTime      @default(now())
-  updated_at        DateTime      @updatedAt
+  id                    String        @id @default(uuid()) @db.Uuid
+  customer_id           String        @db.Uuid
+  customer_name         String?
+  customer_phone        String?
+  show_id               String        @db.Uuid
+  booking_reference     String        @unique
+  total_price           Decimal       @db.Decimal(10, 2)
+  group_discount_amount Decimal       @default(0.00) @db.Decimal(10, 2)
+  discount_amount       Decimal       @default(0.00) @db.Decimal(10, 2)
+  coupon_id             String?       @db.Uuid
+  status                BookingStatus @default(confirmed)
+  qr_code_url           String?
+  created_at            DateTime      @default(now())
+  updated_at            DateTime      @updatedAt
 
   customer       User           @relation(fields: [customer_id], references: [id])
   show           Show           @relation(fields: [show_id], references: [id])
+  coupon         Coupon?        @relation(fields: [coupon_id], references: [id])
   seats          BookingSeat[]
   seat_statuses  SeatStatus[]
   booking_addons BookingAddon[]

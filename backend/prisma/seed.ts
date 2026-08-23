@@ -15,7 +15,7 @@ async function main() {
   console.log('Clearing old data and seeding database with real-world Indian events, cinema chains, metadata, trailers, addons & reviews...');
 
   // Clean wipe tables for fresh layout seeding
-  await prisma.$executeRawUnsafe(`TRUNCATE TABLE "booking_addons", "addon_items", "reviews", "bookings", "booking_seats", "waitlist_entries", "seat_status", "show_category_pricing", "shows", "events", "venue_seats", "seat_categories", "venues" CASCADE;`);
+  await prisma.$executeRawUnsafe(`TRUNCATE TABLE "coupons", "booking_addons", "addon_items", "reviews", "bookings", "booking_seats", "waitlist_entries", "seat_status", "show_category_pricing", "shows", "events", "venue_seats", "seat_categories", "venues" CASCADE;`);
 
   // Create users
   const password_hash = await bcrypt.hash('password123', 10);
@@ -42,6 +42,17 @@ async function main() {
     where: { email: 'diya.patel@example.com' },
     update: { is_verified: true },
     create: { name: 'Diya Patel', email: 'diya.patel@example.com', password_hash, role: 'customer', is_verified: true }
+  });
+
+  // --- SEED PROMO / COUPON CODES ---
+  console.log('Seeding Promo / Coupon Codes...');
+  await prisma.coupon.createMany({
+    data: [
+      { code: 'SEATZY10', discount_type: 'percentage', discount_value: 10.00, max_uses: 100, min_amount: 300.00, is_active: true, created_by: admin.id },
+      { code: 'FLAT100', discount_type: 'flat', discount_value: 100.00, max_uses: 50, min_amount: 500.00, is_active: true, created_by: admin.id },
+      { code: 'WELCOME50', discount_type: 'percentage', discount_value: 15.00, max_uses: 200, min_amount: 200.00, is_active: true, created_by: admin.id },
+      { code: 'FEAST50', discount_type: 'flat', discount_value: 50.00, max_uses: 30, min_amount: 250.00, is_active: true, created_by: admin.id }
+    ]
   });
 
   // Helper to ensure seat category exists

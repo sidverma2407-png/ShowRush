@@ -17,6 +17,8 @@ import {
   acceptWaitlistOffer
 } from '../controllers/customer.controller';
 
+import { validateCoupon } from '../controllers/coupons.controller';
+
 const router = Router();
 
 // Public routes
@@ -26,6 +28,7 @@ router.get('/events/:id/reviews', getEventReviews);
 router.get('/addons', getAddonItems);
 router.get('/shows/:id/seats', getSeatMap);
 router.get('/waitlist/offer/:token', viewWaitlistOffer);
+router.post('/coupons/validate', validateCoupon);
 
 // Authenticated routes
 router.post('/events/:id/reviews', authenticate, createEventReview);
