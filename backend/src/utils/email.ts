@@ -32,8 +32,8 @@ export const validateEmailFormat = (email: string): { valid: boolean; reason?: s
 };
 
 export const isSmtpConfigured = () => {
-  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || 'rishitwork28@gmail.com').trim();
-  const pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || 'hijtkihpgovzjzkb').trim();
+  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
+  const pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim();
   return Boolean(user && pass && !user.includes('ethereal.email'));
 };
 
@@ -43,48 +43,42 @@ let cachedTransporter: nodemailer.Transporter | null = null;
 const getTransporter = () => {
   if (cachedTransporter) return cachedTransporter;
 
-  let user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
-  let pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim().replace(/\s+/g, '');
-
-  // If Render env has old ethereal or empty or broken typo pass, fallback to verified credentials
-  if (!user || user.includes('ethereal.email')) {
-    user = 'rishitwork28@gmail.com';
-  }
-  if (!pass || pass.length !== 16) {
-    pass = 'hijtkihpgovzjzkb';
-  }
-
+  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
+  const pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim().replace(/\s+/g, '');
   const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
   const isGmail = host.includes('gmail') || user.endsWith('@gmail.com');
 
-  cachedTransporter = nodemailer.createTransport({
-    host: isGmail ? 'smtp.gmail.com' : host,
-    port: isGmail ? 465 : (Number(process.env.SMTP_PORT) || 465),
-    secure: true,
-    auth: { user, pass },
-    pool: true,
-    maxConnections: 5,
-    maxMessages: 100,
-    rateDelta: 1000,
-    rateLimit: 5,
-    tls: {
-      rejectUnauthorized: false
-    }
-  });
+  if (user && pass && !user.includes('ethereal.email')) {
+    cachedTransporter = nodemailer.createTransport({
+      host: isGmail ? 'smtp.gmail.com' : host,
+      port: isGmail ? 465 : (Number(process.env.SMTP_PORT) || 465),
+      secure: true,
+      auth: { user, pass },
+      pool: true,
+      maxConnections: 5,
+      maxMessages: 100,
+      rateDelta: 1000,
+      rateLimit: 5,
+      tls: {
+        rejectUnauthorized: false
+      }
+    });
+    return cachedTransporter;
+  }
 
-  return cachedTransporter;
+  return null;
 };
 
 // Ensure From header matches authenticated Gmail account to prevent Google SMTP rejections
 const getSender = (displayName: string) => {
-  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || 'rishitwork28@gmail.com').trim();
+  const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
   if (process.env.EMAIL_FROM && process.env.EMAIL_FROM.includes('@') && !process.env.EMAIL_FROM.includes('ethereal.email')) {
     return process.env.EMAIL_FROM;
   }
   if (user && !user.includes('ethereal.email')) {
     return `"${displayName}" <${user}>`;
   }
-  return `"${displayName}" <rishitwork28@gmail.com>`;
+  return `"${displayName}" <verify@seatzy.com>`;
 };
 
 // Send 6-Digit Email Verification OTP
