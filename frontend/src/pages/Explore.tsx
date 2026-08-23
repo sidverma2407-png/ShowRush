@@ -65,7 +65,7 @@ export default function Explore() {
   return (
     <div className="w-full min-h-screen bg-background selection:bg-primary-fixed selection:text-on-primary-fixed pb-20">
 
-      {/* 🚀 SECTION 1: Platform Introduction & Value Offering */}
+      {/* SECTION 1: Platform Introduction & Value Offering */}
       <section className="w-full bg-on-background text-on-primary py-12 sm:py-16 px-4 md:px-margin-desktop border-b-4 border-on-background relative overflow-hidden">
         <div className="max-w-7xl mx-auto flex flex-col gap-8 relative z-10">
 
@@ -126,7 +126,7 @@ export default function Explore() {
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary-container/10 rounded-full blur-3xl pointer-events-none"></div>
       </section>
 
-      {/* 🧭 SECTION 2: Category Exploration */}
+      {/* SECTION 2: Category Exploration */}
       <section className="max-w-7xl mx-auto px-4 md:px-margin-desktop py-12 sm:py-16">
 
         {/* Category Section Header */}

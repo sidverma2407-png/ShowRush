@@ -3,6 +3,8 @@ import { authenticate, requireRole } from '../middleware/auth';
 import {
   createEvent,
   updateEvent,
+  deleteEvent,
+  uploadImage,
   createShow,
   updateShowPricing,
   cancelShow,
@@ -30,6 +32,10 @@ const orgAuth = [authenticate, requireRole(['organiser', 'admin'])];
 router.get('/organiser/events', ...orgAuth, getMyEvents);
 router.post('/events', ...orgAuth, createEvent);
 router.put('/events/:id', ...orgAuth, updateEvent);
+router.delete('/events/:id', ...orgAuth, deleteEvent);
+
+// Image Upload
+router.post('/upload', ...orgAuth, uploadImage);
 
 // Shows
 router.post('/events/:id/shows', ...orgAuth, createShow);

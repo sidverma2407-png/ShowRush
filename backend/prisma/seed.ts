@@ -157,7 +157,7 @@ async function main() {
   await createLayout(balewadiPune.id, [{ rows: ['A', 'B'], catId: vipPitCat.id }, { rows: ['C', 'D'], catId: lowerTierCat.id }, { rows: ['E', 'F'], catId: upperDeckCat.id }], 14);
   await createLayout(gachibowliHyd.id, [{ rows: ['A', 'B'], catId: vipPitCat.id }, { rows: ['C', 'D', 'E'], catId: goldenCircleCat.id }, { rows: ['F', 'G'], catId: lowerTierCat.id }, { rows: ['H', 'I'], catId: upperDeckCat.id }], 14);
 
-  // --- 20 EXACT USER SPECIFIED EVENTS (DATED AFTER AUG 24, 2026) WITH METADATA ---
+  // --- 20 EXACT USER SPECIFIED EVENTS (DATED AFTER AUG 24, 2026) WITH RICH MULTI-DATE SCHEDULE ---
   const eventList = [
     // --- 1. CONCERTS ---
     {
@@ -172,9 +172,13 @@ async function main() {
       cast: 'A.R. Rahman, Jonita Gandhi, Haricharan, Mohit Chauhan',
       trailer_url: 'https://www.youtube.com/watch?v=1T2bXySg08U',
       shows: [
-        { venue: chinnaswamyBlr, dayOffset: 41, time: '19:00', format: 'Live Arena', language: 'Hindi/Tamil' },
-        { venue: chinnaswamyBlr, dayOffset: 42, time: '19:00', format: 'Live Arena', language: 'Hindi/Tamil' },
-        { venue: chinnaswamyBlr, dayOffset: 43, time: '18:30', format: 'Live Arena', language: 'Hindi/Tamil' }
+        { venue: chinnaswamyBlr, dayOffset: 1, time: '19:00', format: 'Live Arena', language: 'Hindi/Tamil' },
+        { venue: chinnaswamyBlr, dayOffset: 2, time: '19:00', format: 'Live Arena', language: 'Hindi/Tamil' },
+        { venue: chinnaswamyBlr, dayOffset: 3, time: '18:30', format: 'Live Arena', language: 'Hindi/Tamil' },
+        { venue: chinnaswamyBlr, dayOffset: 4, time: '19:00', format: 'Live Arena', language: 'Hindi/Tamil' },
+        { venue: jioMumbai, dayOffset: 5, time: '18:30', format: 'Live Arena', language: 'Hindi/Tamil' },
+        { venue: jioMumbai, dayOffset: 6, time: '19:30', format: 'Live Arena', language: 'Hindi/Tamil' },
+        { venue: noidaStadium, dayOffset: 7, time: '19:00', format: 'Live Arena', language: 'Hindi/Tamil' }
       ]
     },
     {
@@ -189,10 +193,13 @@ async function main() {
       cast: 'Fred again..',
       trailer_url: 'https://www.youtube.com/watch?v=c0-hvjV2A5Y',
       shows: [
-        { venue: noidaStadium, dayOffset: 104, time: '18:00', format: 'Open Air', language: 'English' },
-        { venue: noidaStadium, dayOffset: 104, time: '21:00', format: 'Open Air', language: 'English' },
-        { venue: chinnaswamyBlr, dayOffset: 111, time: '18:00', format: 'Open Air', language: 'English' },
-        { venue: chinnaswamyBlr, dayOffset: 111, time: '21:30', format: 'Open Air', language: 'English' }
+        { venue: noidaStadium, dayOffset: 1, time: '18:00', format: 'Open Air', language: 'English' },
+        { venue: noidaStadium, dayOffset: 2, time: '21:00', format: 'Open Air', language: 'English' },
+        { venue: noidaStadium, dayOffset: 3, time: '19:00', format: 'Open Air', language: 'English' },
+        { venue: chinnaswamyBlr, dayOffset: 4, time: '18:00', format: 'Open Air', language: 'English' },
+        { venue: chinnaswamyBlr, dayOffset: 5, time: '21:30', format: 'Open Air', language: 'English' },
+        { venue: jioMumbai, dayOffset: 6, time: '19:00', format: 'Open Air', language: 'English' },
+        { venue: jioMumbai, dayOffset: 7, time: '21:30', format: 'Open Air', language: 'English' }
       ]
     },
     {
@@ -207,8 +214,13 @@ async function main() {
       cast: 'Sonu Nigam',
       trailer_url: 'https://www.youtube.com/watch?v=y1D11B5zW1w',
       shows: [
-        { venue: gachibowliHyd, dayOffset: 120, time: '19:30', format: 'Stadium', language: 'Hindi' },
-        { venue: gachibowliHyd, dayOffset: 121, time: '19:30', format: 'Stadium', language: 'Hindi' }
+        { venue: gachibowliHyd, dayOffset: 1, time: '19:30', format: 'Stadium', language: 'Hindi' },
+        { venue: gachibowliHyd, dayOffset: 2, time: '19:30', format: 'Stadium', language: 'Hindi' },
+        { venue: gachibowliHyd, dayOffset: 3, time: '18:30', format: 'Stadium', language: 'Hindi' },
+        { venue: wankhedeMumbai, dayOffset: 4, time: '19:00', format: 'Stadium', language: 'Hindi' },
+        { venue: wankhedeMumbai, dayOffset: 5, time: '20:00', format: 'Stadium', language: 'Hindi' },
+        { venue: noidaStadium, dayOffset: 6, time: '19:00', format: 'Stadium', language: 'Hindi' },
+        { venue: noidaStadium, dayOffset: 7, time: '19:30', format: 'Stadium', language: 'Hindi' }
       ]
     },
     {
@@ -223,9 +235,12 @@ async function main() {
       cast: 'Rushil Ranjan, Abi Sampa',
       trailer_url: 'https://www.youtube.com/watch?v=kY7m87b3z2M',
       shows: [
-        { venue: jioMumbai, dayOffset: 20, time: '18:00', format: 'Live Garden', language: 'Hindi/Urdu' },
-        { venue: jioMumbai, dayOffset: 21, time: '19:00', format: 'Live Garden', language: 'Hindi/Urdu' },
-        { venue: jioMumbai, dayOffset: 22, time: '19:30', format: 'Live Garden', language: 'Hindi/Urdu' }
+        { venue: jioMumbai, dayOffset: 1, time: '18:00', format: 'Live Garden', language: 'Hindi/Urdu' },
+        { venue: jioMumbai, dayOffset: 2, time: '19:00', format: 'Live Garden', language: 'Hindi/Urdu' },
+        { venue: jioMumbai, dayOffset: 3, time: '19:30', format: 'Live Garden', language: 'Hindi/Urdu' },
+        { venue: noidaStadium, dayOffset: 4, time: '18:30', format: 'Live Garden', language: 'Hindi/Urdu' },
+        { venue: noidaStadium, dayOffset: 5, time: '19:00', format: 'Live Garden', language: 'Hindi/Urdu' },
+        { venue: chinnaswamyBlr, dayOffset: 6, time: '19:00', format: 'Live Garden', language: 'Hindi/Urdu' }
       ]
     },
     {
@@ -240,10 +255,13 @@ async function main() {
       cast: 'Anup Jalota, Malini Awasthi, Madhubanti Bagchi, Afsana Khan',
       trailer_url: 'https://www.youtube.com/watch?v=QcIy9NiNbmo',
       shows: [
-        { venue: noidaStadium, dayOffset: 3, time: '19:00', format: 'Festival', language: 'Hindi' },
-        { venue: noidaStadium, dayOffset: 4, time: '19:00', format: 'Festival', language: 'Hindi' },
-        { venue: noidaStadium, dayOffset: 5, time: '18:30', format: 'Festival', language: 'Hindi' },
-        { venue: noidaStadium, dayOffset: 6, time: '19:30', format: 'Festival', language: 'Hindi' }
+        { venue: noidaStadium, dayOffset: 1, time: '18:00', format: 'Festival', language: 'Hindi' },
+        { venue: noidaStadium, dayOffset: 2, time: '19:00', format: 'Festival', language: 'Hindi' },
+        { venue: noidaStadium, dayOffset: 3, time: '18:30', format: 'Festival', language: 'Hindi' },
+        { venue: noidaStadium, dayOffset: 4, time: '19:30', format: 'Festival', language: 'Hindi' },
+        { venue: noidaStadium, dayOffset: 5, time: '20:00', format: 'Festival', language: 'Hindi' },
+        { venue: jioMumbai, dayOffset: 6, time: '18:30', format: 'Festival', language: 'Hindi' },
+        { venue: jioMumbai, dayOffset: 7, time: '19:30', format: 'Festival', language: 'Hindi' }
       ]
     },
 
@@ -260,14 +278,66 @@ async function main() {
       cast: 'Tom Holland, Zendaya, Jacob Batalon, Benedict Cumberbatch',
       trailer_url: 'https://www.youtube.com/watch?v=8TZMtslA3UY',
       shows: [
+        // Day 1
+        { venue: pvrDelhi, dayOffset: 1, time: '11:00', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 1, time: '15:15', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 1, time: '18:30', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 1, time: '21:45', format: 'IMAX 3D', language: 'English' },
+        { venue: inoxDelhi, dayOffset: 1, time: '13:00', format: '4DX 3D', language: 'Hindi' },
+        { venue: inoxDelhi, dayOffset: 1, time: '17:00', format: '4DX 3D', language: 'English' },
+        { venue: cinepolisMumbai, dayOffset: 1, time: '14:00', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrBlr, dayOffset: 1, time: '19:00', format: 'IMAX 3D', language: 'English' },
+
+        // Day 2
+        { venue: pvrDelhi, dayOffset: 2, time: '10:30', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 2, time: '14:00', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 2, time: '17:30', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 2, time: '21:00', format: 'IMAX 3D', language: 'English' },
+        { venue: inoxDelhi, dayOffset: 2, time: '12:30', format: '4DX 3D', language: 'English' },
+        { venue: inoxDelhi, dayOffset: 2, time: '16:45', format: '4DX 3D', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 2, time: '18:00', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrBlr, dayOffset: 2, time: '20:30', format: 'IMAX 3D', language: 'English' },
+
+        // Day 3
+        { venue: pvrDelhi, dayOffset: 3, time: '11:15', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 3, time: '15:30', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 3, time: '19:00', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 3, time: '22:15', format: 'IMAX 3D', language: 'English' },
+        { venue: inoxDelhi, dayOffset: 3, time: '14:00', format: '4DX 3D', language: 'English' },
+        { venue: cinepolisMumbai, dayOffset: 3, time: '15:30', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrBlr, dayOffset: 3, time: '17:45', format: 'IMAX 3D', language: 'English' },
+
+        // Day 4
+        { venue: pvrDelhi, dayOffset: 4, time: '12:00', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 4, time: '16:00', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 4, time: '20:00', format: 'IMAX 3D', language: 'English' },
+        { venue: inoxDelhi, dayOffset: 4, time: '18:30', format: '4DX 3D', language: 'English' },
+        { venue: cinepolisMumbai, dayOffset: 4, time: '19:15', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrBlr, dayOffset: 4, time: '21:00', format: 'IMAX 3D', language: 'English' },
+
+        // Day 5
         { venue: pvrDelhi, dayOffset: 5, time: '11:00', format: 'IMAX 3D', language: 'English' },
-        { venue: pvrDelhi, dayOffset: 5, time: '15:15', format: 'IMAX 3D', language: 'English' },
-        { venue: pvrDelhi, dayOffset: 5, time: '18:30', format: '2D', language: 'Hindi' },
-        { venue: pvrDelhi, dayOffset: 5, time: '21:45', format: 'IMAX 3D', language: 'English' },
-        { venue: inoxDelhi, dayOffset: 5, time: '13:00', format: '4DX 3D', language: 'Hindi' },
-        { venue: inoxDelhi, dayOffset: 5, time: '17:00', format: '4DX 3D', language: 'English' },
-        { venue: cinepolisMumbai, dayOffset: 5, time: '14:00', format: 'IMAX 3D', language: 'English' },
-        { venue: pvrBlr, dayOffset: 5, time: '19:00', format: 'IMAX 3D', language: 'English' }
+        { venue: pvrDelhi, dayOffset: 5, time: '15:00', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 5, time: '19:30', format: '2D', language: 'Hindi' },
+        { venue: inoxDelhi, dayOffset: 5, time: '16:30', format: '4DX 3D', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 5, time: '17:00', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrBlr, dayOffset: 5, time: '19:30', format: 'IMAX 3D', language: 'English' },
+
+        // Day 6
+        { venue: pvrDelhi, dayOffset: 6, time: '13:00', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 6, time: '17:30', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 6, time: '21:30', format: '2D', language: 'Hindi' },
+        { venue: inoxDelhi, dayOffset: 6, time: '19:00', format: '4DX 3D', language: 'English' },
+        { venue: cinepolisMumbai, dayOffset: 6, time: '20:00', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrBlr, dayOffset: 6, time: '18:00', format: 'IMAX 3D', language: 'English' },
+
+        // Day 7
+        { venue: pvrDelhi, dayOffset: 7, time: '12:00', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 7, time: '16:30', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 7, time: '20:30', format: '2D', language: 'Hindi' },
+        { venue: inoxDelhi, dayOffset: 7, time: '15:00', format: '4DX 3D', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 7, time: '19:00', format: 'IMAX 3D', language: 'English' },
+        { venue: pvrBlr, dayOffset: 7, time: '21:30', format: 'IMAX 3D', language: 'English' }
       ]
     },
     {
@@ -282,10 +352,52 @@ async function main() {
       cast: 'Ralph Fiennes, Juliette Binoche, Charlie Plummer',
       trailer_url: 'https://www.youtube.com/watch?v=f_bKjZeJBBI',
       shows: [
-        { venue: pvrDelhi, dayOffset: 8, time: '13:00', format: '2D', language: 'English' },
-        { venue: pvrDelhi, dayOffset: 8, time: '17:00', format: '2D', language: 'English' },
-        { venue: pvrDelhi, dayOffset: 8, time: '21:00', format: '2D', language: 'English' },
-        { venue: cinepolisMumbai, dayOffset: 8, time: '18:30', format: '2D', language: 'English' }
+        // Day 1
+        { venue: pvrDelhi, dayOffset: 1, time: '13:00', format: '2D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 1, time: '17:00', format: '2D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 1, time: '21:00', format: '2D', language: 'English' },
+        { venue: cinepolisMumbai, dayOffset: 1, time: '18:30', format: '2D', language: 'English' },
+        { venue: inoxDelhi, dayOffset: 1, time: '15:30', format: '2D', language: 'English' },
+        { venue: pvrBlr, dayOffset: 1, time: '19:30', format: '2D', language: 'English' },
+
+        // Day 2
+        { venue: pvrDelhi, dayOffset: 2, time: '12:30', format: '2D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 2, time: '16:30', format: '2D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 2, time: '20:30', format: '2D', language: 'English' },
+        { venue: cinepolisMumbai, dayOffset: 2, time: '17:00', format: '2D', language: 'English' },
+        { venue: inoxDelhi, dayOffset: 2, time: '19:00', format: '2D', language: 'English' },
+
+        // Day 3
+        { venue: pvrDelhi, dayOffset: 3, time: '13:30', format: '2D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 3, time: '17:30', format: '2D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 3, time: '21:30', format: '2D', language: 'English' },
+        { venue: cinepolisMumbai, dayOffset: 3, time: '19:30', format: '2D', language: 'English' },
+        { venue: pvrBlr, dayOffset: 3, time: '18:00', format: '2D', language: 'English' },
+
+        // Day 4
+        { venue: pvrDelhi, dayOffset: 4, time: '14:00', format: '2D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 4, time: '18:00', format: '2D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 4, time: '21:45', format: '2D', language: 'English' },
+        { venue: cinepolisMumbai, dayOffset: 4, time: '20:15', format: '2D', language: 'English' },
+
+        // Day 5
+        { venue: pvrDelhi, dayOffset: 5, time: '12:00', format: '2D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 5, time: '16:00', format: '2D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 5, time: '20:00', format: '2D', language: 'English' },
+        { venue: inoxDelhi, dayOffset: 5, time: '17:30', format: '2D', language: 'English' },
+        { venue: pvrBlr, dayOffset: 5, time: '20:30', format: '2D', language: 'English' },
+
+        // Day 6
+        { venue: pvrDelhi, dayOffset: 6, time: '13:00', format: '2D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 6, time: '17:00', format: '2D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 6, time: '21:00', format: '2D', language: 'English' },
+        { venue: cinepolisMumbai, dayOffset: 6, time: '18:45', format: '2D', language: 'English' },
+
+        // Day 7
+        { venue: pvrDelhi, dayOffset: 7, time: '14:30', format: '2D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 7, time: '18:30', format: '2D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 7, time: '22:00', format: '2D', language: 'English' },
+        { venue: inoxDelhi, dayOffset: 7, time: '19:30', format: '2D', language: 'English' }
       ]
     },
     {
@@ -300,10 +412,52 @@ async function main() {
       cast: 'Anne Hathaway, Oscar Isaac, Mahershala Ali',
       trailer_url: 'https://www.youtube.com/watch?v=3oB9AxspVow',
       shows: [
-        { venue: pvrDelhi, dayOffset: 12, time: '14:00', format: '3D', language: 'English' },
-        { venue: pvrDelhi, dayOffset: 12, time: '18:00', format: '3D', language: 'Hindi' },
-        { venue: pvrDelhi, dayOffset: 12, time: '21:30', format: '3D', language: 'English' },
-        { venue: inoxDelhi, dayOffset: 12, time: '16:00', format: '2D', language: 'Hindi' }
+        // Day 1
+        { venue: pvrDelhi, dayOffset: 1, time: '14:00', format: '3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 1, time: '18:00', format: '3D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 1, time: '21:30', format: '3D', language: 'English' },
+        { venue: inoxDelhi, dayOffset: 1, time: '16:00', format: '2D', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 1, time: '17:30', format: '3D', language: 'English' },
+        { venue: pvrBlr, dayOffset: 1, time: '20:00', format: '3D', language: 'English' },
+
+        // Day 2
+        { venue: pvrDelhi, dayOffset: 2, time: '11:30', format: '3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 2, time: '15:00', format: '3D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 2, time: '19:00', format: '3D', language: 'English' },
+        { venue: inoxDelhi, dayOffset: 2, time: '18:15', format: '3D', language: 'English' },
+        { venue: cinepolisMumbai, dayOffset: 2, time: '21:00', format: '3D', language: 'English' },
+
+        // Day 3
+        { venue: pvrDelhi, dayOffset: 3, time: '13:00', format: '3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 3, time: '17:15', format: '3D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 3, time: '21:00', format: '3D', language: 'English' },
+        { venue: inoxDelhi, dayOffset: 3, time: '15:45', format: '2D', language: 'Hindi' },
+        { venue: pvrBlr, dayOffset: 3, time: '18:30', format: '3D', language: 'English' },
+
+        // Day 4
+        { venue: pvrDelhi, dayOffset: 4, time: '12:30', format: '3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 4, time: '16:45', format: '3D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 4, time: '20:30', format: '3D', language: 'English' },
+        { venue: cinepolisMumbai, dayOffset: 4, time: '19:00', format: '3D', language: 'English' },
+
+        // Day 5
+        { venue: pvrDelhi, dayOffset: 5, time: '14:30', format: '3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 5, time: '18:30', format: '3D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 5, time: '22:00', format: '3D', language: 'English' },
+        { venue: inoxDelhi, dayOffset: 5, time: '19:15', format: '3D', language: 'English' },
+        { venue: pvrBlr, dayOffset: 5, time: '21:15', format: '3D', language: 'English' },
+
+        // Day 6
+        { venue: pvrDelhi, dayOffset: 6, time: '11:00', format: '3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 6, time: '15:30', format: '3D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 6, time: '19:45', format: '3D', language: 'English' },
+        { venue: cinepolisMumbai, dayOffset: 6, time: '18:00', format: '3D', language: 'English' },
+
+        // Day 7
+        { venue: pvrDelhi, dayOffset: 7, time: '13:30', format: '3D', language: 'English' },
+        { venue: pvrDelhi, dayOffset: 7, time: '17:45', format: '3D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 7, time: '21:15', format: '3D', language: 'English' },
+        { venue: inoxDelhi, dayOffset: 7, time: '20:00', format: '3D', language: 'English' }
       ]
     },
     {
@@ -318,10 +472,54 @@ async function main() {
       cast: 'Emraan Hashmi, Disha Patani, Kay Kay Menon',
       trailer_url: 'https://www.youtube.com/watch?v=qkaSXCqdecM',
       shows: [
-        { venue: pvrDelhi, dayOffset: 16, time: '12:30', format: '2D', language: 'Hindi' },
-        { venue: pvrDelhi, dayOffset: 16, time: '16:45', format: '2D', language: 'Hindi' },
-        { venue: pvrDelhi, dayOffset: 16, time: '20:30', format: '2D', language: 'Hindi' },
-        { venue: inoxDelhi, dayOffset: 16, time: '19:00', format: '2D', language: 'Hindi' }
+        // Day 1
+        { venue: pvrDelhi, dayOffset: 1, time: '12:30', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 1, time: '16:45', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 1, time: '20:30', format: '2D', language: 'Hindi' },
+        { venue: inoxDelhi, dayOffset: 1, time: '19:00', format: '2D', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 1, time: '18:00', format: '2D', language: 'Hindi' },
+        { venue: pvrBlr, dayOffset: 1, time: '20:30', format: '2D', language: 'Hindi' },
+
+        // Day 2
+        { venue: pvrDelhi, dayOffset: 2, time: '11:00', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 2, time: '14:30', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 2, time: '18:00', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 2, time: '21:45', format: '2D', language: 'Hindi' },
+        { venue: inoxDelhi, dayOffset: 2, time: '16:30', format: '2D', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 2, time: '21:00', format: '2D', language: 'Hindi' },
+
+        // Day 3
+        { venue: pvrDelhi, dayOffset: 3, time: '13:00', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 3, time: '17:15', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 3, time: '21:00', format: '2D', language: 'Hindi' },
+        { venue: inoxDelhi, dayOffset: 3, time: '18:45', format: '2D', language: 'Hindi' },
+        { venue: pvrBlr, dayOffset: 3, time: '19:00', format: '2D', language: 'Hindi' },
+
+        // Day 4
+        { venue: pvrDelhi, dayOffset: 4, time: '12:00', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 4, time: '15:45', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 4, time: '19:30', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 4, time: '22:30', format: '2D', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 4, time: '17:30', format: '2D', language: 'Hindi' },
+
+        // Day 5
+        { venue: pvrDelhi, dayOffset: 5, time: '11:30', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 5, time: '15:00', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 5, time: '18:45', format: '2D', language: 'Hindi' },
+        { venue: inoxDelhi, dayOffset: 5, time: '20:15', format: '2D', language: 'Hindi' },
+        { venue: pvrBlr, dayOffset: 5, time: '21:45', format: '2D', language: 'Hindi' },
+
+        // Day 6
+        { venue: pvrDelhi, dayOffset: 6, time: '13:30', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 6, time: '17:00', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 6, time: '20:45', format: '2D', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 6, time: '19:15', format: '2D', language: 'Hindi' },
+
+        // Day 7
+        { venue: pvrDelhi, dayOffset: 7, time: '12:15', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 7, time: '16:00', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 7, time: '19:45', format: '2D', language: 'Hindi' },
+        { venue: inoxDelhi, dayOffset: 7, time: '17:45', format: '2D', language: 'Hindi' }
       ]
     },
     {
@@ -336,8 +534,43 @@ async function main() {
       cast: 'Pankaj Tripathi, Manoj Bajpayee, Sanya Malhotra',
       trailer_url: 'https://www.youtube.com/watch?v=oRsAMzfvVGk',
       shows: [
-        { venue: pvrDelhi, dayOffset: 20, time: '15:00', format: '2D', language: 'Hindi' },
-        { venue: pvrDelhi, dayOffset: 20, time: '19:00', format: '2D', language: 'Hindi' }
+        // Day 1
+        { venue: pvrDelhi, dayOffset: 1, time: '15:00', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 1, time: '19:00', format: '2D', language: 'Hindi' },
+        { venue: inoxDelhi, dayOffset: 1, time: '17:30', format: '2D', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 1, time: '18:15', format: '2D', language: 'Hindi' },
+
+        // Day 2
+        { venue: pvrDelhi, dayOffset: 2, time: '13:30', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 2, time: '17:45', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 2, time: '21:30', format: '2D', language: 'Hindi' },
+        { venue: pvrBlr, dayOffset: 2, time: '19:00', format: '2D', language: 'Hindi' },
+
+        // Day 3
+        { venue: pvrDelhi, dayOffset: 3, time: '14:00', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 3, time: '18:30', format: '2D', language: 'Hindi' },
+        { venue: inoxDelhi, dayOffset: 3, time: '20:00', format: '2D', language: 'Hindi' },
+
+        // Day 4
+        { venue: pvrDelhi, dayOffset: 4, time: '12:30', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 4, time: '16:45', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 4, time: '20:45', format: '2D', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 4, time: '19:30', format: '2D', language: 'Hindi' },
+
+        // Day 5
+        { venue: pvrDelhi, dayOffset: 5, time: '15:15', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 5, time: '19:15', format: '2D', language: 'Hindi' },
+        { venue: pvrBlr, dayOffset: 5, time: '20:30', format: '2D', language: 'Hindi' },
+
+        // Day 6
+        { venue: pvrDelhi, dayOffset: 6, time: '13:00', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 6, time: '17:30', format: '2D', language: 'Hindi' },
+        { venue: inoxDelhi, dayOffset: 6, time: '19:00', format: '2D', language: 'Hindi' },
+
+        // Day 7
+        { venue: pvrDelhi, dayOffset: 7, time: '14:45', format: '2D', language: 'Hindi' },
+        { venue: pvrDelhi, dayOffset: 7, time: '18:45', format: '2D', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 7, time: '20:45', format: '2D', language: 'Hindi' }
       ]
     },
 
@@ -354,8 +587,13 @@ async function main() {
       cast: 'Gokulam Kerala FC, Odisha FC, Sethu FC',
       trailer_url: 'https://www.youtube.com/watch?v=9bZkp7q19f0',
       shows: [
-        { venue: balewadiPune, dayOffset: 11, time: '16:00', format: 'Live Match', language: 'English' },
-        { venue: balewadiPune, dayOffset: 11, time: '19:30', format: 'Live Match', language: 'English' }
+        { venue: balewadiPune, dayOffset: 1, time: '16:00', format: 'Live Match', language: 'English' },
+        { venue: balewadiPune, dayOffset: 2, time: '19:30', format: 'Live Match', language: 'English' },
+        { venue: balewadiPune, dayOffset: 3, time: '16:00', format: 'Live Match', language: 'English' },
+        { venue: balewadiPune, dayOffset: 4, time: '19:30', format: 'Live Match', language: 'English' },
+        { venue: balewadiPune, dayOffset: 5, time: '16:00', format: 'Live Match', language: 'English' },
+        { venue: balewadiPune, dayOffset: 6, time: '19:30', format: 'Live Match', language: 'English' },
+        { venue: balewadiPune, dayOffset: 7, time: '17:00', format: 'Live Match', language: 'English' }
       ]
     },
     {
@@ -370,9 +608,13 @@ async function main() {
       cast: 'Suryakumar Yadav, Hardik Pandya, Rashid Khan',
       trailer_url: 'https://www.youtube.com/watch?v=6v2L2UGZJAQ',
       shows: [
-        { venue: noidaStadium, dayOffset: 21, time: '19:00', format: 'Live T20', language: 'Hindi' },
-        { venue: noidaStadium, dayOffset: 23, time: '19:00', format: 'Live T20', language: 'Hindi' },
-        { venue: noidaStadium, dayOffset: 25, time: '19:00', format: 'Live T20', language: 'Hindi' }
+        { venue: noidaStadium, dayOffset: 1, time: '19:00', format: 'Live T20', language: 'Hindi' },
+        { venue: noidaStadium, dayOffset: 2, time: '19:00', format: 'Live T20', language: 'Hindi' },
+        { venue: noidaStadium, dayOffset: 3, time: '19:00', format: 'Live T20', language: 'Hindi' },
+        { venue: noidaStadium, dayOffset: 4, time: '19:00', format: 'Live T20', language: 'Hindi' },
+        { venue: noidaStadium, dayOffset: 5, time: '19:00', format: 'Live T20', language: 'Hindi' },
+        { venue: wankhedeMumbai, dayOffset: 6, time: '19:30', format: 'Live T20', language: 'Hindi' },
+        { venue: wankhedeMumbai, dayOffset: 7, time: '19:30', format: 'Live T20', language: 'Hindi' }
       ]
     },
     {
@@ -387,8 +629,12 @@ async function main() {
       cast: 'Vinicius Jr, Rodrygo, Sunil Chhetri, Lallianzuala Chhangte',
       trailer_url: 'https://www.youtube.com/watch?v=7X8R1yTz2Q0',
       shows: [
-        { venue: wankhedeMumbai, dayOffset: 41, time: '19:30', format: 'Stadium', language: 'English' },
-        { venue: wankhedeMumbai, dayOffset: 41, time: '22:00', format: 'Stadium', language: 'English' }
+        { venue: wankhedeMumbai, dayOffset: 1, time: '19:30', format: 'Stadium', language: 'English' },
+        { venue: wankhedeMumbai, dayOffset: 2, time: '22:00', format: 'Stadium', language: 'English' },
+        { venue: wankhedeMumbai, dayOffset: 3, time: '19:30', format: 'Stadium', language: 'English' },
+        { venue: wankhedeMumbai, dayOffset: 4, time: '20:00', format: 'Stadium', language: 'English' },
+        { venue: balewadiPune, dayOffset: 5, time: '18:30', format: 'Stadium', language: 'English' },
+        { venue: balewadiPune, dayOffset: 6, time: '20:00', format: 'Stadium', language: 'English' }
       ]
     },
     {
@@ -403,9 +649,12 @@ async function main() {
       cast: 'Neeraj Chopra, Kishore Jena, Jyothi Yarraji',
       trailer_url: 'https://www.youtube.com/watch?v=5X9m7yTz1Q0',
       shows: [
-        { venue: noidaStadium, dayOffset: 46, time: '09:00', format: 'Morning Session', language: 'Hindi' },
-        { venue: noidaStadium, dayOffset: 47, time: '16:00', format: 'Evening Session', language: 'Hindi' },
-        { venue: noidaStadium, dayOffset: 48, time: '16:00', format: 'Finals', language: 'Hindi' }
+        { venue: noidaStadium, dayOffset: 1, time: '09:00', format: 'Morning Session', language: 'Hindi' },
+        { venue: noidaStadium, dayOffset: 2, time: '16:00', format: 'Evening Session', language: 'Hindi' },
+        { venue: noidaStadium, dayOffset: 3, time: '09:00', format: 'Morning Session', language: 'Hindi' },
+        { venue: noidaStadium, dayOffset: 4, time: '16:00', format: 'Evening Session', language: 'Hindi' },
+        { venue: noidaStadium, dayOffset: 5, time: '16:00', format: 'Finals', language: 'Hindi' },
+        { venue: balewadiPune, dayOffset: 6, time: '15:00', format: 'Finals', language: 'Hindi' }
       ]
     },
     {
@@ -420,9 +669,12 @@ async function main() {
       cast: 'PV Sindhu, Lakshya Sen, Satwiksairaj Rankireddy',
       trailer_url: 'https://www.youtube.com/watch?v=4X7m8yTz9Q0',
       shows: [
-        { venue: gachibowliHyd, dayOffset: 93, time: '10:00', format: 'Quarterfinals', language: 'English' },
-        { venue: gachibowliHyd, dayOffset: 94, time: '14:00', format: 'Semifinals', language: 'English' },
-        { venue: gachibowliHyd, dayOffset: 95, time: '15:00', format: 'Finals', language: 'English' }
+        { venue: gachibowliHyd, dayOffset: 1, time: '10:00', format: 'Prelims', language: 'English' },
+        { venue: gachibowliHyd, dayOffset: 2, time: '14:00', format: 'Round 16', language: 'English' },
+        { venue: gachibowliHyd, dayOffset: 3, time: '10:00', format: 'Quarterfinals', language: 'English' },
+        { venue: gachibowliHyd, dayOffset: 4, time: '14:00', format: 'Semifinals', language: 'English' },
+        { venue: gachibowliHyd, dayOffset: 5, time: '15:00', format: 'Finals', language: 'English' },
+        { venue: gachibowliHyd, dayOffset: 6, time: '16:00', format: 'Exhibition', language: 'English' }
       ]
     },
 
@@ -439,9 +691,14 @@ async function main() {
       cast: 'Anubhav Singh Bassi',
       trailer_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       shows: [
-        { venue: habitatBlr, dayOffset: 6, time: '17:00', format: 'Live Comedy', language: 'Hindi' },
-        { venue: habitatBlr, dayOffset: 6, time: '20:00', format: 'Live Comedy', language: 'Hindi' },
-        { venue: habitatBlr, dayOffset: 7, time: '18:00', format: 'Live Comedy', language: 'Hindi' }
+        { venue: habitatBlr, dayOffset: 1, time: '17:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 1, time: '20:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 2, time: '18:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 3, time: '19:30', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 4, time: '17:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 5, time: '20:30', format: 'Live Comedy', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 6, time: '18:30', format: 'Live Comedy', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 7, time: '21:00', format: 'Live Comedy', language: 'Hindi' }
       ]
     },
     {
@@ -456,9 +713,13 @@ async function main() {
       cast: 'Abhishek Upmanyu',
       trailer_url: 'https://www.youtube.com/watch?v=c0-hvjV2A5Y',
       shows: [
-        { venue: habitatBlr, dayOffset: 6, time: '19:00', format: 'Live Comedy', language: 'Hindi' },
-        { venue: habitatBlr, dayOffset: 26, time: '18:00', format: 'Live Comedy', language: 'Hindi' },
-        { venue: habitatBlr, dayOffset: 27, time: '21:00', format: 'Live Comedy', language: 'Hindi' }
+        { venue: habitatBlr, dayOffset: 1, time: '19:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 2, time: '18:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 3, time: '21:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 4, time: '17:30', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 5, time: '20:30', format: 'Live Comedy', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 6, time: '19:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 7, time: '21:30', format: 'Live Comedy', language: 'Hindi' }
       ]
     },
     {
@@ -473,8 +734,13 @@ async function main() {
       cast: 'Samay Raina',
       trailer_url: 'https://www.youtube.com/watch?v=1T2bXySg08U',
       shows: [
-        { venue: habitatBlr, dayOffset: 4, time: '20:00', format: 'Live Comedy', language: 'Hindi' },
-        { venue: habitatBlr, dayOffset: 9, time: '19:30', format: 'Live Comedy', language: 'Hindi' }
+        { venue: habitatBlr, dayOffset: 1, time: '20:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 2, time: '19:30', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 3, time: '18:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 4, time: '21:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 5, time: '19:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 6, time: '20:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 7, time: '22:00', format: 'Live Comedy', language: 'Hindi' }
       ]
     },
     {
@@ -489,10 +755,14 @@ async function main() {
       cast: 'Harsh Gujral',
       trailer_url: 'https://www.youtube.com/watch?v=y1D11B5zW1w',
       shows: [
-        { venue: habitatBlr, dayOffset: 14, time: '17:30', format: 'Live Comedy', language: 'Hindi' },
-        { venue: habitatBlr, dayOffset: 14, time: '20:30', format: 'Live Comedy', language: 'Hindi' },
-        { venue: habitatBlr, dayOffset: 15, time: '18:00', format: 'Live Comedy', language: 'Hindi' },
-        { venue: habitatBlr, dayOffset: 15, time: '21:00', format: 'Live Comedy', language: 'Hindi' }
+        { venue: habitatBlr, dayOffset: 1, time: '17:30', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 1, time: '20:30', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 2, time: '18:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 3, time: '21:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 4, time: '18:30', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 5, time: '20:30', format: 'Live Comedy', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 6, time: '19:30', format: 'Live Comedy', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 7, time: '21:30', format: 'Live Comedy', language: 'Hindi' }
       ]
     },
     {
@@ -507,8 +777,13 @@ async function main() {
       cast: 'Munawar Faruqui',
       trailer_url: 'https://www.youtube.com/watch?v=kY7m87b3z2M',
       shows: [
-        { venue: habitatBlr, dayOffset: 97, time: '18:00', format: 'Live Comedy', language: 'Hindi' },
-        { venue: habitatBlr, dayOffset: 98, time: '20:30', format: 'Live Comedy', language: 'Hindi' }
+        { venue: habitatBlr, dayOffset: 1, time: '18:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 2, time: '20:30', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 3, time: '19:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 4, time: '21:30', format: 'Live Comedy', language: 'Hindi' },
+        { venue: habitatBlr, dayOffset: 5, time: '18:30', format: 'Live Comedy', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 6, time: '19:00', format: 'Live Comedy', language: 'Hindi' },
+        { venue: cinepolisMumbai, dayOffset: 7, time: '21:30', format: 'Live Comedy', language: 'Hindi' }
       ]
     }
   ];

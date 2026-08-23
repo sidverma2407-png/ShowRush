@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { fetchApi } from '../api/client';
+import { getImageUrl } from '../utils/imageUrl';
 
 export default function Events() {
   const [events, setEvents] = useState<any[]>([]);
@@ -74,7 +75,7 @@ export default function Events() {
   return (
     <div className="w-full bg-background selection:bg-primary-fixed selection:text-on-primary-fixed pb-20">
       
-      {/* 🚀 Header Hero Section */}
+      {/* Header Hero Section */}
       <section className="w-full bg-on-background text-on-primary py-12 md:py-16 px-4 md:px-margin-desktop border-b-4 border-on-background relative overflow-hidden">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6 relative z-10">
           <div>
@@ -105,7 +106,7 @@ export default function Events() {
         <div className="absolute top-0 right-0 w-80 h-80 bg-primary-container/10 rounded-full blur-3xl pointer-events-none"></div>
       </section>
 
-      {/* 🧭 Filter Bar & Category Chips */}
+      {/* Filter Bar & Category Chips */}
       <section ref={eventsGridRef} className="max-w-7xl mx-auto px-4 md:px-margin-desktop py-8 flex flex-col gap-6">
         
         {/* Category Quick Selector Chips */}
@@ -130,7 +131,7 @@ export default function Events() {
         </div>
 
         {/* BookMyShow Style Filters: Language, Format, Genre */}
-        <div className="bg-yellow-100 border-3 border-on-background p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-wrap gap-4 items-center">
+        <div className="bg-stone-50 border-3 border-on-background p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-wrap gap-4 items-center">
           <span className="font-mono font-black text-xs uppercase bg-black text-white px-3 py-1 border border-black">
             Movie Filters:
           </span>
@@ -253,7 +254,7 @@ export default function Events() {
         </div>
       </section>
 
-      {/* 🎪 Events List / Grid */}
+      {/* Events List / Grid */}
       {(() => {
         const filteredEvents = events.filter(e => {
           // City filter
@@ -276,15 +277,19 @@ export default function Events() {
             matchDate = e.shows?.some((s: any) => new Date(s.date).toISOString().split('T')[0] === dateFilter);
           }
 
-          // BookMyShow Filters
+          // BookMyShow Filters (checks both event metadata and individual scheduled shows)
           let matchLang = true;
           if (languageFilter !== 'All') {
-            matchLang = e.language ? e.language.toLowerCase().includes(languageFilter.toLowerCase()) : false;
+            const inEvent = e.language ? e.language.toLowerCase().includes(languageFilter.toLowerCase()) : false;
+            const inShows = e.shows?.some((s: any) => s.language && s.language.toLowerCase().includes(languageFilter.toLowerCase()));
+            matchLang = inEvent || inShows;
           }
 
           let matchFmt = true;
           if (formatFilter !== 'All') {
-            matchFmt = e.format ? e.format.toLowerCase().includes(formatFilter.toLowerCase()) : false;
+            const inEvent = e.format ? e.format.toLowerCase().includes(formatFilter.toLowerCase()) : false;
+            const inShows = e.shows?.some((s: any) => s.format && s.format.toLowerCase().includes(formatFilter.toLowerCase()));
+            matchFmt = inEvent || inShows;
           }
 
           let matchGnr = true;
@@ -314,7 +319,7 @@ export default function Events() {
                     setGenreFilter('All');
                     setSearchParams({});
                   }}
-                  className="mt-2 bg-primary-fixed text-on-background border-2 border-on-background px-6 py-3 font-headline-lg text-sm uppercase font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-on-background hover:text-primary-fixed transition-colors min-h-[44px] cursor-pointer"
+                  className="bg-primary-fixed text-black border-2 border-on-background px-6 py-3 font-headline-lg text-xs uppercase font-black shadow-neo hover:bg-black hover:text-primary-fixed transition-colors"
                 >
                   Reset All Filters
                 </button>
@@ -324,28 +329,36 @@ export default function Events() {
         }
 
         return (
-          <section className="max-w-7xl mx-auto px-4 md:px-margin-desktop py-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-16">
+          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {filteredEvents.map((event) => {
               const venueObj = event.shows?.[0]?.venue;
               const showCount = event.shows?.length || 0;
 
               return (
                 <article 
-                  key={event.id} 
+                  key={event.id}
                   onClick={() => navigate(`/events/${event.id}`)}
-                  className="bg-surface border-4 border-on-background flex flex-col group shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] active:translate-x-[0px] active:translate-y-[0px] transition-all relative overflow-hidden cursor-pointer" 
+                  className="bg-surface border-4 border-on-background shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all flex flex-col justify-between overflow-hidden cursor-pointer group"
                 >
-                  {/* Poster Aspect Container */}
-                  <div className="relative w-full aspect-[4/3] border-b-4 border-on-background overflow-hidden bg-black flex items-center justify-center">
+                  {/* Poster Image Container */}
+                  <div className="relative aspect-[16/10] bg-black border-b-4 border-on-background overflow-hidden flex items-center justify-center">
                     {event.poster_url ? (
-                      <img 
-                        src={event.poster_url} 
-                        alt={event.title}
-                        className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105" 
-                      />
+                      <>
+                        <img
+                          src={getImageUrl(event.poster_url)}
+                          alt=""
+                          aria-hidden="true"
+                          className="absolute inset-0 w-full h-full object-cover blur-sm opacity-35 scale-110 pointer-events-none"
+                        />
+                        <img 
+                          src={getImageUrl(event.poster_url)} 
+                          alt={event.title} 
+                          className="relative z-10 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </>
                     ) : (
                       <div className="w-full h-full flex items-center justify-center blueprint-bg">
-                        <span className="font-data-label text-xs uppercase text-on-surface-variant font-bold">No Poster</span>
+                        <span className="font-data-label text-xs uppercase text-on-surface-variant font-bold">No Poster Available</span>
                       </div>
                     )}
 
@@ -363,7 +376,7 @@ export default function Events() {
 
                     {/* Rating Badge */}
                     {event.average_rating && (
-                      <div className="absolute top-3 right-3 bg-yellow-400 text-black font-mono text-xs font-black px-2.5 py-1 border-2 border-on-background shadow-sm flex items-center gap-1">
+                      <div className="absolute top-3 right-3 bg-primary-fixed text-black font-mono text-xs font-black px-2.5 py-1 border-2 border-on-background shadow-sm flex items-center gap-1">
                         ★ {event.average_rating}
                       </div>
                     )}
@@ -382,11 +395,35 @@ export default function Events() {
                         {event.title}
                       </h2>
                       
-                      {/* Language & Format Tags */}
-                      <div className="flex flex-wrap gap-1.5 mb-2 font-mono text-[10px] font-bold uppercase">
-                        {event.language && <span className="bg-slate-100 border border-black px-1.5 py-0.5">{event.language}</span>}
-                        {event.format && <span className="bg-blue-100 border border-black px-1.5 py-0.5">{event.format}</span>}
-                        {event.genre && <span className="bg-emerald-100 border border-black px-1.5 py-0.5">{event.genre}</span>}
+                      {/* Language, Format & Genre Tags */}
+                      <div className="flex flex-wrap gap-1 mb-2 font-mono text-[9px] font-black uppercase">
+                        {(event.language || '')
+                          .split(',')
+                          .map((l: string) => l.trim())
+                          .filter(Boolean)
+                          .map((lang: string) => (
+                            <span key={lang} className="bg-slate-100 text-slate-900 border border-black px-1.5 py-0.5">
+                              {lang}
+                            </span>
+                          ))}
+                        {(event.format || '')
+                          .split(',')
+                          .map((f: string) => f.trim())
+                          .filter(Boolean)
+                          .map((fmt: string) => (
+                            <span key={fmt} className="bg-primary-fixed text-black border border-black px-1.5 py-0.5">
+                              {fmt}
+                            </span>
+                          ))}
+                        {(event.genre || '')
+                          .split(',')
+                          .map((g: string) => g.trim())
+                          .filter(Boolean)
+                          .map((gnr: string) => (
+                            <span key={gnr} className="bg-emerald-100 text-emerald-950 border border-black px-1.5 py-0.5">
+                              {gnr}
+                            </span>
+                          ))}
                       </div>
 
                       <p className="font-body-md text-xs text-on-surface-variant line-clamp-2 font-bold leading-relaxed mb-4">
@@ -407,7 +444,7 @@ export default function Events() {
                           e.stopPropagation();
                           navigate(`/events/${event.id}`);
                         }}
-                        className="bg-yellow-400 text-black font-headline-lg text-xs uppercase font-black border-2 border-on-background px-4 py-2.5 group-hover:bg-black group-hover:text-yellow-400 transition-colors min-h-[42px] flex items-center gap-1 shadow-neo-sm"
+                        className="bg-primary-fixed text-black font-headline-lg text-xs uppercase font-black border-2 border-on-background px-4 py-2.5 group-hover:bg-black group-hover:text-primary-fixed transition-colors min-h-[42px] flex items-center gap-1 shadow-neo-sm"
                       >
                         <span>BOOK SHOWS</span>
                         <span className="material-symbols-outlined text-sm font-black">arrow_forward</span>
@@ -421,7 +458,7 @@ export default function Events() {
         );
       })()}
 
-      {/* 🎟️ Event Details & Multi-Show Selection Modal */}
+      {/* Event Details & Multi-Show Selection Modal */}
       {selectedEvent && (
         <div className="fixed inset-0 z-[99] flex items-center justify-center p-4 bg-on-background/80 backdrop-blur-sm animate-fade-in">
           <div className="bg-surface border-4 border-on-background shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] max-w-4xl w-full flex flex-col md:flex-row relative overflow-hidden max-h-[90vh]">

@@ -319,28 +319,28 @@ export default function SeatMap() {
 
         {/* 1. VIP FRONT STAGE PIT */}
         {vipRows.length > 0 && (
-          <div className="w-full max-w-4xl relative overflow-hidden rounded-xl border-2 sm:border-4 border-yellow-500 shadow-md" style={{background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fbbf24 100%)'}}>
+          <div className="w-full max-w-4xl relative overflow-hidden rounded-xl border-2 sm:border-4 border-on-background shadow-md bg-gradient-to-br from-[#faffcc] to-[#e1ed00]">
             <div className="relative p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2 sm:mb-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-yellow-500 border-2 border-yellow-900 flex items-center justify-center rounded">
-                    <span className="material-symbols-outlined text-yellow-950 text-base font-black">star</span>
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-black text-primary-fixed border-2 border-black flex items-center justify-center rounded">
+                    <span className="material-symbols-outlined text-base font-black">star</span>
                   </div>
                   <div>
-                    <div className="font-black text-yellow-950 uppercase tracking-widest text-[11px] sm:text-xs">{vipInfo.name || 'VIP FRONT STAGE PIT'}</div>
-                    <div className="text-[9px] font-mono text-yellow-800 font-bold">ROWS {vipRows[0]}–{vipRows[vipRows.length - 1]} · CLOSEST TO STAGE</div>
+                    <div className="font-black text-black uppercase tracking-widest text-[11px] sm:text-xs">{vipInfo.name || 'VIP FRONT STAGE PIT'}</div>
+                    <div className="text-[9px] font-mono text-slate-800 font-bold">ROWS {vipRows[0]}–{vipRows[vipRows.length - 1]} · CLOSEST TO STAGE</div>
                   </div>
                 </div>
-                <div className="bg-yellow-900 text-yellow-300 font-mono text-[10px] sm:text-xs font-black px-2.5 py-1 border border-yellow-600 tracking-widest shadow-[2px_2px_0px_0px_rgba(113,63,18,1)]">₹{vipInfo.price} / SEAT</div>
+                <div className="bg-black text-primary-fixed font-mono text-[10px] sm:text-xs font-black px-2.5 py-1 border border-black tracking-widest shadow-sm">₹{vipInfo.price} / SEAT</div>
               </div>
               <div className="flex flex-col gap-2 items-center overflow-x-auto pb-1">
                 {vipRows.map(row => (
                   <div key={row} className="flex gap-2 items-center justify-center">
-                    <span className="font-data-label text-xs text-yellow-900 font-black w-5 text-right shrink-0">{row}</span>
+                    <span className="font-data-label text-xs text-black font-black w-5 text-right shrink-0">{row}</span>
                     <div className="flex gap-1.5">
                       {getRowSeats(row).map(seat => renderSeat(seat, true))}
                     </div>
-                    <span className="font-data-label text-xs text-yellow-900 font-black w-5 text-left shrink-0">{row}</span>
+                    <span className="font-data-label text-xs text-black font-black w-5 text-left shrink-0">{row}</span>
                   </div>
                 ))}
               </div>
@@ -487,16 +487,16 @@ export default function SeatMap() {
   const renderComedyLayout = () => {
     return (
       <div className="flex flex-col gap-4 sm:gap-6 items-center w-full max-w-4xl min-w-[500px] mx-auto px-2">
-        <div className="w-full bg-amber-400 text-on-background border-4 border-on-background p-2.5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-black text-center uppercase tracking-widest text-[11px] sm:text-xs flex items-center justify-center gap-2">
+        <div className="w-full bg-primary-fixed text-on-primary-fixed border-4 border-on-background p-2.5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-black text-center uppercase tracking-widest text-[11px] sm:text-xs flex items-center justify-center gap-2">
           <span className="material-symbols-outlined text-base">mic</span>
           <span>INTIMATE COMEDY CLUB — ALL SEATS FLAT ₹{getPrice('club')}</span>
           <span className="material-symbols-outlined text-base">mic</span>
         </div>
 
         {/* Center Mic Spotlight */}
-        <div className="w-40 sm:w-48 h-16 sm:h-20 bg-yellow-200 border-2 sm:border-4 border-dashed border-yellow-600 rounded-full flex flex-col items-center justify-center my-1 text-center">
-          <span className="material-symbols-outlined text-yellow-800 text-xl sm:text-2xl animate-pulse">mic</span>
-          <span className="font-mono text-[9px] sm:text-[10px] text-amber-950 font-black uppercase tracking-wider">SPOTLIGHT MIC STAND</span>
+        <div className="w-40 sm:w-48 h-16 sm:h-20 bg-primary-fixed/30 border-2 sm:border-4 border-dashed border-black rounded-full flex flex-col items-center justify-center my-1 text-center">
+          <span className="material-symbols-outlined text-black text-xl sm:text-2xl animate-pulse">mic</span>
+          <span className="font-mono text-[9px] sm:text-[10px] text-black font-black uppercase tracking-wider">SPOTLIGHT MIC STAND</span>
         </div>
 
         {/* Club Seats */}
@@ -551,28 +551,28 @@ export default function SeatMap() {
       <div className="flex flex-col gap-4 sm:gap-6 items-center w-full max-w-5xl min-w-[640px] mx-auto px-2">
         {/* 1. VIP PAVILION BOX */}
         {vipRows.length > 0 && (
-          <div className="w-full max-w-4xl relative overflow-hidden rounded-xl border-2 sm:border-4 border-yellow-500 shadow-md" style={{background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fbbf24 100%)'}}>
+          <div className="w-full max-w-4xl relative overflow-hidden rounded-xl border-2 sm:border-4 border-on-background shadow-md bg-gradient-to-br from-[#faffcc] to-[#e1ed00]">
             <div className="relative p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2 sm:mb-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-yellow-500 border-2 border-yellow-900 flex items-center justify-center rounded">
-                    <span className="material-symbols-outlined text-yellow-950 text-base font-black">workspace_premium</span>
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-black text-primary-fixed border-2 border-black flex items-center justify-center rounded">
+                    <span className="material-symbols-outlined text-base font-black">workspace_premium</span>
                   </div>
                   <div>
-                    <div className="font-black text-yellow-950 uppercase tracking-widest text-[11px] sm:text-xs">{vipInfo.name || 'VIP PAVILION & SUITE BOX'}</div>
-                    <div className="text-[9px] font-mono text-yellow-800 font-bold">ROWS {vipRows[0]}–{vipRows[vipRows.length - 1]} · PREMIUM HOSPITALITY</div>
+                    <div className="font-black text-black uppercase tracking-widest text-[11px] sm:text-xs">{vipInfo.name || 'VIP PAVILION & SUITE BOX'}</div>
+                    <div className="text-[9px] font-mono text-slate-800 font-bold">ROWS {vipRows[0]}–{vipRows[vipRows.length - 1]} · PREMIUM HOSPITALITY</div>
                   </div>
                 </div>
-                <div className="bg-yellow-900 text-yellow-300 font-mono text-[10px] sm:text-xs font-black px-2.5 py-1 border border-yellow-600 tracking-widest shadow-[2px_2px_0px_0px_rgba(113,63,18,1)]">₹{vipInfo.price} / SEAT</div>
+                <div className="bg-black text-primary-fixed font-mono text-[10px] sm:text-xs font-black px-2.5 py-1 border border-black tracking-widest shadow-sm">₹{vipInfo.price} / SEAT</div>
               </div>
               <div className="flex flex-col gap-2 items-center overflow-x-auto pb-1">
                 {vipRows.map(row => (
                   <div key={row} className="flex gap-2 items-center justify-center">
-                    <span className="font-data-label text-xs text-yellow-900 font-black w-5 text-right shrink-0">{row}</span>
+                    <span className="font-data-label text-xs text-black font-black w-5 text-right shrink-0">{row}</span>
                     <div className="flex gap-1.5">
                       {getRowSeats(row).map(seat => renderSeat(seat, true))}
                     </div>
-                    <span className="font-data-label text-xs text-yellow-900 font-black w-5 text-left shrink-0">{row}</span>
+                    <span className="font-data-label text-xs text-black font-black w-5 text-left shrink-0">{row}</span>
                   </div>
                 ))}
               </div>
@@ -582,128 +582,103 @@ export default function SeatMap() {
 
         {/* 2. CENTRAL FIELD + SIDE STANDS */}
         <div className="w-full max-w-4xl flex flex-col md:flex-row gap-4 items-stretch justify-center">
-
-          {/* WEST STAND */}
-          {standRows.length > 0 && (
-            <div className="relative overflow-hidden rounded-xl border-2 sm:border-4 border-teal-500 shadow-md shrink-0" style={{background: 'linear-gradient(160deg, #ccfbf1 0%, #99f6e4 60%, #5eead4 100%)'}}>
-              <div className="p-3 pt-4">
-                <div className="flex items-center gap-1.5 mb-2 justify-center">
-                  <span className="material-symbols-outlined text-teal-900 text-sm">stadium</span>
-                  <div className="text-center">
-                    <div className="font-black text-teal-950 uppercase text-[11px] tracking-widest">{standInfo.name || 'WEST STAND'}</div>
-                    <div className="text-[9px] font-mono text-teal-800 font-bold">ROWS {standRows[0]}–{standRows[standRows.length - 1]} · SEATS 1–7 · ₹{standInfo.price}</div>
+          {/* North Stand */}
+          <div className="flex-1 bg-surface border-2 sm:border-4 border-on-background p-3 rounded-xl shadow-md">
+            <div className="font-headline-lg text-xs sm:text-sm text-on-background uppercase font-black tracking-widest mb-2 flex items-center justify-between pb-1 border-b border-on-background/30">
+              <span className="flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm text-primary">stadium</span>
+                NORTH STAND
+              </span>
+              <span className="font-mono text-[10px] font-black text-primary">₹{standInfo.price}</span>
+            </div>
+            <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
+              {standRows.map(row => (
+                <div key={row} className="flex gap-1.5 items-center">
+                  <span className="font-data-label text-[10px] font-black text-on-surface-variant w-4 text-right shrink-0">{row}</span>
+                  <div className="flex gap-1">
+                    {getRowSeats(row, 1, 8).map(seat => renderSeat(seat, true))}
                   </div>
+                  <span className="font-data-label text-[10px] font-black text-on-surface-variant w-4 text-left shrink-0">{row}</span>
                 </div>
-                <div className="flex flex-col gap-1.5 items-start">
-                  {standRows.map(row => (
-                    <div key={`west-${row}`} className="flex gap-1 items-center justify-center">
-                      <span className="font-data-label text-[11px] text-teal-950 font-black w-4 text-right shrink-0">{row}</span>
-                      <div className="flex gap-1">
-                        {getRowSeats(row, 1, 7).map(seat => renderSeat(seat, true))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              ))}
             </div>
-          )}
+          </div>
 
-          {/* CENTRAL FIELD */}
-          {isCricket ? (
-            <div className="shrink-0 flex-grow max-w-xs flex flex-col rounded-xl overflow-hidden shadow-md border-2 sm:border-4 border-emerald-700" style={{background: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)'}}>
-              <div className="bg-emerald-950 border-b-2 border-emerald-700 py-1.5 px-3 flex items-center justify-between">
-                <span className="material-symbols-outlined text-emerald-400 text-sm">sports_cricket</span>
-                <span className="font-mono text-[10px] text-emerald-300 font-black uppercase tracking-widest">CRICKET STADIUM</span>
-                <span className="material-symbols-outlined text-emerald-400 text-sm">sports_cricket</span>
-              </div>
-              <div className="flex-grow flex items-center justify-center p-4 relative" style={{minHeight: '140px'}}>
-                <div className="relative z-10 flex flex-col items-center gap-1">
-                  <div className="w-12 h-20 bg-gradient-to-b from-amber-200 to-amber-300 border-2 border-amber-600 rounded-sm flex flex-col items-center justify-center py-1 shadow-md">
-                    <span className="text-[8px] font-mono font-black text-amber-900 uppercase tracking-wider">PITCH</span>
-                  </div>
-                </div>
-              </div>
+          {/* Central Ground Graphic */}
+          <div className="w-full md:w-48 h-28 md:h-auto bg-emerald-700 border-2 sm:border-4 border-on-background rounded-xl flex flex-col items-center justify-center p-2 shadow-inner relative overflow-hidden shrink-0">
+            <div className="w-20 h-20 rounded-full border-2 border-emerald-400/50 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full border border-emerald-400/70" />
             </div>
-          ) : (
-            <div className="shrink-0 flex-grow max-w-xs flex flex-col rounded-xl overflow-hidden shadow-md border-2 sm:border-4 border-green-700" style={{background: 'linear-gradient(180deg, #14532d 0%, #166534 50%, #15803d 100%)'}}>
-              <div className="bg-green-950 border-b-2 border-green-700 py-1.5 px-3 flex items-center justify-between">
-                <span className="material-symbols-outlined text-green-400 text-sm">sports_soccer</span>
-                <span className="font-mono text-[10px] text-green-300 font-black uppercase tracking-widest">FOOTBALL PITCH</span>
-                <span className="material-symbols-outlined text-green-400 text-sm">sports_soccer</span>
-              </div>
-              <div className="flex-grow relative flex items-center justify-center p-2" style={{minHeight: '140px'}}>
-                <div className="relative z-10 w-full h-full flex flex-col items-center justify-center">
-                  <span className="text-[10px] font-mono font-black text-white uppercase tracking-widest">TOUCHLINE</span>
-                </div>
-              </div>
+            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex flex-col items-center">
+              <span className="material-symbols-outlined text-white text-2xl font-black">{isCricket ? 'sports_cricket' : 'sports_soccer'}</span>
+              <span className="font-mono text-[9px] text-white font-black uppercase tracking-widest mt-0.5">{isCricket ? 'PITCH CENTER' : 'FIELD CENTER'}</span>
             </div>
-          )}
+          </div>
 
-          {/* EAST STAND */}
-          {standRows.length > 0 && (
-            <div className="relative overflow-hidden rounded-xl border-2 sm:border-4 border-teal-500 shadow-md shrink-0" style={{background: 'linear-gradient(200deg, #ccfbf1 0%, #99f6e4 60%, #5eead4 100%)'}}>
-              <div className="p-3 pt-4">
-                <div className="flex items-center gap-1.5 mb-2 justify-center">
-                  <span className="material-symbols-outlined text-teal-900 text-sm">stadium</span>
-                  <div className="text-center">
-                    <div className="font-black text-teal-950 uppercase text-[11px] tracking-widest">{standInfo.name || 'EAST STAND'}</div>
-                    <div className="text-[9px] font-mono text-teal-800 font-bold">ROWS {standRows[0]}–{standRows[standRows.length - 1]} · SEATS 8–14 · ₹{standInfo.price}</div>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1.5 items-end">
-                  {standRows.map(row => (
-                    <div key={`east-${row}`} className="flex gap-1 items-center justify-center">
-                      <div className="flex gap-1">
-                        {getRowSeats(row, 8, 14).map(seat => renderSeat(seat, true))}
-                      </div>
-                      <span className="font-data-label text-[11px] text-teal-950 font-black w-4 text-left shrink-0">{row}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+          {/* South Stand */}
+          <div className="flex-1 bg-surface border-2 sm:border-4 border-on-background p-3 rounded-xl shadow-md">
+            <div className="font-headline-lg text-xs sm:text-sm text-on-background uppercase font-black tracking-widest mb-2 flex items-center justify-between pb-1 border-b border-on-background/30">
+              <span className="flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm text-primary">stadium</span>
+                SOUTH STAND
+              </span>
+              <span className="font-mono text-[10px] font-black text-primary">₹{standInfo.price}</span>
             </div>
-          )}
+            <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
+              {standRows.map(row => (
+                <div key={row} className="flex gap-1.5 items-center">
+                  <span className="font-data-label text-[10px] font-black text-on-surface-variant w-4 text-right shrink-0">{row}</span>
+                  <div className="flex gap-1">
+                    {getRowSeats(row, 9, 16).map(seat => renderSeat(seat, true))}
+                  </div>
+                  <span className="font-data-label text-[10px] font-black text-on-surface-variant w-4 text-left shrink-0">{row}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* 3. UPPER DECK BLEACHERS */}
+        {/* 3. UPPER TIER ROOF STAND */}
         {upperRows.length > 0 && (
-          <div className="w-full max-w-4xl relative overflow-hidden rounded-xl border-2 sm:border-4 border-slate-600 shadow-md" style={{background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%)'}}>
-            <div className="relative p-3 sm:p-4">
-              <div className="flex items-center justify-between mb-2 sm:mb-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-slate-600 border-2 border-slate-400 flex items-center justify-center rounded">
-                    <span className="material-symbols-outlined text-slate-200 text-base">chair</span>
+          <div className="w-full max-w-4xl bg-stone-200/90 border-2 sm:border-4 border-stone-600 p-3 sm:p-4 rounded-xl shadow-md">
+            <div className="font-headline-lg text-xs sm:text-sm text-stone-900 uppercase font-black tracking-widest mb-2 sm:mb-3 flex items-center justify-between pb-1 border-b border-stone-400">
+              <span className="flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm font-black">roofing</span>
+                {upperInfo.name || 'UPPER TIER PANORAMIC DECK'}
+              </span>
+              <span className="font-mono text-[10px] sm:text-xs font-black text-stone-900">₹{upperInfo.price} / SEAT</span>
+            </div>
+            <div className="flex flex-col gap-1.5 items-center overflow-x-auto pb-1">
+              {upperRows.map(row => (
+                <div key={row} className="flex gap-1.5 items-center">
+                  <span className="font-data-label text-[10px] font-black text-stone-700 w-4 text-right shrink-0">{row}</span>
+                  <div className="flex gap-1">
+                    {getRowSeats(row).map(seat => renderSeat(seat, true))}
                   </div>
-                  <div>
-                    <div className="font-black text-slate-100 uppercase tracking-widest text-[11px] sm:text-xs">{upperInfo.name || 'UPPER DECK BLEACHERS'}</div>
-                    <div className="text-[9px] font-mono text-slate-400 font-bold">ROWS {upperRows[0]}–{upperRows[upperRows.length - 1]} · ELEVATED TIER</div>
-                  </div>
+                  <span className="font-data-label text-[10px] font-black text-stone-700 w-4 text-left shrink-0">{row}</span>
                 </div>
-                <div className="bg-slate-800 text-slate-300 font-mono text-[10px] sm:text-xs font-black px-2.5 py-1 border border-slate-500 tracking-widest shadow-[2px_2px_0px_0px_rgba(30,41,59,1)]">₹{upperInfo.price} / SEAT</div>
-              </div>
-              <div className="flex flex-col gap-2 items-center overflow-x-auto pb-1">
-                {upperRows.map(row => (
-                  <div key={row} className="flex gap-2 items-center justify-center">
-                    <span className="font-data-label text-xs text-slate-300 font-black w-5 text-right shrink-0">{row}</span>
-                    <div className="flex gap-1.5">
-                      {getRowSeats(row).map(seat => renderSeat(seat, true))}
-                    </div>
-                    <span className="font-data-label text-xs text-slate-300 font-black w-5 text-left shrink-0">{row}</span>
-                  </div>
-                ))}
-              </div>
+              ))}
             </div>
           </div>
         )}
-
       </div>
     );
   };
 
   const renderCinemaLayout = () => {
-    const standardRows = rows.slice(0, 3) as string[];
-    const premiumRows = rows.slice(3, 6) as string[];
-    const reclinerRows = rows.slice(6) as string[];
+    const totalRows = rows.length;
+    let standardRows: string[] = [];
+    let premiumRows: string[] = [];
+    let reclinerRows: string[] = [];
+
+    if (totalRows <= 4) {
+      standardRows = rows.slice(0, 2) as string[];
+      premiumRows = rows.slice(2) as string[];
+    } else {
+      standardRows = rows.slice(0, Math.floor(totalRows * 0.4)) as string[];
+      premiumRows = rows.slice(Math.floor(totalRows * 0.4), Math.floor(totalRows * 0.75)) as string[];
+      reclinerRows = rows.slice(Math.floor(totalRows * 0.75)) as string[];
+    }
 
     const getRowSeats = (row: string) => {
       return seats
@@ -729,7 +704,7 @@ export default function SeatMap() {
         <div className="w-full max-w-4xl mx-auto mb-1 sm:mb-2">
           <div className="relative">
             <div className="w-full h-10 sm:h-12 bg-on-background text-primary-fixed font-headline-lg text-center flex items-center justify-center border-2 sm:border-4 border-on-background shadow-md rounded-b-[40%] overflow-hidden bg-gradient-to-r from-on-background via-slate-800 to-on-background">
-              <span className="tracking-[0.2em] font-black text-xs sm:text-sm text-yellow-300 animate-pulse flex items-center gap-1.5">
+              <span className="tracking-[0.2em] font-black text-xs sm:text-sm text-primary-fixed animate-pulse flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-sm sm:text-base">movie</span>
                 CINEMA CURVED SCREEN
                 <span className="material-symbols-outlined text-sm sm:text-base">movie</span>
@@ -743,22 +718,20 @@ export default function SeatMap() {
           </div>
         </div>
 
-        {/* 1. 🎬 STANDARD CINEMA ZONE */}
+        {/* 1. STANDARD CINEMA ZONE */}
         {standardRows.length > 0 && (
           <div className="w-full max-w-4xl bg-slate-200/90 border-2 sm:border-4 border-slate-600 p-3 sm:p-4 shadow-md rounded-xl text-center">
             <div className="font-headline-lg text-slate-950 uppercase tracking-widest mb-2 sm:mb-3 flex items-center justify-between px-2.5 py-1.5 bg-slate-300 border border-slate-700 rounded-lg">
               <div className="flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-sm sm:text-base text-slate-950 font-black">theater_comedy</span>
-                <span className="font-black text-[11px] sm:text-xs md:text-sm">{standardInfo.name || '🎬 STANDARD SEATING'}</span>
+                <span className="material-symbols-outlined text-sm font-black">chair</span>
+                <span className="text-xs sm:text-sm font-black">{standardInfo.name || 'EXECUTIVE FRONT ZONE'}</span>
               </div>
-              <span className="font-mono text-[10px] sm:text-xs font-black bg-slate-950 text-slate-200 px-2.5 py-0.5 border border-slate-700">
-                ₹{standardInfo.price} / SEAT — ROWS {standardRows[0]}–{standardRows[standardRows.length - 1]}
-              </span>
+              <span className="font-mono text-[10px] sm:text-xs font-black text-slate-950">₹{standardInfo.price} / SEAT</span>
             </div>
             <div className="flex flex-col gap-2 items-center overflow-x-auto pb-1">
               {standardRows.map(row => (
-                <div key={row} className="flex gap-1.5 sm:gap-2 items-center justify-center">
-                  <span className="font-data-label text-xs text-slate-950 font-black w-5 text-right shrink-0">{row}</span>
+                <div key={row} className="flex gap-2 items-center justify-center">
+                  <span className="font-data-label text-xs font-black text-slate-800 w-5 text-right shrink-0">{row}</span>
                   <div className="flex gap-1.5">
                     {getRowSeats(row).map(seat => (
                       <div key={seat.id} className="flex items-center">
@@ -771,34 +744,32 @@ export default function SeatMap() {
                       </div>
                     ))}
                   </div>
-                  <span className="font-data-label text-xs text-slate-950 font-black w-5 text-left shrink-0">{row}</span>
+                  <span className="font-data-label text-xs font-black text-slate-800 w-5 text-left shrink-0">{row}</span>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* 2. ⭐ PREMIUM CLUB ZONE */}
+        {/* 2. PREMIUM CLUB ZONE */}
         {premiumRows.length > 0 && (
-          <div className="w-full max-w-4xl bg-cyan-100/90 border-2 sm:border-4 border-cyan-600 p-3 sm:p-4 shadow-md rounded-xl text-center">
-            <div className="font-headline-lg text-cyan-950 uppercase tracking-widest mb-2 sm:mb-3 flex items-center justify-between px-2.5 py-1.5 bg-cyan-300/90 border border-cyan-800 rounded-lg">
+          <div className="w-full max-w-4xl bg-blue-100/90 border-2 sm:border-4 border-blue-600 p-3 sm:p-4 shadow-md rounded-xl text-center">
+            <div className="font-headline-lg text-blue-950 uppercase tracking-widest mb-2 sm:mb-3 flex items-center justify-between px-2.5 py-1.5 bg-blue-200 border border-blue-600 rounded-lg">
               <div className="flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-sm sm:text-base text-cyan-950 font-black">visibility</span>
-                <span className="font-black text-[11px] sm:text-xs md:text-sm">{premiumInfo.name || '⭐ PREMIUM CLUB — PRIME ANGLE'}</span>
+                <span className="material-symbols-outlined text-sm font-black">stars</span>
+                <span className="text-xs sm:text-sm font-black">{premiumInfo.name || 'PREMIUM CLUB SEATS'}</span>
               </div>
-              <span className="font-mono text-[10px] sm:text-xs font-black bg-cyan-950 text-cyan-300 px-2.5 py-0.5 border border-cyan-900">
-                ₹{premiumInfo.price} / SEAT — ROWS {premiumRows[0]}–{premiumRows[premiumRows.length - 1]}
-              </span>
+              <span className="font-mono text-[10px] sm:text-xs font-black text-blue-950">₹{premiumInfo.price} / SEAT</span>
             </div>
             <div className="flex flex-col gap-2 items-center overflow-x-auto pb-1">
               {premiumRows.map(row => (
-                <div key={row} className="flex gap-1.5 sm:gap-2 items-center justify-center">
-                  <span className="font-data-label text-xs text-cyan-950 font-black w-5 text-right shrink-0">{row}</span>
+                <div key={row} className="flex gap-2 items-center justify-center">
+                  <span className="font-data-label text-xs font-black text-blue-900 w-5 text-right shrink-0">{row}</span>
                   <div className="flex gap-1.5">
                     {getRowSeats(row).map(seat => (
                       <div key={seat.id} className="flex items-center">
                         {seat.venue_seat.seat_number === 8 && (
-                          <div className="w-6 h-full flex items-center justify-center font-mono text-[8px] text-cyan-950 font-black opacity-80 uppercase px-0.5">
+                          <div className="w-6 h-full flex items-center justify-center font-mono text-[8px] text-blue-950 font-black opacity-80 uppercase px-0.5">
                             AISLE
                           </div>
                         )}
@@ -806,29 +777,27 @@ export default function SeatMap() {
                       </div>
                     ))}
                   </div>
-                  <span className="font-data-label text-xs text-cyan-950 font-black w-5 text-left shrink-0">{row}</span>
+                  <span className="font-data-label text-xs font-black text-blue-900 w-5 text-left shrink-0">{row}</span>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* 3. 👑 EXECUTIVE RECLINER ZONE */}
+        {/* 3. VIP RECLINER LUXE ZONE */}
         {reclinerRows.length > 0 && (
           <div className="w-full max-w-4xl bg-amber-100/90 border-2 sm:border-4 border-amber-600 p-3 sm:p-4 shadow-md rounded-xl text-center">
-            <div className="font-headline-lg text-amber-950 uppercase tracking-widest mb-2 sm:mb-3 flex items-center justify-between px-2.5 py-1.5 bg-amber-300/90 border border-amber-800 rounded-lg">
+            <div className="font-headline-lg text-amber-950 uppercase tracking-widest mb-2 sm:mb-3 flex items-center justify-between px-2.5 py-1.5 bg-amber-200 border border-amber-600 rounded-lg">
               <div className="flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-sm sm:text-base text-amber-950 font-black">chair</span>
-                <span className="font-black text-[11px] sm:text-xs md:text-sm">{reclinerInfo.name || '👑 EXECUTIVE RECLINER ZONE'}</span>
+                <span className="material-symbols-outlined text-sm font-black">weekend</span>
+                <span className="text-xs sm:text-sm font-black">{reclinerInfo.name || 'ROYAL RECLINER COUCHES'}</span>
               </div>
-              <span className="font-mono text-[10px] sm:text-xs font-black bg-amber-950 text-amber-300 px-2.5 py-0.5 border border-amber-900">
-                ₹{reclinerInfo.price} / SEAT — ROWS {reclinerRows[0]}–{reclinerRows[reclinerRows.length - 1]}
-              </span>
+              <span className="font-mono text-[10px] sm:text-xs font-black text-amber-950">₹{reclinerInfo.price} / SEAT</span>
             </div>
             <div className="flex flex-col gap-2 items-center overflow-x-auto pb-1">
               {reclinerRows.map(row => (
-                <div key={row} className="flex gap-1.5 sm:gap-2 items-center justify-center">
-                  <span className="font-data-label text-xs text-amber-950 font-black w-5 text-right shrink-0">{row}</span>
+                <div key={row} className="flex gap-2 items-center justify-center">
+                  <span className="font-data-label text-xs font-black text-amber-900 w-5 text-right shrink-0">{row}</span>
                   <div className="flex gap-1.5">
                     {getRowSeats(row).map(seat => (
                       <div key={seat.id} className="flex items-center">
@@ -957,7 +926,7 @@ export default function SeatMap() {
           )}
 
           {/* Mobile Swipe & Zoom Hint Banner */}
-          <div className="md:hidden flex items-center justify-between bg-yellow-300 text-black border-2 border-black p-2.5 mb-2 font-mono text-[11px] font-black uppercase shadow-neo-sm">
+          <div className="md:hidden flex items-center justify-between bg-primary-fixed text-black border-2 border-black p-2.5 mb-2 font-mono text-[11px] font-black uppercase shadow-neo-sm">
             <span className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-base">touch_app</span>
               <span>SWIPE OR PINCH TO NAVIGATE SEAT MAP</span>
@@ -981,15 +950,15 @@ export default function SeatMap() {
           {/* Seat Status & Category Legend */}
           <div className="mt-4 bg-surface border-2 sm:border-4 border-on-background p-3 sm:p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-wrap gap-3 sm:gap-4 items-center z-10 text-xs">
             <div className="flex items-center gap-1.5">
-              <div className="w-5 h-5 border border-amber-900 bg-amber-300 font-black text-amber-950 flex items-center justify-center text-[10px]">👑</div>
+              <div className="w-5 h-5 border border-amber-900 bg-amber-300 font-black text-amber-950 flex items-center justify-center text-[10px]">R</div>
               <span className="font-data-label text-[11px] sm:text-xs uppercase font-bold text-on-surface">Recliner (₹450)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-5 h-5 border border-cyan-900 bg-cyan-300 font-black text-cyan-950 flex items-center justify-center text-[10px]">⭐</div>
+              <div className="w-5 h-5 border border-cyan-900 bg-cyan-300 font-black text-cyan-950 flex items-center justify-center text-[10px]">P</div>
               <span className="font-data-label text-[11px] sm:text-xs uppercase font-bold text-on-surface">Premium (₹300)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-5 h-5 border border-slate-700 bg-slate-200 font-black text-slate-900 flex items-center justify-center text-[10px]">🎬</div>
+              <div className="w-5 h-5 border border-slate-700 bg-slate-200 font-black text-slate-900 flex items-center justify-center text-[10px]">S</div>
               <span className="font-data-label text-[11px] sm:text-xs uppercase font-bold text-on-surface">Standard (₹200)</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -1103,7 +1072,7 @@ export default function SeatMap() {
                    />
                    {customerPhone && customerPhone.length !== 10 ? (
                      <span className="text-[10px] font-mono font-bold text-red-600 uppercase flex items-center gap-1">
-                       <span>⚠️ MUST BE EXACTLY 10 DIGITS</span>
+                       <span>MUST BE EXACTLY 10 DIGITS</span>
                        <span>({customerPhone.length}/10)</span>
                      </span>
                    ) : customerPhone && customerPhone.length === 10 ? (

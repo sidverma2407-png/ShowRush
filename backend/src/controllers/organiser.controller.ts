@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import fs from 'fs';
+import path from 'path';
 import prisma from '../utils/prisma';
 import { BadRequestError, NotFoundError } from '../utils/errors';
 import { AuthRequest } from '../middleware/auth';
@@ -76,9 +78,8 @@ export const updateEvent = async (req: AuthRequest, res: Response) => {
 
 export const createShow = async (req: AuthRequest, res: Response) => {
   const event_id = req.params.id as string;
-  const { venue_id, date, time, pricing } = req.body;
-
-  if (!venue_id || !date || !time) throw new BadRequestError('Venue, date, and time required');
+  const { venue_id, date, time, pricing, format, language } = req.body;
+  if (!venue_id || !date || !time) throw new BadRequestError('venue_id, date, and time required');
 
   const event = await prisma.event.findUnique({ where: { id: event_id } });
   if (!event || event.organiser_id !== req.user!.id) {
@@ -87,7 +88,15 @@ export const createShow = async (req: AuthRequest, res: Response) => {
 
   const show = await prisma.$transaction(async (tx) => {
     const newShow = await tx.show.create({
-      data: { event_id, venue_id, date: new Date(date), time, status: ShowStatus.scheduled }
+      data: {
+        event_id,
+        venue_id,
+        date: new Date(date),
+        time,
+        format: format || undefined,
+        language: language || undefined,
+        status: ShowStatus.scheduled
+      }
     });
 
     const venueSeats = await tx.venueSeat.findMany({ where: { venue_id } });
@@ -272,3 +281,81 @@ export const getSeatCategories = async (_req: Request, res: Response) => {
   const categories = await prisma.seatCategory.findMany({ orderBy: { name: 'asc' } });
   res.json({ status: 'success', data: categories });
 };
+
+// Upload Event Poster Image (Supports any JPEG / PNG in any dimensions)
+export const uploadImage = async (req: AuthRequest, res: Response) => {
+  const { image, filename } = req.body;
+  if (!image) {
+    throw new BadRequestError('Image data required');
+  }
+
+  let cleanData = image;
+  let extension = 'png';
+
+  if (image.startsWith('data:image/')) {
+    const matches = image.match(/^data:image\/([a-zA-Z0-9+.-]+);base64,(.+)$/);
+    if (matches) {
+      extension = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+      cleanData = matches[2];
+    }
+  }
+
+  const uploadsDir = path.join(__dirname, '../../uploads');
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+
+  const uniqueName = `poster-${Date.now()}-${Math.floor(Math.random() * 100000)}.${extension}`;
+  const filePath = path.join(uploadsDir, uniqueName);
+
+  try {
+    const buffer = Buffer.from(cleanData, 'base64');
+    fs.writeFileSync(filePath, buffer);
+
+    const fileUrl = `/uploads/${uniqueName}`;
+    return res.json({
+      status: 'success',
+      data: {
+        url: fileUrl,
+        filename: uniqueName
+      }
+    });
+  } catch (err: any) {
+    // If filesystem write fails, fallback gracefully to returning data URL directly
+    return res.json({
+      status: 'success',
+      data: {
+        url: image,
+        filename: filename || 'poster.png'
+      }
+    });
+  }
+};
+
+// Delete Event & its dependencies
+export const deleteEvent = async (req: AuthRequest, res: Response) => {
+  const id = req.params.id as string;
+  const event = await prisma.event.findUnique({ where: { id } });
+  if (!event || (event.organiser_id !== req.user!.id && req.user!.role !== 'admin')) {
+    throw new NotFoundError('Event not found or not owned by you');
+  }
+
+  // Delete event and cascade related records
+  await prisma.$transaction(async (tx) => {
+    const shows = await tx.show.findMany({ where: { event_id: id }, select: { id: true } });
+    const showIds = shows.map(s => s.id);
+
+    if (showIds.length > 0) {
+      await tx.showCategoryPricing.deleteMany({ where: { show_id: { in: showIds } } });
+      await tx.seatStatus.deleteMany({ where: { show_id: { in: showIds } } });
+      await tx.waitlistEntry.deleteMany({ where: { show_id: { in: showIds } } });
+      await tx.show.deleteMany({ where: { id: { in: showIds } } });
+    }
+
+    await tx.review.deleteMany({ where: { event_id: id } });
+    await tx.event.delete({ where: { id } });
+  });
+
+  res.json({ status: 'success', message: 'Event successfully deleted' });
+};
+

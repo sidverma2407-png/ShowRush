@@ -253,7 +253,7 @@ export default function AdminVenues() {
               <div className="w-full max-w-full mx-auto flex flex-col items-center justify-center flex-grow mt-2 sm:mt-16 overflow-auto border-2 border-dashed border-on-background/30 p-3 bg-surface/50 rounded-lg">
                  {selectedVenue ? (
                    <>
-                     <div className="w-full max-w-md bg-on-background text-yellow-300 py-1.5 text-center font-mono text-xs font-black uppercase tracking-widest mb-6 border-2 border-on-background shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                     <div className="w-full max-w-md bg-on-background text-primary-fixed py-1.5 text-center font-mono text-xs font-black uppercase tracking-widest mb-6 border-2 border-on-background shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
                        STAGE / SCREEN
                      </div>
                      <div className="flex flex-col gap-1 overflow-auto max-h-[60vh] max-w-full p-3 bg-surface border-2 sm:border-4 border-on-background shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">

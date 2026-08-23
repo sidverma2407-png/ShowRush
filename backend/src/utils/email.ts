@@ -158,19 +158,19 @@ export const sendBookingEmail = async (
   // Event specific tailored warm wish
   let eventWish = "We hope you have an incredible time at the event!";
   if (eventType === 'movie') {
-    eventWish = "🍿 Grab your popcorn, sit back, and enjoy the cinematic experience on the big screen!";
+    eventWish = "Grab your popcorn, sit back, and enjoy the cinematic experience on the big screen!";
   } else if (eventType === 'concert') {
-    eventWish = "🎸 Get ready for an unmissable night of electrifying live music and pure euphoria!";
+    eventWish = "Get ready for an unmissable night of electrifying live music and pure energy!";
   } else if (eventType === 'comedy') {
-    eventWish = "😂 Prepare for non-stop laughter, hilarious stand-up punchlines, and great vibes!";
+    eventWish = "Prepare for non-stop laughter, hilarious stand-up punchlines, and great vibes!";
   } else if (eventType === 'sports') {
-    eventWish = "⚽ Wear your team colors, cheer loud, and feel the live stadium adrenaline!";
+    eventWish = "Wear your team colors, cheer loud, and feel the live stadium adrenaline!";
   }
 
   const mailOptions = {
     from: process.env.EMAIL_FROM || '"Seatzy Tickets" <tickets@seatzy.com>',
     to: email,
-    subject: `🎟️ Ticket Confirmed: ${eventTitle} (${bookingRef})`,
+    subject: `Ticket Confirmed: ${eventTitle} (${bookingRef})`,
     html: `
       <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f5; padding: 30px; text-align: center;">
         <div style="max-width: 580px; margin: 0 auto; background: #ffffff; border: 4px solid #000000; box-shadow: 8px 8px 0px #000000; text-align: left; overflow: hidden;">
@@ -183,7 +183,7 @@ export const sendBookingEmail = async (
           <div style="padding: 30px;">
             <div style="background-color: #fef08a; border: 3px solid #000000; box-shadow: 4px 4px 0px #000000; padding: 18px; margin-bottom: 25px;">
               <h3 style="font-size: 18px; font-weight: 900; margin: 0 0 8px 0; color: #000000; text-transform: uppercase;">
-                Thank you ${attendeeName} for your booking! 🎉
+                Thank you ${attendeeName} for your booking!
               </h3>
               <p style="font-size: 14px; margin: 0; color: #18181b; font-weight: bold; leading-relaxed;">
                 ${eventWish}
@@ -195,7 +195,7 @@ export const sendBookingEmail = async (
             </h2>
 
             <div style="background-color: #e0f2fe; border: 2px solid #000000; padding: 10px 14px; margin-bottom: 25px; font-weight: 900; font-size: 15px; color: #0369a1; text-transform: uppercase; display: inline-block;">
-              🗓️ ${showDate} &nbsp;|&nbsp; ⏰ ${showTime}
+              ${showDate} &nbsp;|&nbsp; ${showTime}
             </div>
 
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
@@ -284,7 +284,7 @@ export const sendWaitlistOfferEmail = async (email: string, token: string, showD
   const mailOptions = {
     from: process.env.EMAIL_FROM || '"Seatzy Waitlist" <waitlist@seatzy.com>',
     to: email,
-    subject: `🎉 Seat Available! Claim your ticket for ${showDetails.event.title}`,
+    subject: `Seat Available! Claim your ticket for ${showDetails.event.title}`,
     html: `
       <div style="font-family: Arial, sans-serif; background-color: #f4f4f5; padding: 30px; text-align: center;">
         <div style="max-width: 500px; margin: 0 auto; background: #ffffff; border: 4px solid #000000; box-shadow: 6px 6px 0px #000000; padding: 30px; text-align: left;">

@@ -475,6 +475,8 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
 
   const updatedStatuses = await prisma.seatStatus.findMany({ where: { id: { in: seat_status_ids } } });
   updatedStatuses.forEach(seat => io.to(show_id).emit('seat_status_updated', seat));
+  io.emit('dashboard_updated', { event_id: showDetails?.event_id, show_id, booking_id: booking.id, amount: Number(booking.total_price) });
+  io.emit('booking_created', { event_id: showDetails?.event_id, show_id, booking_id: booking.id, amount: Number(booking.total_price) });
 
   res.json({ status: 'success', data: booking });
 };
@@ -599,6 +601,8 @@ export const cancelBooking = async (req: AuthRequest, res: Response) => {
       }
     }
   }
+
+  io.emit('dashboard_updated', { event_id: booking.show?.event_id, show_id: booking.show_id });
 
   res.json({ status: 'success', message: 'Booking cancelled and seats reallocated' });
 };

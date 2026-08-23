@@ -40,15 +40,15 @@ export default function Navbar() {
               SEATZY
             </Link>
 
-            {/* City Selection Trigger Badge */}
+            {/* High-Contrast City Selection Trigger Badge */}
             <button
               onClick={() => setIsCityModalOpen(true)}
-              className="flex items-center gap-1 bg-surface text-on-surface border-2 border-on-background px-2.5 py-1.5 font-data-label text-xs uppercase font-black hover:bg-primary-fixed hover:text-on-primary-fixed neo-brutalism-shadow-sm transition-all min-h-[44px]"
+              className="flex items-center gap-1.5 bg-primary-fixed text-on-background border-2 border-black px-3 py-1.5 font-mono text-xs sm:text-sm uppercase font-black shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:bg-white hover:text-black hover:shadow-[4px_4px_0px_0px_rgba(225,237,0,1)] active:translate-x-[1px] active:translate-y-[1px] transition-all min-h-[44px] cursor-pointer group"
               title="Click to change your city"
             >
-              <span className="material-symbols-outlined text-base text-primary-fixed group-hover:text-on-primary-fixed">location_on</span>
-              <span className="truncate max-w-[80px] sm:max-w-[120px] md:max-w-[140px]">{selectedCity}</span>
-              <span className="material-symbols-outlined text-xs">arrow_drop_down</span>
+              <span className="material-symbols-outlined text-base font-black text-on-background group-hover:scale-110 transition-transform">location_on</span>
+              <span className="truncate max-w-[90px] sm:max-w-[140px] tracking-wider font-extrabold">{selectedCity}</span>
+              <span className="material-symbols-outlined text-sm font-black bg-black text-primary-fixed px-0.5 group-hover:bg-primary-fixed group-hover:text-black transition-colors">expand_more</span>
             </button>
 
             {/* Desktop Navigation Links */}

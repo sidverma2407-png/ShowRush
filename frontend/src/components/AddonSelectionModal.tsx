@@ -135,9 +135,9 @@ export const AddonSelectionModal: React.FC<AddonSelectionModalProps> = ({
       <div className="bg-background border-4 border-on-background shadow-neo w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
         
         {/* Header */}
-        <div className="p-4 sm:p-5 bg-yellow-300 border-b-4 border-on-background flex justify-between items-center">
+        <div className="p-4 sm:p-5 bg-primary-fixed border-b-4 border-on-background flex justify-between items-center">
           <div>
-            <span className="text-xs font-mono font-black uppercase tracking-widest text-black/70 bg-black/10 px-2 py-0.5 border border-black mb-1 inline-block">
+            <span className="text-xs font-mono font-black uppercase tracking-widest text-black/80 bg-black/10 px-2 py-0.5 border border-black mb-1 inline-block">
               Enhance Your Seatzy Booking
             </span>
             <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-on-background flex items-center gap-2">
@@ -158,7 +158,7 @@ export const AddonSelectionModal: React.FC<AddonSelectionModalProps> = ({
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-2xl font-black animate-bounce">celebration</span>
               <div>
-                <div className="text-xs font-mono uppercase tracking-wider font-extrabold text-emerald-950">🎉 GROUP BOOKING DISCOUNT APPLIED!</div>
+                <div className="text-xs font-mono uppercase tracking-wider font-extrabold text-emerald-950">GROUP BOOKING DISCOUNT APPLIED!</div>
                 <div className="text-sm font-black">10% OFF FOR 5+ SEATS (SAVED ₹{groupDiscount.toFixed(0)})</div>
               </div>
             </div>
@@ -177,7 +177,7 @@ export const AddonSelectionModal: React.FC<AddonSelectionModalProps> = ({
               className={`px-4 py-2 text-xs font-black uppercase border-2 border-on-background transition-all whitespace-nowrap ${
                 selectedCategory === cat
                   ? 'bg-black text-white shadow-neo'
-                  : 'bg-white text-black hover:bg-yellow-200'
+                  : 'bg-white text-black hover:bg-primary-fixed/30'
               }`}
             >
               {cat === 'all' ? 'All Items' : cat === 'food' ? 'Snacks & Food' : cat === 'drink' ? 'Beverages' : 'Combos'}
@@ -203,7 +203,7 @@ export const AddonSelectionModal: React.FC<AddonSelectionModalProps> = ({
                   <div
                     key={item.id}
                     className={`bg-white border-3 border-on-background p-3 flex flex-col justify-between transition-all ${
-                      qty > 0 ? 'ring-4 ring-yellow-400 bg-yellow-50/50 shadow-neo' : 'hover:shadow-neo-sm'
+                      qty > 0 ? 'ring-4 ring-black bg-primary-fixed/20 shadow-neo' : 'hover:shadow-neo-sm'
                     }`}
                   >
                     <div>
@@ -216,7 +216,7 @@ export const AddonSelectionModal: React.FC<AddonSelectionModalProps> = ({
                           />
                         </div>
                       ) : (
-                        <div className="h-28 sm:h-32 w-full mb-3 border-2 border-on-background flex items-center justify-center bg-yellow-100">
+                        <div className="h-28 sm:h-32 w-full mb-3 border-2 border-on-background flex items-center justify-center bg-stone-100">
                           <span className="material-symbols-outlined text-4xl text-black font-black">fastfood</span>
                         </div>
                       )}
@@ -230,7 +230,7 @@ export const AddonSelectionModal: React.FC<AddonSelectionModalProps> = ({
                         </span>
                       </div>
                       
-                      <p className="font-mono font-black text-base text-yellow-600 mb-3">
+                      <p className="font-mono font-black text-base text-black mb-3">
                         ₹{Number(item.price).toFixed(0)}
                       </p>
                     </div>
@@ -264,16 +264,16 @@ export const AddonSelectionModal: React.FC<AddonSelectionModalProps> = ({
         </div>
 
         {/* Promo Code Section */}
-        <div className="p-4 bg-amber-50 border-t-4 border-on-background">
+        <div className="p-4 bg-stone-100 border-t-4 border-on-background">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-yellow-600 font-black">confirmation_number</span>
+              <span className="material-symbols-outlined text-black font-black">confirmation_number</span>
               <span className="font-mono font-black text-xs uppercase text-on-background">PROMO / COUPON CODE:</span>
             </div>
 
             {appliedCoupon ? (
               <div className="flex items-center gap-2 bg-emerald-100 border-2 border-emerald-700 px-3 py-1.5 font-mono text-xs font-bold text-emerald-950 w-full sm:w-auto justify-between">
-                <span>✅ <strong>{appliedCoupon.code}</strong> ({appliedCoupon.discount_type === 'percentage' ? `${appliedCoupon.discount_value}% OFF` : `₹${appliedCoupon.discount_value} OFF`}) Saved ₹{couponDiscount.toFixed(0)}</span>
+                <span><strong>{appliedCoupon.code}</strong> ({appliedCoupon.discount_type === 'percentage' ? `${appliedCoupon.discount_value}% OFF` : `₹${appliedCoupon.discount_value} OFF`}) Saved ₹{couponDiscount.toFixed(0)}</span>
                 <button
                   onClick={handleRemoveCoupon}
                   className="bg-red-200 hover:bg-red-300 text-red-900 border border-red-800 px-2 py-0.5 text-[10px] font-black uppercase ml-2"
@@ -288,12 +288,12 @@ export const AddonSelectionModal: React.FC<AddonSelectionModalProps> = ({
                   placeholder="e.g. SEATZY10, FLAT100"
                   value={couponInput}
                   onChange={e => setCouponInput(e.target.value.toUpperCase())}
-                  className="bg-white border-2 border-on-background px-3 py-1.5 font-mono text-xs font-bold uppercase focus:outline-none focus:ring-2 focus:ring-yellow-400 w-full sm:w-48"
+                  className="bg-white border-2 border-on-background px-3 py-1.5 font-mono text-xs font-bold uppercase focus:outline-none focus:ring-2 focus:ring-primary-fixed w-full sm:w-48"
                 />
                 <button
                   onClick={handleApplyCoupon}
                   disabled={couponLoading || !couponInput.trim()}
-                  className="bg-black text-white hover:bg-yellow-400 hover:text-black border-2 border-on-background px-4 py-1.5 font-black text-xs uppercase transition-all shadow-neo-sm disabled:opacity-50 min-w-[70px]"
+                  className="bg-black text-white hover:bg-primary-fixed hover:text-black border-2 border-on-background px-4 py-1.5 font-black text-xs uppercase transition-all shadow-neo-sm disabled:opacity-50 min-w-[70px]"
                 >
                   {couponLoading ? '...' : 'APPLY'}
                 </button>
@@ -302,7 +302,7 @@ export const AddonSelectionModal: React.FC<AddonSelectionModalProps> = ({
           </div>
           {couponError && (
             <div className="mt-2 text-xs font-mono font-bold text-red-700 bg-red-100 p-2 border border-red-400">
-              ⚠️ {couponError}
+              {couponError}
             </div>
           )}
         </div>
@@ -322,7 +322,7 @@ export const AddonSelectionModal: React.FC<AddonSelectionModalProps> = ({
             )}
             <div>
               <span className="text-[10px] text-slate-500 block font-bold uppercase">Add-ons:</span>
-              <span className="font-black text-sm text-yellow-600">+₹{addonTotal.toFixed(0)}</span>
+              <span className="font-black text-sm text-black">+₹{addonTotal.toFixed(0)}</span>
             </div>
             {appliedCoupon && (
               <div>
@@ -345,7 +345,7 @@ export const AddonSelectionModal: React.FC<AddonSelectionModalProps> = ({
             </button>
             <button
               onClick={handleProceed}
-              className="px-6 py-3 bg-yellow-400 hover:bg-yellow-300 border-3 border-on-background font-black text-xs uppercase shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all cursor-pointer"
+              className="px-6 py-3 bg-primary-fixed hover:bg-primary-container text-black border-3 border-on-background font-black text-xs uppercase shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all cursor-pointer"
             >
               Confirm & Pay ₹{grandTotal.toFixed(0)} →
             </button>

@@ -40,7 +40,14 @@ export const io = new Server(httpServer, {
 
 // Middleware
 app.use(cors({ origin: true, credentials: true }));
-app.use(express.json());
+app.use(express.json({ limit: '35mb' }));
+app.use(express.urlencoded({ extended: true, limit: '35mb' }));
+
+// Static uploads & event_pics directories
+const uploadsPath = path.join(__dirname, '../uploads');
+app.use('/uploads', express.static(uploadsPath));
+const frontendPicsPath = path.join(__dirname, '../../frontend/public/event_pics');
+app.use('/event_pics', express.static(frontendPicsPath));
 
 // Routes
 app.use('/api/auth', authRoutes);
