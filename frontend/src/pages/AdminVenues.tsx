@@ -6,6 +6,8 @@ export default function AdminVenues() {
   const [categories, setCategories] = useState<any[]>([]);
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
+  const [categoryName, setCategoryName] = useState('');
+  const [creatingCategory, setCreatingCategory] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Editor State
@@ -19,6 +21,12 @@ export default function AdminVenues() {
     fetchApi('/venues')
       .then(res => setVenues(res.data))
       .catch(err => console.error('Failed to fetch venues:', err));
+  };
+
+  const loadCategories = () => {
+    fetchApi('/seat-categories')
+      .then(res => setCategories(res.data))
+      .catch(err => console.error('Failed to fetch categories:', err));
   };
 
   useEffect(() => {
@@ -40,6 +48,24 @@ export default function AdminVenues() {
       loadVenues();
     } catch (err: any) {
       alert(err.message);
+    }
+  };
+
+  const handleCreateCategory = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!categoryName.trim()) return;
+    setCreatingCategory(true);
+    try {
+      await fetchApi('/seat-categories', {
+        method: 'POST',
+        body: JSON.stringify({ name: categoryName.trim() })
+      });
+      setCategoryName('');
+      loadCategories();
+    } catch (err: any) {
+      alert(err.message || 'Failed to create category');
+    } finally {
+      setCreatingCategory(false);
     }
   };
 
@@ -177,6 +203,40 @@ export default function AdminVenues() {
                 Create Venue Entry
               </button>
             </form>
+          </div>
+
+          {/* Seat Categories Management */}
+          <div className="bg-surface border-2 sm:border-4 border-on-background p-4 sm:p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <div className="flex justify-between items-center mb-3 border-b-2 border-on-background pb-2">
+              <h3 className="font-headline-lg text-lg uppercase font-black">Seat Categories ({categories.length})</h3>
+            </div>
+            <form onSubmit={handleCreateCategory} className="flex gap-2 mb-3">
+              <input 
+                type="text" 
+                value={categoryName} 
+                onChange={e => setCategoryName(e.target.value)} 
+                placeholder="E.G. VIP RECLINER"
+                className="flex-1 bg-surface-lowest border-2 border-on-background p-2 font-data-label text-xs font-bold focus:outline-none min-h-[40px]"
+                required
+              />
+              <button 
+                type="submit" 
+                disabled={creatingCategory || !categoryName.trim()}
+                className="bg-on-background text-primary-fixed border-2 border-on-background px-3 font-headline-lg text-xs uppercase font-black hover:bg-primary-fixed hover:text-on-background transition-colors disabled:opacity-50 min-h-[40px] shrink-0"
+              >
+                + Add
+              </button>
+            </form>
+            <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto p-2 bg-surface-lowest border-2 border-on-background/30">
+              {categories.map(cat => (
+                <span 
+                  key={cat.id} 
+                  className={`px-2 py-1 border border-on-background font-mono text-[10px] font-black uppercase ${getCategoryColor(cat.id)}`}
+                >
+                  {cat.name}
+                </span>
+              ))}
+            </div>
           </div>
 
           {/* Venues List */}

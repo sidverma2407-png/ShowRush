@@ -159,7 +159,7 @@ export default function Register() {
                         onChange={() => setRole('customer')}
                         className="peer sr-only"
                       />
-                      <div className="w-full py-2.5 text-center font-data-label text-xs uppercase font-black transition-all peer-checked:bg-primary-fixed peer-checked:text-on-background peer-checked:border-2 peer-checked:border-on-background text-on-surface-variant flex items-center justify-center gap-1.5 min-h-[42px]">
+                      <div className="w-full py-2 text-center font-data-label text-xs uppercase font-black transition-all peer-checked:bg-primary-fixed peer-checked:text-on-background peer-checked:border-2 peer-checked:border-on-background text-on-surface-variant flex items-center justify-center gap-1 min-h-[42px]">
                         <span className="material-symbols-outlined text-sm">confirmation_number</span>
                         Customer
                       </div>
@@ -173,9 +173,23 @@ export default function Register() {
                         onChange={() => setRole('organiser')}
                         className="peer sr-only"
                       />
-                      <div className="w-full py-2.5 text-center font-data-label text-xs uppercase font-black transition-all peer-checked:bg-primary-fixed peer-checked:text-on-background peer-checked:border-2 peer-checked:border-on-background text-on-surface-variant flex items-center justify-center gap-1.5 min-h-[42px]">
+                      <div className="w-full py-2 text-center font-data-label text-xs uppercase font-black transition-all peer-checked:bg-primary-fixed peer-checked:text-on-background peer-checked:border-2 peer-checked:border-on-background text-on-surface-variant flex items-center justify-center gap-1 min-h-[42px]">
                         <span className="material-symbols-outlined text-sm">campaign</span>
                         Organiser
+                      </div>
+                    </label>
+                    <label className="flex-1 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="role"
+                        value="admin"
+                        checked={role === 'admin'}
+                        onChange={() => setRole('admin')}
+                        className="peer sr-only"
+                      />
+                      <div className="w-full py-2 text-center font-data-label text-xs uppercase font-black transition-all peer-checked:bg-primary-fixed peer-checked:text-on-background peer-checked:border-2 peer-checked:border-on-background text-on-surface-variant flex items-center justify-center gap-1 min-h-[42px]">
+                        <span className="material-symbols-outlined text-sm">admin_panel_settings</span>
+                        Admin
                       </div>
                     </label>
                   </div>

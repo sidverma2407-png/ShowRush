@@ -244,6 +244,51 @@ export default function Login() {
                 <h2 className="font-headline-lg text-2xl sm:text-3xl uppercase text-on-background font-black tracking-tight">Sign In</h2>
                 <p className="font-body-md text-xs sm:text-sm text-on-surface-variant font-bold mt-1">Enter your registered email and password.</p>
               </div>
+
+              {/* Quick Demo Role Auto-Fill */}
+              <div className="bg-surface-variant/80 border-2 border-on-background p-2.5 flex flex-col gap-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                <div className="flex justify-between items-center">
+                  <span className="font-data-label text-[10px] uppercase font-black tracking-wider text-on-background">
+                    ⚡ Quick Demo Auto-Fill:
+                  </span>
+                  <span className="font-mono text-[10px] text-on-surface-variant font-bold">pw: password123</span>
+                </div>
+                <div className="grid grid-cols-3 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('customer@seatzy.com');
+                      setPassword('password123');
+                    }}
+                    className="bg-surface border border-on-background hover:bg-primary-fixed text-on-background py-1.5 px-2 font-data-label text-[10px] uppercase font-black flex items-center justify-center gap-1 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-xs">person</span>
+                    Customer
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('organiser@seatzy.com');
+                      setPassword('password123');
+                    }}
+                    className="bg-surface border border-on-background hover:bg-primary-fixed text-on-background py-1.5 px-2 font-data-label text-[10px] uppercase font-black flex items-center justify-center gap-1 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-xs">campaign</span>
+                    Organiser
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('admin@seatzy.com');
+                      setPassword('password123');
+                    }}
+                    className="bg-primary-fixed text-on-background border border-on-background hover:bg-on-background hover:text-primary-fixed py-1.5 px-2 font-data-label text-[10px] uppercase font-black flex items-center justify-center gap-1 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-xs">admin_panel_settings</span>
+                    Admin
+                  </button>
+                </div>
+              </div>
               
               {error && (
                 <div className="bg-error text-on-error border-2 border-on-background px-4 py-3 font-data-label text-xs sm:text-sm flex items-start gap-2.5 font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">

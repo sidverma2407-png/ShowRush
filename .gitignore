@@ -4,3 +4,4 @@ dist
 build
 .DS_Store
 seatzy-master-prompt.md
+*.zip
