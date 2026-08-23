@@ -9,7 +9,8 @@ import {
   resetPasswordWithOtp,
   getProfile,
   updateProfile,
-  changePassword
+  changePassword,
+  testSmtp
 } from '../controllers/auth.controller';
 import { authenticate } from '../middleware/auth';
 
@@ -27,5 +28,8 @@ router.post('/reset-password-otp', resetPasswordWithOtp);
 router.get('/profile', authenticate, getProfile);
 router.put('/profile', authenticate, updateProfile);
 router.put('/change-password', authenticate, changePassword);
+
+// SMTP diagnostic — remove in production or restrict with admin auth
+router.get('/test-smtp', testSmtp);
 
 export default router;

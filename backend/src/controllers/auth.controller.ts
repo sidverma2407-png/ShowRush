@@ -523,3 +523,90 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
     message: 'Password changed successfully!'
   });
 };
+
+// SMTP Diagnostic endpoint — use to verify Render env vars & Gmail connectivity
+// GET /api/auth/test-smtp?to=your@email.com
+export const testSmtp = async (req: Request, res: Response) => {
+  const smtpUser = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
+  const smtpPass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim();
+  const smtpHost = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
+  const smtpPort = process.env.SMTP_PORT || '587';
+  const emailFrom = process.env.EMAIL_FROM || '';
+  const frontendUrl = process.env.FRONTEND_URL || 'not set';
+
+  const envSummary = {
+    SMTP_USER: smtpUser ? `${smtpUser.substring(0, 4)}...${smtpUser.split('@')[1] || ''}` : 'NOT SET',
+    SMTP_PASS: smtpPass ? `${'*'.repeat(Math.min(smtpPass.length, 8))} (${smtpPass.length} chars)` : 'NOT SET',
+    SMTP_HOST: smtpHost,
+    SMTP_PORT: smtpPort,
+    EMAIL_FROM: emailFrom || 'not set',
+    FRONTEND_URL: frontendUrl,
+    smtpConfigured: Boolean(smtpUser && smtpPass && !smtpUser.includes('ethereal.email'))
+  };
+
+  if (!smtpUser || !smtpPass) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'SMTP credentials missing from environment variables',
+      env: envSummary
+    });
+  }
+
+  // Optional: send a real test email if ?to= is provided
+  const toEmail = (req.query.to as string || '').trim();
+  if (toEmail && toEmail.includes('@')) {
+    try {
+      const nodemailer = await import('nodemailer');
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: { user: smtpUser, pass: smtpPass },
+        tls: { rejectUnauthorized: false },
+        connectionTimeout: 20000,
+        greetingTimeout: 15000,
+        socketTimeout: 20000
+      } as any);
+
+      // First verify connection
+      await transporter.verify();
+      console.log('[SMTP TEST] Connection verified successfully');
+
+      const info = await transporter.sendMail({
+        from: emailFrom || `"Seatzy Test" <${smtpUser}>`,
+        to: toEmail,
+        subject: 'Seatzy SMTP Test Email ✓',
+        html: `<div style="font-family:Arial;padding:20px;border:3px solid #000;max-width:400px">
+          <h2 style="color:#000">✅ SMTP is Working!</h2>
+          <p>If you received this email, your Render SMTP configuration is correct.</p>
+          <p><strong>SMTP User:</strong> ${smtpUser}</p>
+          <p><strong>SMTP Host:</strong> smtp.gmail.com:587</p>
+          <p style="color:#666;font-size:12px">Sent from Seatzy backend on Render.</p>
+        </div>`
+      });
+
+      return res.json({
+        status: 'success',
+        message: `✅ Test email delivered to ${toEmail}`,
+        messageId: info.messageId,
+        env: envSummary
+      });
+    } catch (err: any) {
+      console.error('[SMTP TEST ERROR]', err.message);
+      return res.status(500).json({
+        status: 'smtp_error',
+        message: `❌ SMTP connection failed: ${err.message}`,
+        hint: err.message?.includes('535') ? 'Invalid Gmail credentials — check App Password' :
+              err.message?.includes('ETIMEDOUT') || err.message?.includes('ECONNREFUSED') ? 'Port 587 blocked on Render — try Resend/SendGrid instead' :
+              err.message?.includes('534') ? 'Gmail requires App Password (not your account password)' : 'Check Render logs for more details',
+        env: envSummary
+      });
+    }
+  }
+
+  return res.json({
+    status: 'configured',
+    message: 'SMTP env vars are set. Add ?to=email@gmail.com to send a real test email.',
+    env: envSummary
+  });
+};

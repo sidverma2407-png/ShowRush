@@ -37,36 +37,43 @@ export const isSmtpConfigured = () => {
   return Boolean(user && pass && !user.includes('ethereal.email'));
 };
 
-let cachedTransporter: nodemailer.Transporter | null = null;
-
-// Create Nodemailer Transporter dynamically with connection pooling
+// Create a fresh Nodemailer Transporter on each call.
+// Cloud hosts (Render) often block port 465/SSL; port 587 with STARTTLS is universally supported.
+// No caching — pooled connections go stale on Render's ephemeral infra.
 const getTransporter = () => {
-  if (cachedTransporter) return cachedTransporter;
-
   const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
   const pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').trim().replace(/\s+/g, '');
   const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
   const isGmail = host.includes('gmail') || user.endsWith('@gmail.com');
 
-  if (user && pass && !user.includes('ethereal.email')) {
-    cachedTransporter = nodemailer.createTransport({
-      host: isGmail ? 'smtp.gmail.com' : host,
-      port: isGmail ? 465 : (Number(process.env.SMTP_PORT) || 465),
-      secure: true,
-      auth: { user, pass },
-      pool: true,
-      maxConnections: 5,
-      maxMessages: 100,
-      rateDelta: 1000,
-      rateLimit: 5,
-      tls: {
-        rejectUnauthorized: false
-      }
-    });
-    return cachedTransporter;
-  }
+  if (!user || !pass || user.includes('ethereal.email')) return null;
 
-  return null;
+  // Gmail: force port 587 + STARTTLS (port 465/SSL is blocked on most cloud providers)
+  const transportConfig: any = isGmail
+    ? {
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false, // STARTTLS upgrade after connect
+        auth: { user, pass },
+        tls: { rejectUnauthorized: false },
+        connectionTimeout: 20000,
+        greetingTimeout: 15000,
+        socketTimeout: 20000
+      }
+    : {
+        host,
+        port: Number(process.env.SMTP_PORT) || 587,
+        secure: Number(process.env.SMTP_PORT) === 465,
+        auth: { user, pass },
+        tls: { rejectUnauthorized: false },
+        connectionTimeout: 20000,
+        greetingTimeout: 15000,
+        socketTimeout: 20000
+      };
+
+  const t = nodemailer.createTransport(transportConfig);
+  console.log(`[SMTP] Transporter created: host=${isGmail ? 'smtp.gmail.com' : host} port=${isGmail ? 587 : (Number(process.env.SMTP_PORT) || 587)} user=${user.substring(0, 4)}***`);
+  return t;
 };
 
 // Ensure From header matches authenticated Gmail account to prevent Google SMTP rejections
