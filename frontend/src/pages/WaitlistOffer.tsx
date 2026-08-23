@@ -44,7 +44,7 @@ export default function WaitlistOffer() {
     setClaiming(true);
     try {
       await fetchApi(`/waitlist/offer/${token}/accept`, { method: 'POST' });
-      alert('🎉 Offer Accepted! Your seat is booked and your ticket has been emailed to you.');
+      alert('Offer Accepted! Your seat is booked and your ticket has been emailed to you.');
       navigate('/bookings');
     } catch (err: any) {
       alert(err.message || 'Failed to claim seat');
@@ -146,7 +146,7 @@ export default function WaitlistOffer() {
               <span>{claiming ? 'Confirming Ticket...' : 'CLAIM THIS SEAT NOW'}</span>
             </button>
             <p className="font-data-label text-[11px] uppercase text-center text-on-surface-variant font-bold">
-              ⚡ This reservation is held exclusively for you. If not claimed within the timer, it automatically passes to the next person on the waitlist.
+              This reservation is held exclusively for you. If not claimed within the timer, it automatically passes to the next person on the waitlist.
             </p>
           </div>
         </div>

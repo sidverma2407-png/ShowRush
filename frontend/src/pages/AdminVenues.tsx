@@ -358,7 +358,7 @@ export default function AdminVenues() {
         method: 'POST',
         body: JSON.stringify({ seats: seatsToCreate })
       });
-      alert(`🎉 Success! Saved ${seatsToCreate.length} seats for ${selectedVenue.name}`);
+      alert(`Success! Saved ${seatsToCreate.length} seats for ${selectedVenue.name}`);
       loadVenues();
     } catch (err: any) {
       alert(err.message || 'Failed to save venue map');
@@ -624,35 +624,35 @@ export default function AdminVenues() {
               {/* Preset Templates */}
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-data-label text-[10px] uppercase font-black tracking-wider text-on-background shrink-0">
-                  ⚡ Presets:
+                  Templates:
                 </span>
                 <button
                   onClick={() => applyTemplate('cinema')}
                   disabled={!selectedVenue}
                   className="bg-surface hover:bg-primary-fixed border border-on-background px-2.5 py-1 font-data-label text-[10px] uppercase font-black disabled:opacity-50 transition-colors cursor-pointer"
                 >
-                  🎬 Cinema
+                  Cinema
                 </button>
                 <button
                   onClick={() => applyTemplate('stadium')}
                   disabled={!selectedVenue}
                   className="bg-surface hover:bg-primary-fixed border border-on-background px-2.5 py-1 font-data-label text-[10px] uppercase font-black disabled:opacity-50 transition-colors cursor-pointer"
                 >
-                  🏟️ Stadium
+                  Stadium
                 </button>
                 <button
                   onClick={() => applyTemplate('concert')}
                   disabled={!selectedVenue}
                   className="bg-surface hover:bg-primary-fixed border border-on-background px-2.5 py-1 font-data-label text-[10px] uppercase font-black disabled:opacity-50 transition-colors cursor-pointer"
                 >
-                  🎸 Concert
+                  Concert
                 </button>
                 <button
                   onClick={() => applyTemplate('club')}
                   disabled={!selectedVenue}
                   className="bg-surface hover:bg-primary-fixed border border-on-background px-2.5 py-1 font-data-label text-[10px] uppercase font-black disabled:opacity-50 transition-colors cursor-pointer"
                 >
-                  🎭 Club
+                  Club
                 </button>
               </div>
 
@@ -709,7 +709,7 @@ export default function AdminVenues() {
             {/* Color Palette Palette Toolbar */}
             <div className="flex items-center gap-2 flex-wrap border-t-2 border-on-background/20 pt-3">
               <span className="font-data-label text-[10px] uppercase font-black tracking-wider shrink-0">
-                🖌️ Active Brush:
+                Active Category Brush:
               </span>
               
               {categories.map(cat => (
@@ -733,7 +733,7 @@ export default function AdminVenues() {
                   activeCategory === 'empty' ? 'ring-4 ring-black scale-105 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-stone-300 text-black' : 'opacity-80 hover:opacity-100'
                 }`}
               >
-                🚫 Aisle / Gap
+                Aisle / Gap
               </button>
             </div>
 

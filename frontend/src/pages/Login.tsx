@@ -249,7 +249,7 @@ export default function Login() {
               <div className="bg-surface-variant/80 border-2 border-on-background p-2.5 flex flex-col gap-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                 <div className="flex justify-between items-center">
                   <span className="font-data-label text-[10px] uppercase font-black tracking-wider text-on-background">
-                    ⚡ Quick Demo Auto-Fill:
+                    Quick Demo Accounts:
                   </span>
                   <span className="font-mono text-[10px] text-on-surface-variant font-bold">pw: password123</span>
                 </div>

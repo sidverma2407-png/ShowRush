@@ -553,7 +553,7 @@ export const testSmtp = async (req: Request, res: Response) => {
     if (result.success) {
       return res.json({
         status: 'success',
-        message: `✅ Test email delivered to ${toEmail} via Brevo HTTP API!`,
+        message: `Test email delivered to ${toEmail} via Brevo HTTP API!`,
         messageId: result.messageId,
         env: envSummary
       });
