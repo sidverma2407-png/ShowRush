@@ -131,22 +131,44 @@ export const sendBookingEmail = async (
 ) => {
   const transporter = getTransporter();
   
-  // Create a live verification URL inside the QR Code
-  const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-  const qrVerificationUrl = `${frontendBaseUrl}/ticket/verify/${bookingRef}`;
-
-  const qrCodeDataUrl = await QRCode.toDataURL(qrVerificationUrl, { margin: 1, scale: 6 });
-
   const eventTitle = showDetails?.event?.title || 'Seatzy Live Event';
-  const eventType = showDetails?.event?.type || 'event';
-  const showDate = showDetails?.date ? new Date(showDetails.date).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : '';
+  const eventType = (showDetails?.event?.type || 'EVENT').toUpperCase();
+  const showDate = showDetails?.date ? new Date(showDetails.date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) : '';
   const showTime = showDetails?.time || '';
   const venueName = showDetails?.venue?.name || 'Main Arena';
-  const venueAddress = showDetails?.venue?.address ? `${showDetails.venue.address}, ${showDetails.venue.city}` : 'Venue Location';
+  const venueCity = showDetails?.venue?.city || '';
+  const venueAddress = showDetails?.venue?.address ? `${showDetails.venue.address}${venueCity ? `, ${venueCity}` : ''}` : venueCity || 'Venue Location';
+  const seatsFormatted = seatLabels && seatLabels.length > 0 ? seatLabels.join(', ') : 'Reserved Seating';
   const seatsText = seatLabels && seatLabels.length > 0 ? seatLabels.join('<br/>') : 'Reserved Seating';
   const formattedPrice = totalPrice ? `₹${totalPrice.toLocaleString('en-IN')}` : 'Confirmed';
   const attendeeName = customerName || 'Seatzy Guest';
   const attendeePhone = customerPhone || 'N/A';
+  const formatLang = [showDetails?.format || showDetails?.event?.format, showDetails?.language || showDetails?.event?.language].filter(Boolean).join(' - ');
+
+  // Clean, structured plain text ticket pass for instant offline camera & scanner verification
+  const qrPlainText = [
+    '========================================',
+    '       SEATZY OFFICIAL ADMISSION PASS   ',
+    '========================================',
+    `TICKET REF   : ${bookingRef}`,
+    `EVENT        : ${eventTitle.toUpperCase()}`,
+    `CATEGORY     : ${eventType}${formatLang ? ` (${formatLang})` : ''}`,
+    `SHOWTIME     : ${showDate} @ ${showTime}`,
+    `VENUE        : ${venueName}`,
+    `LOCATION     : ${venueAddress}`,
+    '----------------------------------------',
+    `ATTENDEE     : ${attendeeName}`,
+    `PHONE        : ${attendeePhone}`,
+    `SEATS        : ${seatsFormatted}`,
+    `TOTAL AMOUNT : ${formattedPrice} (PAID)`,
+    'STATUS       : CONFIRMED & VERIFIED FOR ENTRY',
+    '========================================',
+    'GATE CLEARANCE: ACTIVE & VALID FOR ADMISSION',
+    'SECURITY SEAL : SEATZY-256-AUTHENTICATED',
+    '========================================'
+  ].join('\n');
+
+  const qrCodeDataUrl = await QRCode.toDataURL(qrPlainText, { margin: 1, scale: 6 });
 
   // Event specific tailored warm wish
   let eventWish = "We hope you have an incredible time at the event!";

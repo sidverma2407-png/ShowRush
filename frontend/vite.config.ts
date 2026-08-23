@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: true, // Listen on all network interfaces for multi-device & mobile LAN testing
     proxy: {
       '/uploads': {
         target: 'http://localhost:3000',
@@ -13,4 +14,3 @@ export default defineConfig({
     }
   }
 })
-

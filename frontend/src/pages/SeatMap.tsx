@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
-import { fetchApi } from '../api/client';
+import { fetchApi, getSocketUrl } from '../api/client';
 import { useAuthStore } from '../store/auth';
 import { useModalStore } from '../store/modal';
 import { AddonSelectionModal } from '../components/AddonSelectionModal';
@@ -37,7 +37,7 @@ export default function SeatMap() {
       .catch(err => console.error('Failed to fetch seats:', err))
       .finally(() => setLoading(false));
 
-    const newSocket = io((import.meta as any).env?.VITE_API_URL || 'http://localhost:3000');
+    const newSocket = io(getSocketUrl());
     newSocket.emit('join_room', showId);
     newSocket.on('seat_status_updated', (updatedSeat: any) => {
       setSeats(prev => prev.map(s => s.id === updatedSeat.id ? { ...s, ...updatedSeat, venue_seat: updatedSeat.venue_seat || s.venue_seat } : s));

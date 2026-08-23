@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { fetchApi } from '../api/client';
+import { fetchApi, getSocketUrl } from '../api/client';
 import { useModalStore } from '../store/modal';
 import { getImageUrl } from '../utils/imageUrl';
 import { io } from 'socket.io-client';
@@ -87,11 +87,7 @@ export default function OrganiserDashboard() {
     fetchData();
 
     // Setup real-time Socket.IO synchronization for live revenue & booking updates
-    const serverUrl = typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'
-      ? 'https://seatzy-oqbv.onrender.com'
-      : 'http://localhost:3000';
-
-    const socket = io(serverUrl);
+    const socket = io(getSocketUrl());
 
     socket.on('dashboard_updated', (data) => {
       setLivePulse(true);

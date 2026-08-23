@@ -702,9 +702,19 @@ export const acceptWaitlistOffer = async (req: AuthRequest, res: Response) => {
     return newBooking;
   });
 
-  const showDetails = await prisma.show.findUnique({ where: { id: entry.show_id }, include: { event: true } });
+  const showDetails = await prisma.show.findUnique({ where: { id: entry.show_id }, include: { event: true, venue: true } });
   const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
-  const qrUrl = await sendBookingEmail(user!.email, booking.booking_reference, showDetails);
+  const offeredSeat = await prisma.venueSeat.findUnique({ where: { id: entry.offered_venue_seat_id! }, include: { category: true } });
+  const seatLabels = offeredSeat ? [`${offeredSeat.row_label}${offeredSeat.seat_number} (${offeredSeat.category.name})`] : [];
+  const qrUrl = await sendBookingEmail(
+    user!.email,
+    booking.booking_reference,
+    showDetails,
+    user?.name,
+    seatLabels,
+    Number(booking.total_price),
+    'N/A'
+  );
   
   if (qrUrl) {
     await prisma.booking.update({
