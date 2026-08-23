@@ -247,7 +247,7 @@ async function main() {
       genre: 'Action, Superhero, Sci-Fi',
       certification: 'U/A',
       cast: 'Tom Holland, Zendaya, Jacob Batalon, Benedict Cumberbatch',
-      trailer_url: 'https://www.youtube.com/watch?v=JfVOs4VSpmA',
+      trailer_url: 'https://www.youtube.com/watch?v=8TZMtslA3UY',
       shows: [
         { venue: pvrDelhi, dayOffset: 5, time: '11:00', format: 'IMAX 3D', language: 'English' },
         { venue: pvrDelhi, dayOffset: 5, time: '15:15', format: 'IMAX 3D', language: 'English' },
@@ -269,7 +269,7 @@ async function main() {
       genre: 'Drama, Action, History',
       certification: 'A',
       cast: 'Ralph Fiennes, Juliette Binoche, Charlie Plummer',
-      trailer_url: 'https://www.youtube.com/watch?v=02f_V7x2k0c',
+      trailer_url: 'https://www.youtube.com/watch?v=f_bKjZeJBBI',
       shows: [
         { venue: pvrDelhi, dayOffset: 8, time: '13:00', format: '2D', language: 'English' },
         { venue: pvrDelhi, dayOffset: 8, time: '17:00', format: '2D', language: 'English' },
@@ -287,7 +287,7 @@ async function main() {
       genre: 'Sci-Fi, Thriller, Mystery',
       certification: 'U/A',
       cast: 'Anne Hathaway, Oscar Isaac, Mahershala Ali',
-      trailer_url: 'https://www.youtube.com/watch?v=8Qn_spdM5Zg',
+      trailer_url: 'https://www.youtube.com/watch?v=3oB9AxspVow',
       shows: [
         { venue: pvrDelhi, dayOffset: 12, time: '14:00', format: '3D', language: 'English' },
         { venue: pvrDelhi, dayOffset: 12, time: '18:00', format: '3D', language: 'Hindi' },
@@ -305,7 +305,7 @@ async function main() {
       genre: 'Action, Romance, Crime',
       certification: 'A',
       cast: 'Emraan Hashmi, Disha Patani, Kay Kay Menon',
-      trailer_url: 'https://www.youtube.com/watch?v=3R7b0w2X6mM',
+      trailer_url: 'https://www.youtube.com/watch?v=qkaSXCqdecM',
       shows: [
         { venue: pvrDelhi, dayOffset: 16, time: '12:30', format: '2D', language: 'Hindi' },
         { venue: pvrDelhi, dayOffset: 16, time: '16:45', format: '2D', language: 'Hindi' },
@@ -323,7 +323,7 @@ async function main() {
       genre: 'Drama, History',
       certification: 'U/A',
       cast: 'Pankaj Tripathi, Manoj Bajpayee, Sanya Malhotra',
-      trailer_url: 'https://www.youtube.com/watch?v=4M8aQ8yX2wQ',
+      trailer_url: 'https://www.youtube.com/watch?v=oRsAMzfvVGk',
       shows: [
         { venue: pvrDelhi, dayOffset: 20, time: '15:00', format: '2D', language: 'Hindi' },
         { venue: pvrDelhi, dayOffset: 20, time: '19:00', format: '2D', language: 'Hindi' }
