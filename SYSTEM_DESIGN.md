@@ -1,32 +1,35 @@
-# Seatzy: System Design Write-Up
+# Seatzy: System Design & Architecture Write-Up
 
 ## 1. Architecture Overview
-The platform architecture is composed of:
-- **Presentation Tier**: React 18 + Vite SPA utilizing WebSocket (`Socket.IO`) clients for live seat status and canvas rendering.
-- **Application Tier**: Node.js / Express / TypeScript API server with transactional business logic and scheduled cron workers (`node-cron`).
-- **Data Tier**: PostgreSQL 16 managed via Prisma ORM with strict foreign-key integrity and row-level locking capabilities (`SELECT ... FOR UPDATE`).
+Seatzy is engineered as a high-concurrency event ticketing platform supporting high traffic volumes, instant checkout seat reservations, and automated waitlist reallocation.
 
 ```
-[ Customer / Organiser / Turnstiles ]
-                 │
-      HTTPS / WSS Connection
-                 │
-        ┌────────┴────────┐
-        ▼                 ▼
- [ Vite React SPA ]  [ Socket.IO Engine ]
-        │                 ▲
-     REST API             │ Real-time Events
-        │                 │ (seat_status_updated)
-        ▼                 │
- [ Express API Services ] ┤
-   ├─ Auth & Passwords    │
-   ├─ Seat Hold & Locks   │
-   ├─ Payment & QR Code   │
-   ├─ Waitlist Reallocate │
-   └─ Cron Worker (TTL) ──┘
-        │
-   PostgreSQL 16 (Row-Level Locks FOR UPDATE)
+[ Patrons / Organisers / Admins / Turnstiles ]
+                      │
+           HTTPS / WSS Connection
+                      │
+             ┌────────┴────────┐
+             ▼                 ▼
+      [ Vite React SPA ]  [ Socket.IO Engine ]
+             │                 ▲
+          REST API             │ Real-time Events
+             │                 │ (seat_status_updated)
+             ▼                 │
+      [ Express API Services ] ┤
+        ├─ Role-Based Auth     │
+        ├─ Seat Hold & Locks   │
+        ├─ Brevo HTTP API (QR) │
+        ├─ Waitlist Engine     │
+        ├─ Admin Venue Studio  │
+        └─ Cron Worker (TTL) ──┘
+             │
+        PostgreSQL 16 (Row-Level Locks FOR UPDATE)
 ```
+
+The system is decoupled into three primary tiers:
+- **Presentation Tier**: React 18 Single-Page Application (Vite + TypeScript) styled with a high-contrast Neo-Brutalist design system. Fully responsive across Large Desktop (`1440px+`), Laptop (`1024px–1439px`), Tablet (`768px–1023px`), and Mobile (`375px–767px`) with touch pan/zoom support on visual seat layouts.
+- **Application Tier**: Node.js & Express REST API server in TypeScript utilizing Prisma ORM, Socket.IO rooms for per-show seat state synchronization, Node-Cron background workers for TTL sweeps, and Axios for direct Brevo HTTP API transactional email delivery (port 443).
+- **Data Tier**: PostgreSQL 16 relational database with ACID guarantees, foreign-key cascade integrity, and strict row-level pessimistic locking (`SELECT ... FOR UPDATE`).
 
 ---
 
@@ -35,7 +38,7 @@ When a customer selects seats on the interactive visual map and initiates checko
 
 1. **State Transition**: The targeted seat records in `seat_status` transition from `available` to `held`.
 2. **Identity & TTL Binding**: The system stamps `held_by = customer_id` and sets `hold_expires_at = NOW() + HOLD_TTL_MINUTES` (configurable, default 10 minutes).
-3. **Real-time Broadcast**: The server broadcasts a `seat_status_updated` event via WebSocket to all clients in the show's room. Other patrons immediately see these seats styled as unavailable (`seat-sold`), preventing futile checkout attempts.
+3. **Real-time Broadcast**: The server broadcasts a `seat_status_updated` event via WebSocket to all clients in the show's room. Other patrons immediately see these seats styled as unavailable (`seat-sold`), preventing duplicate checkout attempts.
 4. **Automated Expiry Sweeper**: A background cron worker sweeps the database every 60 seconds (`*/1 * * * *`). Any hold where `status = 'held'` and `hold_expires_at < NOW()` is atomically reverted to `available` with `held_by = NULL`. The sweeper immediately emits `seat_status_updated`, restoring the seats to the public pool in real time without human intervention.
 
 ---
@@ -96,4 +99,5 @@ Patron Cancels Booking
 ## 5. Security, Pass Delivery & Zero-Dependency QR Offline Verification
 On confirmed booking, the server generates a standardized, tamper-evident Plain-Text cryptographic admission pass rendered as a QR code:
 - **Offline Reliability**: Encodes all ticket details in a structured plain-text string, enabling gate attendants and security turnstiles to verify admission 100% offline without external network dependencies.
-- **Role Isolation**: Strict JWT authentication guarantees customer-only booking access and organizer-only command dashboard metrics.
+- **Role Isolation**: Strict JWT authentication guarantees customer-only booking access, organizer-only command dashboard metrics, and admin-only venue seating creation.
+- **Brevo HTTP API Integration**: Uses direct REST calls over HTTPS (port 443) for transactional ticket and OTP delivery, bypassing cloud platform SMTP port blocks.

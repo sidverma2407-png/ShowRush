@@ -1,17 +1,19 @@
 # Seatzy
 
-Ticket booking platform for Movies and Concerts. Supports high-demand ticket sales, zero-double-booking concurrency control, automatic waitlist reallocation, real-time seat maps, and QR code ticket generation.
+High-performance, full-stack ticket booking platform for Movies, Concerts, Stand-up Comedy, and Live Sports. Built for high-demand ticket drops with zero-double-booking concurrency control, automated waitlist reallocation on cancellations, real-time visual seat selection, instant QR admission tickets delivered via email, and responsive UI across all screen sizes.
 
 ---
 
 ## Key Features
 
-- **Visual Seat Map Engine**: Dedicated, interactive layouts for Movies (Executive, Premium, Standard), Concerts (VIP Pit, Golden Circle, Upper Deck), and Sports Stadiums (VIP Pavilion, Touchline/30-Yard Field, Bleachers).
-- **Pessimistic Concurrency Control**: Prevents simultaneous double-holds or double-bookings using PostgreSQL row-level locks (`SELECT ... FOR UPDATE`).
-- **10-Minute Hold TTL and Auto-Release**: Temporary seat holds on checkout auto-expire if abandoned, with live WebSocket updates (`Socket.IO`) to all connected users.
-- **Automatic Waitlist Reallocation**: Sold-out categories support FIFO waitlists. On booking cancellation, the freed seat is automatically held and offered to the next waitlisted user via a time-limited email link.
-- **QR Code Ticket Delivery**: Confirmed bookings generate a unique QR code ticket containing the booking reference code and email it directly to the customer via the **Brevo API**.
-- **Organiser and Admin Command Center**: Comprehensive dashboard tracking Gross Revenue (INR), Tickets Sold, Capacity Utilization %, Show Schedules, Per-Category Pricing, and Booking Logs.
+- **Responsive Visual Seat Map Engine**: Dedicated, interactive layouts for Movies (Executive Recliner, Premium Club, Standard), 360° Concert Arenas (VIP Front Stage Pit, Golden Circle, Upper Deck), and Sports Stadiums (VIP Pavilion, Touchline/30-Yard Field, Bleachers). Supports bounded pan & pinch-zoom on mobile and tablet devices.
+- **Pessimistic Concurrency Control**: Prevents simultaneous double-holds or double-bookings using PostgreSQL row-level serialization locks (`SELECT ... FOR UPDATE`) wrapped inside atomic database transactions.
+- **10-Minute Hold TTL & Auto-Release Sweeper**: Temporary seat holds during checkout automatically expire if abandoned. A background cron worker sweeps expired holds and broadcasts live WebSocket state updates (`Socket.IO`) to all connected patrons in real time.
+- **Automatic Waitlist Reallocation Engine**: Sold-out categories support FIFO waitlists. On booking cancellation, the freed seat is automatically held and offered to the next waitlisted user via a secure, time-limited email link. Unclaimed offers cascade automatically down the queue.
+- **Brevo API Email & QR Code Ticket Delivery**: Confirmed bookings generate a unique QR code ticket containing the booking reference code and dispatch it directly to the customer's inbox via the **Brevo HTTP API** (port 443).
+- **Pro Admin Seating Studio**: Dedicated visual venue architect allowing platform administrators to build custom venue seating charts, configure multi-tier seat categories, use architectural presets (Cinema, Stadium, Concert, Club), and paint seats with row/column tools.
+- **Organiser Analytics & Command Center**: Comprehensive dashboard tracking Gross Revenue (INR), Tickets Sold, Capacity Utilization %, Show Schedules, Per-Category Pricing, and Live Booking Logs.
+- **Multi-Device Responsiveness**: Designed with responsive layouts across Large Desktop (`1440px+`), Laptop (`1024px–1439px`), Tablet (`768px–1023px`), and Mobile (`375px–767px`), including full support for mobile "Request Desktop Site" mode.
 
 ---
 
@@ -44,9 +46,10 @@ Ticket booking platform for Movies and Concerts. Supports high-demand ticket sal
 
 ## Tech Stack
 
-- **Frontend**: React 18, Vite, Tailwind CSS (Neo-Brutalist design system), Material Symbols.
-- **Backend**: Node.js, Express, TypeScript, Prisma ORM, Socket.IO, Nodemailer, Node-Cron, QRCode.
-- **Database**: PostgreSQL 16 (Dockerized).
+- **Frontend**: React 18, TypeScript, Vite, Tailwind CSS (Neo-Brutalist design system), Material Symbols, jsPDF, html2canvas, Socket.IO Client.
+- **Backend**: Node.js, Express, TypeScript, Prisma ORM, Socket.IO, Node-Cron, QRCode, Axios (Brevo HTTP API integration).
+- **Database**: PostgreSQL 16 (Dockerized / Cloud Hosted).
+- **Email Delivery**: Brevo (Sendinblue) Transactional HTTP API (HTTPS port 443) with SMTP fallback.
 
 ---
 
@@ -60,6 +63,18 @@ Ticket booking platform for Movies and Concerts. Supports high-demand ticket sal
 Copy the sample environment configuration in the root directory:
 ```bash
 cp .env.example .env
+```
+
+Ensure your `.env` contains:
+```env
+PORT=5000
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/seatzy?schema=public"
+JWT_SECRET="supersecretjwtkeyforseatzyapp"
+BREVO_API_KEY="your-brevo-api-key"
+BREVO_SENDER_EMAIL="your-verified-sender@example.com"
+BREVO_SENDER_NAME="Seatzy Tickets"
+HOLD_TTL_MINUTES=10
+WAITLIST_OFFER_TTL_MINUTES=15
 ```
 
 ### 3. Spin Up PostgreSQL Database
@@ -87,45 +102,68 @@ npm run dev
 
 ---
 
+## 1-Click Demo Accounts
+
+For instant evaluation, the login page includes quick auto-fill buttons:
+- **Customer Account**: `customer@seatzy.com` / `password123`
+- **Organiser Account**: `organiser@seatzy.com` / `password123`
+- **Admin Account**: `admin@seatzy.com` / `password123`
+
+---
+
 ## Database Schema Summary
 
 The platform uses Prisma ORM connected to PostgreSQL with the following core entities:
 
-- **`User`**: Role-based access control (`customer`, `organiser`, `admin`).
+- **`User`**: Role-based access control (`customer`, `organiser`, `admin`), email verification state, and hashed credentials.
 - **`Venue`**: Name, address, city, and relationships to `VenueSeat` and `Show`.
 - **`SeatCategory`**: Recliner, VIP Pit, Premium, Standard, Bleachers.
 - **`VenueSeat`**: Unique `(venue_id, row_label, seat_number, category_id)`.
-- **`Event`**: Title, type (`movie`, `concert`, `comedy`, `sports`), description, poster URL, city.
-- **`Show`**: Linking an `Event` to a `Venue` with specific `date`, `time`, and `status`.
+- **`Event`**: Title, type (`movie`, `concert`, `comedy`, `sports`), description, poster URL, cast, trailer URL, certification, language, format, genre.
+- **`Show`**: Linking an `Event` to a `Venue` with specific `date`, `time`, `language`, `format`, and `status`.
 - **`ShowCategoryPricing`**: Unique price per show and seat category (`show_id`, `category_id`, `price`).
 - **`SeatStatus`**: Real-time seat state for a show (`available`, `held`, `booked`), `held_by`, `hold_expires_at`.
-- **`Booking`**: Customer details, booking reference code, total price, QR code URL, and array of booked seats.
-- **`WaitlistEntry`**: FIFO queue (`show_id`, `category_id`, `customer_id`, `position`, `status`, `offered_venue_seat_id`, `offer_expires_at`).
+- **`Booking`**: Customer details, booking reference code, total price, QR code URL, status (`confirmed`, `cancelled`), and relation to booked seats.
+- **`WaitlistEntry`**: FIFO queue (`show_id`, `category_id`, `customer_id`, `position`, `status`, `offered_venue_seat_id`, `offer_expires_at`, `offer_token`).
+- **`AddonItem` & `BookingAddon`**: Food, beverages, combo snacks, and discount coupon applications.
 
 ---
 
 ## Core API Endpoints
 
 ### Authentication (`/api/auth`)
-- `POST /api/auth/register`: Register new account (Role: Customer/Organiser)
-- `POST /api/auth/login`: Authenticate and receive JWT token
+- `POST /api/auth/register`: Register new account (Customer / Organiser / Admin)
+- `POST /api/auth/login`: Authenticate with password or Email OTP
+- `POST /api/auth/send-otp`: Request 6-digit email sign-in code
+- `POST /api/auth/verify-otp-login`: Authenticate via Email OTP
+- `POST /api/auth/test-email`: Test live Brevo email delivery
 
 ### Customer and Browsing (`/api`)
-- `GET /api/events`: Filter events by city, category type, date range
-- `GET /api/events/:id`: View event details and scheduled shows
-- `GET /api/shows/:id/map`: Get visual seat grid with real-time status and pricing
+- `GET /api/events`: Filter events by city, category type, language, format, genre, date
+- `GET /api/events/:id`: View event details, cast, reviews, trailers, and scheduled shows
+- `GET /api/shows/:id/seats`: Get visual seat grid with real-time status and pricing
 - `POST /api/shows/:id/hold`: Place temporary 10-min hold on selected seats
-- `POST /api/shows/:id/book`: Confirm booking, lock seats, generate QR ticket and email
+- `POST /api/bookings`: Confirm booking, lock seats, apply coupons, generate QR ticket and email
 - `DELETE /api/bookings/:id`: Cancel booking, release seats, trigger waitlist reallocation
 - `POST /api/shows/:id/waitlist`: Join waitlist for sold-out category
+- `GET /api/waitlist/offer/:token`: View and accept time-limited waitlist offer
+- `POST /api/waitlist/offer/:token/accept`: Claim offered seat and confirm ticket
 
-### Organiser and Admin (`/api/organiser`)
+### Admin & Venue Studio (`/api/admin` & `/api/venues`)
+- `GET /api/venues`: Retrieve all venues with seat matrices and category details
+- `POST /api/venues`: Create a new venue
+- `DELETE /api/venues/:id`: Delete venue
+- `POST /api/venues/:id/seats`: Save custom painted seat matrix for venue
+- `GET /api/seat-categories`: Get all seat categories
+- `POST /api/seat-categories`: Create new seat category
+- `DELETE /api/seat-categories/:id`: Delete seat category
+
+### Organiser Command Center (`/api/organiser`)
 - `GET /api/organiser/events`: Get organiser's managed events and gross metrics
-- `POST /api/events`: Create new event listing
-- `POST /api/events/:id/shows`: Schedule new show with date, time, and venue
+- `POST /api/events`: Create new event listing with metadata, trailer, cast
+- `POST /api/events/:id/shows`: Schedule new show with date, time, venue, and per-tier pricing
 - `PUT /api/shows/:id/pricing`: Set dynamic per-category seat prices
 - `GET /api/events/:id/summary`: Event revenue summary, occupancy, and booking logs
-- `GET /api/organiser/venues` / `POST /api/organiser/venues`: Manage partner venues and seat layouts
 
 ---
 
@@ -160,8 +198,8 @@ When an existing customer cancels a booking (`DELETE /api/bookings/:id`):
    - The waitlist status changes to `offered`.
    - An `offer_expires_at` TTL is set (e.g., 15 minutes).
    - The freed `SeatStatus` is reserved specifically for that customer (`held_by = customer_id`).
-   - An automated email is sent to the customer containing a time-limited claim link (`/waitlist/offer/:id`).
-4. If the waitlisted customer clicks the claim link before expiry, they complete payment and the seat becomes `booked`.
+   - An automated email is sent to the customer containing a time-limited claim link (`/waitlist/offer/:token`).
+4. If the waitlisted customer clicks the claim link before expiry, they complete booking and the seat becomes `booked`.
 5. If the waitlisted customer fails to claim within the TTL, the background scheduler detects the expired offer (`status = 'offered'` and `offer_expires_at < NOW()`), marks the entry `expired`, and automatically offers the seat to the **next customer in line** (`position + 1`).
 6. If no remaining users exist in the waitlist queue, the seat status is safely reverted to `available` on the public map.
 
@@ -169,4 +207,4 @@ When an existing customer cancels a booking (`DELETE /api/bookings/:id`):
 
 ## License and Compliance
 
-Built for high-concurrency ticket reservation standards. All requirements are fully implemented and verified.
+Built for high-concurrency ticket reservation standards. All requirements are fully implemented, tested, and verified.
