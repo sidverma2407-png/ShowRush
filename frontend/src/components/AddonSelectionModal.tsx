@@ -174,7 +174,7 @@ export const AddonSelectionModal: React.FC<AddonSelectionModalProps> = ({
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 text-xs font-black uppercase border-2 border-on-background transition-all whitespace-nowrap ${
+              className={`px-4 py-2 min-h-[36px] flex items-center justify-center shrink-0 text-xs font-black uppercase border-2 border-on-background transition-all whitespace-nowrap ${
                 selectedCategory === cat
                   ? 'bg-black text-white shadow-neo'
                   : 'bg-white text-black hover:bg-primary-fixed/30'

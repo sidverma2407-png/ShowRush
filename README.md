@@ -15,6 +15,33 @@ Ticket booking platform for Movies and Concerts. Supports high-demand ticket sal
 
 ---
 
+## Screenshots
+
+### 1. Landing & Authentication
+![Landing Page](./README%20SS/landingpage.png)
+![Login Page](./README%20SS/loginpage.png)
+![Register Page](./README%20SS/registerpage.png)
+
+### 2. Discover & Events
+![Explore Page](./README%20SS/explorepage.png)
+![Events List](./README%20SS/eventspage.png)
+![Events Detail](./README%20SS/eventspage2.png)
+![Movie Details](./README%20SS/movie.png)
+
+### 3. Booking & Seat Selection
+![Seat Map](./README%20SS/seatmap.png)
+
+### 4. Tickets & Emails
+![Tickets Page](./README%20SS/ticketspage.png)
+![Gmail Ticket](./README%20SS/gmailticket.png)
+![Gmail OTP](./README%20SS/gmailOTP.png)
+
+### 5. Organiser Dashboard
+![Dashboard](./README%20SS/dashboard.png)
+![Create Event](./README%20SS/createevent.png)
+
+---
+
 ## Tech Stack
 
 - **Frontend**: React 18, Vite, Tailwind CSS (Neo-Brutalist design system), Material Symbols.
