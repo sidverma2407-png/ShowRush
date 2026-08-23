@@ -1,71 +1,85 @@
-# Seatzy — Design System (Neo-Brutalism)
+# Seatzy — Design System (Neo-Brutalism & Responsiveness)
 
-This is the single source of truth for HOW the product looks. Apply these tokens and rules consistently across every screen. The attached reference image (`Gemini_Generated_Image_ifmsvqifmsvqifms.png`) is the visual ground truth — when in doubt, match it, don't improvise a "nicer" alternative.
+This is the single source of truth for HOW the product looks and scales across viewports. Apply these tokens and rules consistently across every screen.
 
 ## 1. Design Philosophy
 
-Neo-Brutalism: raw, structural, high-contrast, unapologetically geometric. The UI should feel like a technical blueprint or drafting document, not a soft consumer app. No gradients, no soft shadows, no rounded corners on structural elements, no decorative whitespace-heavy minimalism.
+**Neo-Brutalism**: Raw, structural, high-contrast, unapologetically geometric, and functional. The UI should feel like a technical blueprint or architectural drafting document. Features high-contrast solid borders, hard offset shadows, vibrant primary accents, and responsive data-dense layouts.
 
 ## 2. Color Tokens
 
-| Token | Value | Usage |
+| Token | Hex Value | Usage |
 |---|---|---|
-| `--color-black` | `#000000` | Text, borders, shadows, backgrounds of high-emphasis blocks (nav, footer, section headers) |
-| `--color-white` | `#FFFFFF` | Base page background, available-seat color, text-on-black |
-| `--color-acid-yellow` | `#F2FF00` | Primary accent — held/active/taken seats, highlight bands, primary CTA backgrounds, "sold out" banners |
-| `--color-neon-magenta` | `#FF00E5` | Secondary accent — "held by you / your active hold" state, urgent/live indicators |
-| `--color-cyan` | `#00F0FF` | Tertiary accent — used sparingly for links, secondary badges, hover states |
-| `--color-gray-grid` | `#E5E5E5` at ~15–25% opacity | Background architectural grid lines only |
+| `--color-black` | `#000000` / `#0c0f17` | Text, borders, hard shadows, high-emphasis headers, and dark canvas sections |
+| `--color-white` | `#FFFFFF` | Base page background, available-seat fill, high-contrast text |
+| `--color-acid-yellow` | `#F2FF00` / `#E1ED00` | Primary accent — selected/held seats, highlight bands, primary CTAs, active badges |
+| `--color-neon-magenta` | `#FF00E5` | Urgent indicators, active countdown highlights |
+| `--color-cyan` | `#00F0FF` / `#67e8f9` | Premium seat tiers, secondary chips, info alerts |
+| `--color-emerald` | `#10B981` / `#6ee7b7` | Standard seat tiers, confirmed statuses, group discounts |
+| `--color-amber` | `#F59E0B` / `#fde047` | Executive Recliner tiers, VIP pavilion badges |
+| `--color-gray-grid` | `#E5E5E5` at ~15–25% opacity | Subtle architectural blueprint grid texture |
 
-Rules:
-- Base backgrounds are always white or black. Accent colors are never used as full-page backgrounds — only as bands, badges, buttons, or status fills.
-- Seat map color coding is fixed and must not be changed: **White = available, Black = booked, Acid Yellow = held (general/others) or waitlist-relevant, Magenta = held by the current user's active hold.**
+### Color Rules:
+- Base backgrounds are high-contrast light or dark surfaces. Accent colors are used as bands, badges, buttons, and seat status indicators.
+- Fixed Seat Map Color Coding:
+  - **Recliner / VIP Pit**: Amber (`bg-amber-300`, `text-amber-950`)
+  - **Premium Club / Lower Tier**: Cyan (`bg-cyan-300`, `text-cyan-950`)
+  - **Standard**: Slate (`bg-slate-200`, `text-slate-900`)
+  - **Active Hold by You**: Neon Magenta / Yellow with live countdown
+  - **Booked / Sold**: Dark Slate / Strikethrough (`opacity-60`)
 
-## 3. Borders & Shadows
+## 3. Borders & Hard Offset Shadows
 
-- All containers, cards, buttons, and inputs get a **thick black border**: `border-4 border-black` as the default; scale to `border-[3px]` for dense/small elements (table rows, small badges) and up to `border-[6px]` for hero/page-level containers.
-- Shadows are **solid, unblurred, offset black rectangles**, never soft/blurred: `shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]` as default; `shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]` for hero elements (page titles, primary CTAs, modals).
-- Interactive press/hover state: on click or hover, either (a) translate the element by the shadow's offset and remove the shadow (simulating "pressed flat"), or (b) invert fill/border color. Pick one pattern and apply it consistently to every button/clickable card in the app.
-- **No border-radius** on structural elements (cards, buttons, containers, inputs). The only exception: small pill-shaped status badges (e.g. "HELD", "AVAILABLE" tags) may use `rounded-full`, matching the reference image's small yellow/magenta pill labels.
+- **Thick Solid Borders**: Default `border-2 sm:border-4 border-on-background` (`border-black`).
+- **Hard Offset Shadows**: Unblurred solid black shadows:
+  - Small / Chips: `shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`
+  - Cards / Standard Buttons: `shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`
+  - Hero Containers / Modals: `shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]` to `shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]`
+- **Interactive States**: On click or hover, translate by `translate-x-[-1px] translate-y-[-1px]` or invert fill/border colors.
+- **No Border Radius on Structural Elements**: Containers, cards, tables, and buttons use sharp 90-degree corners. Small pill badges may use `rounded-full` or `rounded-sm`.
 
 ## 4. Typography
 
-- **Headings** (`h1`–`h3`, page titles, section titles): heavy, uppercase, bold sans-serif with tight tracking — `font-black uppercase tracking-tight`. Use a font like Archivo Black, Space Grotesk (bold weight), or system sans-serif bold as fallback. Headings should be large enough to feel structural (page titles at `text-5xl`+ on desktop).
-- **Body text**: a clean sans-serif, regular weight, readable at smaller sizes. Not uppercase.
-- **Data/stat text** (venue stats, revenue numbers, booking IDs, ticket references, seat labels): **monospace font** (e.g. `font-mono`), matching the reference image's "VENUE STATS / REVENUE: $50m" style blocks. This distinguishes "data" from "prose" throughout the UI.
-- Uppercase is used for labels, headings, and buttons — not for body paragraphs or descriptions.
+- **Headings** (`h1`–`h3`, page banners): Heavy, uppercase bold sans-serif with tight tracking (`font-headline-lg font-black uppercase tracking-tight`). Responsive scaling steps down appropriately on mobile (`text-3xl sm:text-5xl lg:text-7xl`).
+- **Body Prose**: Clean sans-serif, regular/bold weight, high-contrast readability.
+- **Data & Stat Blocks**: Monospace font (`font-mono`) for prices, seat coordinates, booking references, timestamps, and capacity counts.
 
-## 5. Background Pattern
+## 5. Background Textures
 
-- Main page backgrounds (behind content, not behind text-dense cards) use a **subtle architectural/blueprint grid**: thin gray lines (`--color-gray-grid`) forming an evenly spaced square grid (e.g. 40–60px cells), implemented via a repeating CSS `linear-gradient` or a tiled SVG background. Low opacity — it must never compete with foreground content or reduce text contrast.
-- Solid black or solid white sections (e.g. the site header, the "RECENT BOOKINGS" band in the reference image) do not need the grid — it's a background-only texture for open canvas areas.
+- Open canvas areas utilize a subtle architectural blueprint grid (`blueprint-bg`) with thin lines forming an evenly spaced grid.
+- High-contrast solid banners (e.g. site header, hero sections, modal headers) provide clear structural division.
 
-## 6. Layout Principles
+## 6. Multi-Device Responsiveness Standards
 
-- Layouts are **data-dense structural blocks**, not whitespace-heavy centered cards. Sections are divided by thick black borders/rules, not soft spacing alone (see reference image's sidebar of stacked "VENUE STATS / TOTAL STATS / TOTAL REVENUE" boxes).
-- Grid-based layout throughout (CSS grid/flex with visible border divisions between cells), echoing a spreadsheet/blueprint feel.
-- Primary navigation: black background bar, white/yellow text, logo top-left in heavy uppercase type, nav links top-right, a bordered search box and a high-contrast "Login" button — matching the reference image's header exactly.
-- Section headers (e.g. "LIVE SEAT MAP", "RECENT BOOKINGS") are rendered as **full-width or block-level bands** — large uppercase text on a black or yellow background bar, not a plain `<h2>` floating in whitespace.
+| Viewport Range | Breakpoint | Layout Adaptations |
+|---|---|---|
+| **Large Desktop** | `1440px+` | Full 3-column event grid, expansive seating canvas, side-by-side split panels, expanded tables |
+| **Laptop** | `1024px–1439px` | 3-column event grid, sticky sidebars, high-density dashboard layouts |
+| **Tablet** | `768px–1023px` | 2-column event grid, collapsible topbars, side-by-side venue editors |
+| **Mobile** | `375px–767px` | 1-column cards, slide-in hamburger navigation drawer, touch pan/zoom seat canvas, sticky bottom checkout bar |
+
+### Mobile Touch Guidelines:
+- Touch targets on mobile are at least **44x44px** (buttons, dropdowns, nav links, close icons).
+- Bounded scroll containers for dense data grids and seating matrixes prevent horizontal window-level overflow.
+- Mobile browsers in "Request Desktop Site" mode render full zoomed layouts smoothly without breaking click targets.
 
 ## 7. Component-Specific Rules
 
 ### 7.1 Live Seat Map
-- Grid of raw squares (not circles, not seat-icon SVGs) with visible black borders between cells, matching the reference image's cinema seat grid.
-- Fixed color coding (see Section 2/table above): white = available, black = booked, yellow = held/general, magenta = held-by-you.
-- A seat currently held (by anyone) shows a small pill-style "HELD" label; the current user's own active hold additionally shows a **live mm:ss countdown timer**, either inline on the seat or in an adjacent detail panel.
-- Clicking a seat opens a side panel (bordered, black-and-white, monospace data style) showing seat ID, price, and either a "CLAIM SEAT (Xm timer)" CTA (acid yellow button, thick border, hard shadow) or, if sold out, waitlist position ("YOU ARE #4").
+- Bounded touch-pan container with zoom controls (`+`, `-`, `Reset`) and clear front-of-house stage orientation banners.
+- Sticky Bottom Mobile Action Tray displaying selected count, subtotal (in ₹), live hold timer, and single-tap checkout CTA.
+- Collapsible seat status legend and waitlist prompt cards.
 
-### 7.2 Organiser Analytics Dashboard
-- Right-hand or grid-arranged stacked stat blocks, each a bordered box with an uppercase monospace label and a large bold value (e.g. `TOTAL REVENUE / $1,000,000`), matching the reference image's stat sidebar.
-- No charts required by default, but if included, they must use flat, solid-fill bars/blocks with black borders — no soft gradients or 3D chart styling.
+### 7.2 Organiser Command Center
+- Stacked responsive KPI metric tiles displaying gross revenue, tickets sold, occupancy %, and show count.
+- Horizontal scroll wrappers on show schedules and booking log tables.
 
-### 7.3 Recent Bookings / Digital Tickets
-- Each booking is a bordered "ticket stub" card: poster thumbnail on the left, event/venue/ticket-ID text in monospace/uppercase mix in the middle, a bordered QR code inset, and a full-width black "CANCEL BOOKING" button at the bottom — matching the reference image's bottom ticket row layout exactly.
+### 7.3 Ticket Stubs & QR Passes
+- Tear-off ticket pass layout with poster thumbnail, event details, scannable QR code, and full-width actions (Download PDF, Cancel Booking).
 
-## 8. Explicit Anti-Patterns (do not do these)
+## 8. Explicit Anti-Patterns
 
-- No soft drop shadows (`shadow-md`, `shadow-lg` from default Tailwind) — always use the hard offset shadow token.
-- No rounded-corner cards/buttons/inputs (except small status pills as noted).
-- No pastel or muted accent colors — accents are always at full saturation (acid yellow, neon magenta, bright cyan as specified).
-- No centered, whitespace-heavy "SaaS landing page" layouts — layouts are dense, bordered, grid-structured.
-- No gradient backgrounds or glassmorphism/blur effects anywhere.
+- No soft/blurred drop shadows — always use solid hard offset rectangular shadows.
+- No rounded-corner structural cards or buttons.
+- No muted or faded pastel accents — use high-saturation Neo-Brutalist color tokens.
+- No window-level horizontal overflow on any viewport size.
