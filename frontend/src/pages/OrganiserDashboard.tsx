@@ -58,7 +58,7 @@ export default function OrganiserDashboard() {
     seats_per_row: 16,
   });
 
-  const { showSuccess, showError } = useModalStore();
+  const { showSuccess, showError, showAlert, showConfirm } = useModalStore();
 
   const INDIAN_CITIES = ['Delhi', 'Noida', 'Mumbai', 'Pune', 'Bengaluru', 'Chennai', 'Vellore', 'Hyderabad'];
   const AVAILABLE_LANGUAGES = ['Hindi', 'English', 'Tamil', 'Telugu', 'Malayalam', 'Punjabi', 'Kannada', 'Bengali', 'Marathi', 'Gujarati'];
@@ -310,17 +310,21 @@ export default function OrganiserDashboard() {
   };
 
   // Delete Event
-  const handleDeleteEvent = async (eventId: string, title: string) => {
-    if (!confirm(`Are you sure you want to permanently delete event "${title}" and all its shows?`)) return;
-
-    try {
-      await fetchApi(`/events/${eventId}`, { method: 'DELETE' });
-      showSuccess(`Event "${title}" has been deleted.`, { title: 'EVENT DELETED' });
-      if (summaryModal?.event_id === eventId) setSummaryModal(null);
-      fetchData();
-    } catch (err: any) {
-      showError(err.message || 'Failed to delete event', { title: 'DELETE ERROR' });
-    }
+  const handleDeleteEvent = (eventId: string, title: string) => {
+    showConfirm(
+      `Are you sure you want to permanently delete event "${title}" and all its scheduled shows?`,
+      async () => {
+        try {
+          await fetchApi(`/events/${eventId}`, { method: 'DELETE' });
+          showSuccess(`Event "${title}" has been deleted.`, { title: 'EVENT DELETED' });
+          if (summaryModal?.event_id === eventId) setSummaryModal(null);
+          fetchData();
+        } catch (err: any) {
+          showError(err.message || 'Failed to delete event', { title: 'DELETE ERROR' });
+        }
+      },
+      { title: 'DELETE EVENT', confirmText: 'YES, DELETE', type: 'error' }
+    );
   };
 
   // Create Venue
@@ -396,18 +400,23 @@ export default function OrganiserDashboard() {
   };
 
   // Cancel Show
-  const handleCancelShow = async (showId: string) => {
-    if (!confirm('Are you sure you want to cancel this show?')) return;
-    try {
-      await fetchApi(`/shows/${showId}/cancel`, { method: 'PUT' });
-      if (summaryModal) {
-        handleManageEvent(summaryModal.event_id, summaryModal.title);
-      }
-      showSuccess('Show cancelled successfully.', { title: 'SHOW CANCELLED' });
-      fetchData();
-    } catch (err: any) {
-      showError(err.message || 'Failed to cancel show', { title: 'ERROR' });
-    }
+  const handleCancelShow = (showId: string) => {
+    showConfirm(
+      'Are you sure you want to cancel this show?',
+      async () => {
+        try {
+          await fetchApi(`/shows/${showId}/cancel`, { method: 'PUT' });
+          if (summaryModal) {
+            handleManageEvent(summaryModal.event_id, summaryModal.title);
+          }
+          showSuccess('Show cancelled successfully.', { title: 'SHOW CANCELLED' });
+          fetchData();
+        } catch (err: any) {
+          showError(err.message || 'Failed to cancel show', { title: 'ERROR' });
+        }
+      },
+      { title: 'CANCEL SHOW', confirmText: 'YES, CANCEL', type: 'warning' }
+    );
   };
 
   // Calculate Metrics
@@ -977,7 +986,7 @@ export default function OrganiserDashboard() {
                     type="button"
                     onClick={() => {
                       if (!newEventData.title || !newEventData.description) {
-                        alert('Please fill out Event Title and Description');
+                        showAlert('Please fill out Event Title and Description before continuing.', { title: 'REQUIRED FIELDS', type: 'warning' });
                         return;
                       }
                       setEventStep(2);

@@ -1,7 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { fetchApi } from '../api/client';
+import { useModalStore } from '../store/modal';
 
 export default function AdminVenues() {
+  const { showAlert, showSuccess, showError, showConfirm } = useModalStore();
   const [venues, setVenues] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [name, setName] = useState('');
@@ -176,7 +178,10 @@ export default function AdminVenues() {
 
   // Architectural Layout Presets
   const applyTemplate = (type: 'cinema' | 'stadium' | 'concert' | 'club') => {
-    if (categories.length === 0) return alert('Please create seat categories first');
+    if (categories.length === 0) {
+      showAlert('Please create at least one seat category before applying templates.', { title: 'NO CATEGORIES' });
+      return;
+    }
 
     const vipCat = categories.find(c => c.name.toLowerCase().includes('vip') || c.name.toLowerCase().includes('recliner')) || categories[0];
     const premCat = categories.find(c => c.name.toLowerCase().includes('prem') || c.name.toLowerCase().includes('gold')) || categories[0];
@@ -281,22 +286,27 @@ export default function AdminVenues() {
       setAddress('');
       await loadVenues();
       handleSelectVenue(res.data);
-      alert('Venue created successfully! You can now design its seat layout.');
+      showSuccess('Venue created successfully! You can now design its seat layout.', { title: 'VENUE CREATED' });
     } catch (err: any) {
-      alert(err.message || 'Failed to create venue');
+      showError(err.message || 'Failed to create venue', { title: 'CREATION FAILED' });
     }
   };
 
-  const handleDeleteVenue = async (vId: string, vName: string) => {
-    if (!confirm(`Are you sure you want to delete "${vName}" and its seat layout?`)) return;
-    try {
-      await fetchApi(`/venues/${vId}`, { method: 'DELETE' });
-      alert('Venue deleted successfully.');
-      setSelectedVenue(null);
-      loadVenues();
-    } catch (err: any) {
-      alert(err.message || 'Cannot delete venue in use.');
-    }
+  const handleDeleteVenue = (vId: string, vName: string) => {
+    showConfirm(
+      `Are you sure you want to delete "${vName}" and its seat layout?`,
+      async () => {
+        try {
+          await fetchApi(`/venues/${vId}`, { method: 'DELETE' });
+          showSuccess('Venue deleted successfully.', { title: 'VENUE DELETED' });
+          setSelectedVenue(null);
+          loadVenues();
+        } catch (err: any) {
+          showError(err.message || 'Cannot delete venue in use.', { title: 'DELETE ERROR' });
+        }
+      },
+      { title: 'DELETE VENUE', confirmText: 'YES, DELETE', type: 'error' }
+    );
   };
 
   const handleCreateCategory = async (e: FormEvent) => {
@@ -310,25 +320,35 @@ export default function AdminVenues() {
       });
       setCategoryName('');
       loadCategories();
+      showSuccess('Seat category created successfully.', { title: 'CATEGORY CREATED' });
     } catch (err: any) {
-      alert(err.message || 'Failed to create category');
+      showError(err.message || 'Failed to create category', { title: 'CREATION FAILED' });
     } finally {
       setCreatingCategory(false);
     }
   };
 
-  const handleDeleteCategory = async (catId: string, catName: string) => {
-    if (!confirm(`Delete seat category "${catName}"?`)) return;
-    try {
-      await fetchApi(`/seat-categories/${catId}`, { method: 'DELETE' });
-      loadCategories();
-    } catch (err: any) {
-      alert(err.message || 'Failed to delete category');
-    }
+  const handleDeleteCategory = (catId: string, catName: string) => {
+    showConfirm(
+      `Delete seat category "${catName}"?`,
+      async () => {
+        try {
+          await fetchApi(`/seat-categories/${catId}`, { method: 'DELETE' });
+          showSuccess(`Category "${catName}" deleted.`, { title: 'CATEGORY DELETED' });
+          loadCategories();
+        } catch (err: any) {
+          showError(err.message || 'Failed to delete category', { title: 'DELETE ERROR' });
+        }
+      },
+      { title: 'DELETE CATEGORY', confirmText: 'YES, DELETE', type: 'warning' }
+    );
   };
 
   const handleSaveMap = async () => {
-    if (!selectedVenue) return alert('Select a venue first');
+    if (!selectedVenue) {
+      showAlert('Please select or create a venue first before designing.', { title: 'NO VENUE SELECTED' });
+      return;
+    }
     
     // Construct serialized seats array
     const seatsToCreate: any[] = [];
@@ -349,7 +369,8 @@ export default function AdminVenues() {
     }
 
     if (seatsToCreate.length === 0) {
-      return alert('No seats defined! Please paint some seats on the grid before saving.');
+      showAlert('No seats defined! Please paint some seats on the grid before saving.', { title: 'EMPTY SEATING GRID', type: 'warning' });
+      return;
     }
 
     setSavingLayout(true);
@@ -358,10 +379,10 @@ export default function AdminVenues() {
         method: 'POST',
         body: JSON.stringify({ seats: seatsToCreate })
       });
-      alert(`Success! Saved ${seatsToCreate.length} seats for ${selectedVenue.name}`);
+      showSuccess(`Saved ${seatsToCreate.length} seats for ${selectedVenue.name} successfully!`, { title: 'SEATING SAVED' });
       loadVenues();
     } catch (err: any) {
-      alert(err.message || 'Failed to save venue map');
+      showError(err.message || 'Failed to save venue map', { title: 'SAVE FAILED' });
     } finally {
       setSavingLayout(false);
     }

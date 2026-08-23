@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchApi } from '../api/client';
+import { useModalStore } from '../store/modal';
 
 export default function WaitlistOffer() {
+  const { showSuccess, showError } = useModalStore();
   const { token } = useParams();
   const [offer, setOffer] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -44,10 +46,12 @@ export default function WaitlistOffer() {
     setClaiming(true);
     try {
       await fetchApi(`/waitlist/offer/${token}/accept`, { method: 'POST' });
-      alert('Offer Accepted! Your seat is booked and your ticket has been emailed to you.');
-      navigate('/bookings');
+      showSuccess('Offer Accepted! Your seat has been booked and your QR admission ticket has been emailed to you.', {
+        title: 'OFFER ACCEPTED',
+        onClose: () => navigate('/bookings')
+      });
     } catch (err: any) {
-      alert(err.message || 'Failed to claim seat');
+      showError(err.message || 'Failed to claim seat', { title: 'CLAIM FAILED' });
     } finally {
       setClaiming(false);
     }
