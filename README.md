@@ -20,7 +20,7 @@ High-performance, full-stack ticket booking platform for Movies, Concerts, Stand
 ## Screenshots
 
 ### 1. Landing & Authentication
-![Landing Page](./README%20SS/landingpage.png)
+
 ![Login Page](./README%20SS/loginpage.png)
 ![Register Page](./README%20SS/registerpage.png)
 
