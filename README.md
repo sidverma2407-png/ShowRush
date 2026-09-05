@@ -26,7 +26,6 @@ High-performance, full-stack ticket booking platform for Movies, Concerts, Stand
 
 ### 2. Discover & Events
 ![Explore Page](./README%20SS/explorepage.png)
-![Events List](./README%20SS/eventspage.png)
 ![Movie Details](./README%20SS/movie.png)
 
 ### 3. Booking & Seat Selection
