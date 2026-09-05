@@ -42,7 +42,7 @@ export default function Navbar() {
               to={user?.role === 'organiser' ? '/organiser/dashboard' : user?.role === 'admin' ? '/admin/venues' : '/'}
               className="font-headline-lg text-2xl sm:text-3xl md:text-4xl font-black text-primary-fixed italic tracking-tight flex items-center min-h-[44px] min-w-[44px]"
             >
-              SEATZY
+              ShowRush
             </Link>
 
             {/* High-Contrast City Selection Trigger Badge */}
