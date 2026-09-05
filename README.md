@@ -33,12 +33,8 @@ High-performance, full-stack ticket booking platform for Movies, Concerts, Stand
 
 ### 4. Tickets & Emails
 ![Tickets Page](./README%20SS/ticketspage.png)
-![Gmail Ticket](./README%20SS/gmailticket.png)
-![Gmail OTP](./README%20SS/gmailOTP.png)
 
-### 5. Organiser Dashboard
-![Dashboard](./README%20SS/dashboard.png)
-![Create Event](./README%20SS/createevent.png)
+
 
 ---
 
